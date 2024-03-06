@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>chart_rules.json</file>
+    </qresource>
+</RCC>

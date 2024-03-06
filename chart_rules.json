@@ -1,0 +1,5 @@
+{
+"chartrules":{"charts":[
+{"chart":"Power","description":"","legend":"Power (dBm)","vaxislabel":"dBm","graphs":[{"name":"Power","rule":"dBm"}]}
+]}
+}
