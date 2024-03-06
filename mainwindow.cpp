@@ -104,9 +104,9 @@ void MainWindow::updateData(QString data)
     QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
     ui->data_plainTextEdit->appendPlainText(curdate+" "+data);
 
-    QRegularExpression reg("[$]([-+][0-9.]+).+dBm([0-9.]+).+(.)Vpp[$]");
+    QRegularExpression reg("[$]([-+][0-9.]+)dBm([0-9.]+)(.)Vpp[$]");
 
-    QRegularExpressionMatchIterator i = reg.globalMatch(data);
+    QRegularExpressionMatchIterator i = reg.globalMatch(data.simplified().replace(" ",""));
     if (i.isValid())
     {
         while (i.hasNext())
@@ -169,12 +169,12 @@ void MainWindow::on_connect_pushButton_clicked()
 {
     qDebug()<<"on_connect_pushButton_clicked()";
 
-        if(ui->device_comboBox->currentData().toString().isEmpty())
+        if(!ui->device_comboBox->currentData().toString().isEmpty())
         {
             serialPortReader->setportName(ui->device_comboBox->currentData().toString());
             serialPortReader->setbaudRate(9600);
             serialPortReader->startPort();
-        }
+       }
 
 }
 
