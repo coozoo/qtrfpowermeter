@@ -12,7 +12,7 @@
 #include <QTimer>
 #include <QRandomGenerator>
 #include <QtMath>
-#include "serialportreader.h"
+#include "serialportinterface.h"
 #include "qcustomplot.h"
 #include "chartmanager.h"
 
@@ -69,7 +69,7 @@ public:
 private:
     Ui::MainWindow *ui;
     void updateDeviceList();
-    SerialPortReader *serialPortReader;
+    SerialPortInterface *serialPortReader;
     double dBmTomW(double dbm);
     QTimer simulatorTimer;
     QString curFrequency="0";
@@ -79,11 +79,13 @@ private slots:
     void ondevice_comboBox_currentIndexChanged();
     void updateData(QString data);
     void on_connect_pushButton_clicked();
+    void on_disconnect_pushButton_clicked();
     void on_refresh_toolButton_clicked();
     void on_data_model_rowsInserted(const QModelIndex & parent, int start, int end);
     void on_simulate_checkBox_clicked();
     void on_set_pushButton_clicked();
     void on_simulatorTimer();
+    void on_serialPortError(QString error);
 signals:
     void newData(QString headersList,QString dataList);
 };

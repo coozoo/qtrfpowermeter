@@ -1,5 +1,5 @@
-#ifndef SERIALPORTREADER_H
-#define SERIALPORTREADER_H
+#ifndef SERIALPORTINTERFACE_H
+#define SERIALPORTINTERFACE_H
 
 #include <QSerialPort>
 #include <QObject>
@@ -8,7 +8,7 @@
 #include <QRegularExpression>
 
 
-class SerialPortReader : public QObject
+class SerialPortInterface : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString portName
@@ -20,8 +20,8 @@ class SerialPortReader : public QObject
                        WRITE setbaudRate
                )
 public:
-    explicit SerialPortReader(QObject *parent = nullptr);
-    ~SerialPortReader();
+    explicit SerialPortInterface(QObject *parent = nullptr);
+    ~SerialPortInterface();
 
     void setportName(QString m_portName)
     {
@@ -48,6 +48,7 @@ public:
 public slots:
     void startPort();
     void stopPort();
+    void writeData(const QByteArray &data);
 
 private:
     QString portName;
@@ -74,4 +75,4 @@ private slots:
     void serialError(QSerialPort::SerialPortError serialPortError);
 };
 
-#endif // SERIALPORTREADER_H
+#endif // SERIALPORTINTERFACE_H

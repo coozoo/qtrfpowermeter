@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>803</width>
-    <height>581</height>
+    <width>811</width>
+    <height>589</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,6 +41,13 @@
        <widget class="QPushButton" name="connect_pushButton">
         <property name="text">
          <string>Connect</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="disconnect_pushButton">
+        <property name="text">
+         <string>Disconnect</string>
         </property>
        </widget>
       </item>
@@ -103,8 +110,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>735</width>
-                    <height>162</height>
+                    <width>743</width>
+                    <height>170</height>
                    </rect>
                   </property>
                  </widget>
@@ -349,7 +356,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>803</width>
+     <width>811</width>
      <height>24</height>
     </rect>
    </property>

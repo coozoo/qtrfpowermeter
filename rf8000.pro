@@ -16,14 +16,14 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     qcustomplot.cpp \
-    serialportreader.cpp
+    serialportinterface.cpp
 
 HEADERS += \
     chartmanager.h \
     chartrealtime.h \
     mainwindow.h \
     qcustomplot.h \
-    serialportreader.h
+    serialportinterface.h
 
 FORMS += \
     mainwindow.ui

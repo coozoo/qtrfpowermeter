@@ -9,9 +9,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     updateDeviceList();
-    serialPortReader= new SerialPortReader();
+    serialPortReader= new SerialPortInterface();
+    Q_EMIT(ondevice_comboBox_currentIndexChanged());
     connect(ui->device_comboBox, &QComboBox::currentTextChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
-    connect(serialPortReader,&SerialPortReader::serialPortNewData,this,&MainWindow::updateData);
+    connect(serialPortReader,&SerialPortInterface::serialPortNewData,this,&MainWindow::updateData);
+    connect(serialPortReader,&SerialPortInterface::serialPortErrorSignal,this,&MainWindow::on_serialPortError);
 
     data_model=new QStandardItemModel(0,0,this);
     data_model->setHorizontalHeaderItem(dataTimeColumnID,new QStandardItem(QString("Time")));
@@ -97,6 +99,16 @@ MainWindow::~MainWindow()
 void MainWindow::ondevice_comboBox_currentIndexChanged()
 {
     qDebug()<<ui->device_comboBox->currentData().toString();
+    if(ui->device_comboBox->currentText().isEmpty())
+    {
+        ui->connect_pushButton->setDisabled(true);
+        ui->disconnect_pushButton->setDisabled(true);
+    }
+    else
+    {
+        ui->connect_pushButton->setDisabled(false);
+        ui->disconnect_pushButton->setDisabled(false);
+    }
 }
 
 void MainWindow::updateData(QString data)
@@ -163,6 +175,10 @@ void MainWindow::updateData(QString data)
             data_model->setData(data_model->index(row,dataValueCorrectColumnID),getOffset(),Qt::UserRole);
         }
     }
+    else
+    {
+        ui->statusbar->showMessage(tr("Error incoming data, check device"),1000);
+    }
 }
 
 void MainWindow::on_connect_pushButton_clicked()
@@ -178,13 +194,22 @@ void MainWindow::on_connect_pushButton_clicked()
 
 }
 
+void MainWindow::on_disconnect_pushButton_clicked()
+{
+       qDebug()<<"on_disconnect_pushButton_clicked()";
+       serialPortReader->stopPort();
+
+}
+
 void MainWindow::on_refresh_toolButton_clicked()
 {
+    qDebug()<<"on_refresh_toolButton_clicked()";
     updateDeviceList();
 }
 
 void MainWindow::updateDeviceList()
 {
+    qDebug()<<"updateDeviceList()";
     ui->device_comboBox->clear();
     const auto infos = QSerialPortInfo::availablePorts();
     for (const QSerialPortInfo &info : infos)
@@ -193,12 +218,12 @@ void MainWindow::updateDeviceList()
         if(info.hasVendorIdentifier() && QString::number(info.vendorIdentifier(),16)=="1a86")
         {
             QString s = tr("Port: ") + info.portName() +
-                        tr(" Location: ") + info.systemLocation() +
-                        tr("; Description: ") + info.description() +
-                        tr("; Manufacturer: ") + info.manufacturer() +
-                        tr("; S\\n: ") + info.serialNumber() +
-                        tr("; VId: ") + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
-                        tr("; PId: ") + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +
+                        tr(" (") + info.systemLocation() +
+                        tr(") ") + info.description() +
+                        tr(" ") + info.manufacturer() +
+                        tr(" ") + info.serialNumber() +
+                        tr(" (") + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
+                        tr(":") + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+
                         (info.isBusy()?QString(" [Busy]"):QString(""));
             qInfo()<<info.portName();
 
@@ -251,7 +276,7 @@ void MainWindow::on_simulatorTimer()
 {
 
     double simdbmvalue =  QRandomGenerator::global()->generateDouble() * (5 + 60) - 60;
-    qDebug()<<"simulator in progress";
+    qDebug()<<"simulator is in progress";
     QString formattedValue = (simdbmvalue >= 0) ? QString("+%1").arg(simdbmvalue, 0, 'f', 1) : QString::number(simdbmvalue, 'f', 1);
     //2×(((2×impedance)÷1000)^(1÷2))×(10^(simdbmvalue÷20))
     //2×(((2×50)÷1000)^(1÷2))=0.6324555322
@@ -272,11 +297,21 @@ void MainWindow::on_simulatorTimer()
 
 void MainWindow::on_set_pushButton_clicked()
 {
+    qDebug()<<"on_set_pushButton_clicked";
     setFrequency(QString::number(ui->frequency_spinBox->value(),'d',0));
     //if(ui->correctionplus_radioButton->isChecked())
     //{
-    setOffset(QString(ui->correctionplus_radioButton->isChecked()?"+":"-")+QString::number(ui->offset_doubleSpinBox->value(),'f',1));
+    setOffset(QString(ui->correctionplus_radioButton->isChecked()?"+":"-")+QString::number(ui->offset_doubleSpinBox->value(),'f',1).rightJustified(4, '0'));
     //}
     qDebug()<<getFrequency();
     qDebug()<<getOffset();
+    serialPortReader->writeData(("$"+getFrequency()+getOffset()+"#").toLatin1());
 }
+
+void MainWindow::on_serialPortError(QString error)
+{
+    qDebug()<<"on_serialPortError";
+    ui->statusbar->showMessage(error,1000);
+    Q_EMIT(ondevice_comboBox_currentIndexChanged());
+}
+

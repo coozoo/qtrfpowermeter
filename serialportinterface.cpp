@@ -1,41 +1,41 @@
-#include "serialportreader.h"
+#include "serialportinterface.h"
 #include "qserialportinfo.h"
 #include <QDebug>
 
-SerialPortReader::SerialPortReader(QObject *parent) : QObject{parent}
+SerialPortInterface::SerialPortInterface(QObject *parent) : QObject{parent}
 {
 
 
     m_serialPort = new QSerialPort();
     connect(m_serialPort, &QSerialPort::readyRead, this,
-            &SerialPortReader::readData);
+            &SerialPortInterface::readData);
     connect(m_serialPort, &QSerialPort::errorOccurred, this,
-            &SerialPortReader::serialError);
+            &SerialPortInterface::serialError);
 }
 
-SerialPortReader::~SerialPortReader()
+SerialPortInterface::~SerialPortInterface()
 {
     stopPort();
     m_serialPort->deleteLater();
 }
 
-void SerialPortReader::onPortName_changed() {}
+void SerialPortInterface::onPortName_changed() {}
 
-void SerialPortReader::onBaudRate_changed() {}
+void SerialPortInterface::onBaudRate_changed() {}
 
-void SerialPortReader::startPort()
+void SerialPortInterface::startPort()
 {
     qDebug() << "startPort()" << getportName() << getbaudRate();
     stopPort();
     m_serialPort->setPortName(getportName());
     m_serialPort->setBaudRate(getbaudRate());
-    if (!m_serialPort->open(QIODevice::ReadOnly))
+    if (!m_serialPort->open(QIODevice::ReadWrite))
     {
         qDebug() << "failed to open";
     }
 }
 
-void SerialPortReader::stopPort()
+void SerialPortInterface::stopPort()
 {
     if (m_serialPort->isOpen())
     {
@@ -44,11 +44,11 @@ void SerialPortReader::stopPort()
     }
 }
 
-void SerialPortReader::onPort_started() {}
+void SerialPortInterface::onPort_started() {}
 
-void SerialPortReader::onPort_stopped() {}
+void SerialPortInterface::onPort_stopped() {}
 
-void SerialPortReader::readData()
+void SerialPortInterface::readData()
 {
     qDebug() << "readData()";
     QByteArray data = m_serialPort->readAll();
@@ -70,7 +70,12 @@ void SerialPortReader::readData()
     }
 }
 
-void SerialPortReader::serialError(
+void SerialPortInterface::writeData(const QByteArray &data)
+{
+    m_serialPort->write(data);
+}
+
+void SerialPortInterface::serialError(
     QSerialPort::SerialPortError serialPortError)
 {
     qDebug() << "serialError";
