@@ -3,7 +3,8 @@ This application few hours project intended to improve usage of chinese RF power
 
 Device shown on image below.
 
-<img src="https://private-user-images.githubusercontent.com/25594311/310401908-3579a887-5e65-40f3-8108-0039601ab364.png" width="60%"></img> 
+![image](https://github.com/coozoo/qtrfpowermeter/assets/25594311/392a07ee-0ab3-42d0-b2da-7b5d18c994e4)
+
 
 There is versions of device with lower frequency range I'm not aware if they're compatible, but I suspect the only limitation will be the ability to set higher frequencies.
 
@@ -15,8 +16,9 @@ To initiate connection press connect. After that raw data captured from device w
 
 On data tab there is parsed and calculated data exactly in the same way it's written to csv if such option selected on stat tab.
 
-Stat tab contains on fly monitors, box with possibility to set device offcet and frequency, there is chart with posibility to save images.
+Status tab contains on-fly monitors, box with possibility to set device offcet and frequency, there is chart with posibility to save images.
 
-<img src="https://private-user-images.githubusercontent.com/25594311/311221844-ffeae88f-2a85-4209-a16a-127aba5ff7e8.png" width="60%"></img> 
+![image](https://github.com/coozoo/qtrfpowermeter/assets/25594311/b71a20ff-38fb-4361-9710-ce44f0b54d50)
+
 
 
