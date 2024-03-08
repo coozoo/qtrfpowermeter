@@ -14,9 +14,9 @@ There is no way to identify device for sure so you should do that by your own if
 
 To initiate connection press connect. After that raw data captured from device will be in log tab. 
 
-On data tab there is parsed and calculated data exactly in the same way it's written to csv if such option selected on stat tab.
+On data tab there is parsed and calculated data exactly in the same way it's written to csv if such option selected on status tab.
 
-Status tab contains on-fly monitors, box with possibility to set device offcet and frequency, there is chart with posibility to save images.
+Status tab contains on-fly monitors, box with possibility to set device offset and frequency, there is chart with posibility to save images.
 
 ![image](https://github.com/coozoo/qtrfpowermeter/assets/25594311/b71a20ff-38fb-4361-9710-ce44f0b54d50)
 
