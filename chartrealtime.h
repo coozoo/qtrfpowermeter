@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QDockWidget>
 #include <QColor>
 #include <limits>
@@ -24,6 +25,11 @@ class chartRealTime : public QMainWindow
     Q_PROPERTY(int range
            READ getRange
            WRITE setRange
+        )
+    //range how much data range on chart
+    Q_PROPERTY(bool isflow
+           READ getisflow
+           WRITE setisflow
         )
 public:
     explicit chartRealTime(QMainWindow *parent = 0);
@@ -59,13 +65,22 @@ public:
     int getRange() const
     { return range; }
 
+    void setisflow(int m_isflow)
+    {
+        isflow = m_isflow;
+        emit on_setisflow();
+    }
+    int getisflow() const
+    { return isflow; }
+
 
 private:
   QString demoName;
-  QTimer dataTimer;
   QString windowTitle;
-  QTime time;
+  QTimer dataTimer;
+  QElapsedTimer timer;
   int range;
+  bool isflow;
   bool timeReset;
 
 signals:
@@ -83,9 +98,10 @@ private slots:
   void showPointToolTip(QMouseEvent *event);
   void on_dockLocationChanged(bool state);
   void on_setRange();
+  void on_setisflow();
 
 protected:
-     bool eventFilter(QObject* obj, QEvent *event);
+     bool eventFilter(QObject* obj, QEvent *event) override;
 
 };
 

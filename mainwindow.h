@@ -45,6 +45,11 @@ class MainWindow : public QMainWindow
                        WRITE setOffset
                )
 
+    Q_PROPERTY(QString strDateTimeFile
+                   READ getstrDateTimeFile
+                       WRITE setstrDateTimeFile
+               )
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -66,26 +71,45 @@ public:
     QString getOffset() const
     { return curOffset; }
 
+    void setstrDateTimeFile(QString m_strDateTimeFile)
+    {
+        strDateTimeFile = m_strDateTimeFile;
+    }
+    QString getstrDateTimeFile() const
+    { return strDateTimeFile; }
+
+    bool createDir(QString path);
+
 private:
     Ui::MainWindow *ui;
     void updateDeviceList();
-    SerialPortInterface *serialPortReader;
+    SerialPortInterface *serialPortPowerMeter;
     double dBmTomW(double dbm);
     QTimer simulatorTimer;
     QString curFrequency="0";
     QString curOffset="0";
+    QString strDateTimeFile;
+    QString rootstatsdir;
+    QString statsdirlocation;
+    QString filepath;
 
 private slots:
     void ondevice_comboBox_currentIndexChanged();
     void updateData(QString data);
     void on_connect_pushButton_clicked();
     void on_disconnect_pushButton_clicked();
-    void on_refresh_toolButton_clicked();
+    void on_refreshDevices_toolbutton_clicked();
     void on_data_model_rowsInserted(const QModelIndex & parent, int start, int end);
     void on_simulate_checkBox_clicked();
     void on_set_pushButton_clicked();
     void on_simulatorTimer();
     void on_serialPortError(QString error);
+    void writeStatCSV(QString appendFileName, QString logLine, QString headersList);
+
+public slots:
+    void on_range_spinBox_valueChanged(int range);
+    int on_saveCharts_toolButton_clicked();
+
 signals:
     void newData(QString headersList,QString dataList);
 };

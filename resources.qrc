@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
+        <file>images/view-refresh.svg</file>
+        <file>images/document-save.svg</file>
+        <file>images/process-stop.svg</file>
+        <file>images/sine-graphdBm.svg</file>
         <file>chart_rules.json</file>
     </qresource>
 </RCC>

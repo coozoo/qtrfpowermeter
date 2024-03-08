@@ -66,9 +66,10 @@ public slots:
     void on_jsonChartRuleObjectChanged();
     void resetAllCharts();
     void setAllRanges(int range);
+    void setisflow(bool flow);
 
 protected:
-     bool eventFilter(QObject* obj, QEvent *event);
+     bool eventFilter(QObject* obj, QEvent *event) override;
 
 };
 
