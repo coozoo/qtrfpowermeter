@@ -53,6 +53,9 @@ int main(int argc, char *argv[])
 #endif
     a.setProperty("appversion", APP_VERSION + platform);
     a.setProperty("appname", "QT RF Power Meter");
+#ifdef Q_OS_LINUX
+    a.setWindowIcon(QIcon(":/images/sine-graphdBm.svg"));
+#endif
     QLoggingCategory::setFilterRules("*.debug=true\nqt.*.debug=false");
     MainWindow w;
     w.setWindowTitle(a.property("appname").toString() + " " + a.property("appversion").toString());

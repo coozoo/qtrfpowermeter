@@ -191,15 +191,16 @@ void chartRealTime::setPlotTitle(QString plotTitle)
  */
 void chartRealTime::on_datacoming(QDateTime dateTime, QList<int> data)
 {
-    Q_UNUSED(dateTime);
-    //static QTime time(QTime::currentTime());
+    Q_UNUSED(dateTime)
     //if bool flag to reset timer is raised
     if(timeReset==true)
     {
-        time=QTime::currentTime();
+        timer.restart();
         timeReset=false;
     }
-    double key = time.elapsed()/1000.0;
+
+    double key = static_cast<double>(timer.elapsed())/1000.0;
+    qDebug()<<getisflow()<<key;
     //add each value to graph
     int i=0;
     foreach (int value, data)
@@ -215,8 +216,8 @@ void chartRealTime::on_datacoming(QDateTime dateTime, QList<int> data)
     //if more then range than "compress" it
     //later I want to add scroll type (flow like when old data moves to left side and lost when our of range)
     int currentRange=getRange();
-    if(key>=currentRange)
-        {
+    if(key>=currentRange && !getisflow())
+    {
             customPlot->xAxis->setRange(key, key, Qt::AlignRight);
         }
     else
@@ -316,7 +317,15 @@ void chartRealTime::showPointToolTip(QMouseEvent *event)
 
 void chartRealTime::on_setRange()
 {
+    qDebug()<<"on_setRange"<<getRange();
     //something to handle  range change (need something really smart to make it work smoothly :) )
+
+}
+
+void chartRealTime::on_setisflow()
+{
+    qDebug()<<"on_setisflow"<<getisflow();
+    //something to handle  flow change
 
 }
 
@@ -329,7 +338,7 @@ void chartRealTime::on_setRange()
 void chartRealTime::saveImage(QString imagePath, QString imageType, int width,int height)
 {
     //replace charachters which posibly incorrect for filename in chart name with underscore
-    QString chartname=chart_dockwidget->windowTitle()+"_"+QString::number(time.elapsed(),'g',10);
+    QString chartname=chart_dockwidget->windowTitle()+"_"+QString::number(static_cast<double>(timer.elapsed()),'g',10);
     QStringList forbidCharachters={" ","<",">",":","\"","/","\\","|","&","*","@","#","$","%","^","\"","+","=","`"};
     foreach(QString stringtoreplace, forbidCharachters)
     {
@@ -355,6 +364,7 @@ void chartRealTime::saveImage(QString imagePath, QString imageType, int width,in
 
 bool chartRealTime::eventFilter(QObject* obj, QEvent *event)
 {
+    Q_UNUSED(obj)
     if (event->type() == QEvent::MouseMove)
       {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);

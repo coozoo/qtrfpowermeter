@@ -296,10 +296,21 @@ void chartManager::resetAllCharts()
  */
 void chartManager::setAllRanges(int range)
 {
+    qDebug()<<"setAllRanges"<<range;
     for(int i=0;i<listCharts.count();i++)
     {
        chartRealTime *chart=listCharts.at(i);
        chart->setRange(range);
+    }
+}
+
+void chartManager::setisflow(bool flow)
+{
+    qDebug()<<"setisflow"<<flow;
+    for(int i=0;i<listCharts.count();i++)
+    {
+       chartRealTime *chart=listCharts.at(i);
+       chart->setisflow(flow);
     }
 }
 
@@ -311,6 +322,7 @@ void chartManager::setAllRanges(int range)
  */
 void chartManager::saveAllCharts(QString imagePath, QString imageType, int width, int height)
 {
+    qDebug()<<"saveAllCharts"<<imagePath<<imageType<<width<<height;
     for(int i=0;i<listCharts.count();i++)
     {
        chartRealTime *chart=listCharts.at(i);
@@ -321,6 +333,7 @@ void chartManager::saveAllCharts(QString imagePath, QString imageType, int width
 
 bool chartManager::eventFilter(QObject* obj, QEvent *event)
 {
+    Q_UNUSED(obj)
     if (event->type() == QEvent::MouseMove)
       {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
