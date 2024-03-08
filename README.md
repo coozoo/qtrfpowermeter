@@ -6,7 +6,7 @@ Device shown on image below.
 ![image](https://github.com/coozoo/qtrfpowermeter/assets/25594311/392a07ee-0ab3-42d0-b2da-7b5d18c994e4)
 
 
-There is versions of device with lower frequency range I'm not aware if they're compatible, but I suspect the only limitation will be the ability to set higher frequencies.
+There are versions of device with lower frequency range I'm not aware if they're compatible, but I suspect the only limitation will be the ability to set higher frequencies.
 
 Simple serial protocol that reports dbm and Vpp values, with some bugs of broken charachters can be fixed with setting frequency and offset (basically most of the times program will do that for you, but if you see no captures and broken symbols on device screen simply try to set frequency using program).
 
