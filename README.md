@@ -1,5 +1,5 @@
 # QT RF Power Meter
-This application few hours project intended to improve usage of chinese RF power meter RF8000. Chinese default application is terrible unreliablr with no functionality and lot of crashes.
+This application few hours project intended to improve usage of chinese RF power meter RF8000. Chinese default application is terrible unreliable with no functionality and lot of crashes.
 
 Device shown on image below.
 
