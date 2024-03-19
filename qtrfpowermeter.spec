@@ -17,8 +17,8 @@ License: MIT
 
 BuildRequires: qt5-qtbase-devel >= 5.9
 BuildRequires: qt5-linguist >= 5.9
-BuildRequires: qt5-qtserialport >= 5.9
-BuildRequires: qt5-qtcharts >= 5.9
+BuildRequires: qt5-qtserialport-devel >= 5.9
+BuildRequires: qt5-qtcharts-devel >= 5.9
 
 # Requires: qt5 >= 5.5
 
