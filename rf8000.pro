@@ -28,6 +28,9 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
+win32:RC_FILE = icon.rc
+macx:RC_FILE = icon.icns
+
 RESOURCES += \
     resources.qrc
 
