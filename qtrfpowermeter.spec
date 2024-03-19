@@ -3,14 +3,14 @@
 
 %define name qtrfpowermeter
 %define reponame qtrfpowermeter
-%define version %(echo "$(curl --silent 'https://raw.githubusercontent.com/coozoo/qtrfpowermeter/master/main.cpp'|grep 'QString APP_VERSION'| tr -d ' '|grep -oP '(?<=constQStringAPP_VERSION=").*(?=\";)')")
+%define version %(echo "$(curl --silent 'https://raw.githubusercontent.com/coozoo/qtrfpowermeter/main/main.cpp'|grep 'QString APP_VERSION'| tr -d ' '|grep -oP '(?<=constQStringAPP_VERSION=").*(?=\";)')")
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
 
 Summary: QT Radio Frequency Power Meter application UI for logarithmic detector RF-8000
 Name: %{name}
 Version: %{version}
 Release: %{build_timestamp}%{?dist}
-Source0: https://github.com/coozoo/qtrfpowermeter/archive/master.zip#/%{name}-%{version}.tar.gz
+Source0: https://github.com/coozoo/qtrfpowermeter/archive/main.zip#/%{name}-%{version}.tar.gz
 
 
 License: MIT
@@ -33,7 +33,7 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 
 %prep
 #%setup -q -n %{name}-%{version}
-%setup -q -n %{name}-master
+%setup -q -n %{name}-main
 
 %build
 # don't know maybe it's stupid me but lrelease in qt looks like runs after make file generation as result automatic file list inside qmake doesn't work
