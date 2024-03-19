@@ -175,11 +175,6 @@ jobs:
           export PATH=$ROOTMSYS/bin:$PATH
           qmake
           make
-          cp platformtools/platform-tools_windows.zip release/
-          cd release/
-          7z x platform-tools_windows.zip
-          rm platform-tools_windows.zip
-          cd ..
           rm -f release/*.o; rm -f release/*.cpp; rm -f release/*.h
           windeployqt.exe --no-translations release/${{ steps.buildwin.outputs.APP_NAME }}.exe
           ls -l $ROOTMSYS/bin
@@ -197,11 +192,6 @@ jobs:
       #     export PATH=$ROOTMSYS/bin:$PATH
       #     qmake
       #     make
-      #     cp platformtools/platform-tools_windows32.zip release/
-      #     cd release/
-      #     7z x platform-tools_windows32.zip
-      #     rm platform-tools_windows32.zip
-      #     cd ..
       #     rm -f release/*.o; rm -f release/*.cpp; rm -f release/*.h;
       #     windeployqt.exe --no-translations release/${{ steps.buildwin.outputs.APP_NAME }}.exe
       #     cp $ROOTMSYS/bin/zlib*.dll release/; cp $ROOTMSYS/bin/libgcc*.dll release/; cp $ROOTMSYS/bin/libwinpthread*.dll release/; cp $ROOTMSYS/bin/libstdc*.dll release/; cp $ROOTMSYS/bin/libdouble*.dll release/; cp $ROOTMSYS/bin/libicuin*.dll release/; cp $ROOTMSYS/bin/libicuuc*.dll release/; cp $ROOTMSYS/bin/libicudt*.dll release/; cp $ROOTMSYS/bin/libpcre*.dll release/; cp $ROOTMSYS/bin/libzstd*.dll release/; cp $ROOTMSYS/bin/libharfbuzz*.dll release/; cp $ROOTMSYS/bin/libgraphite*.dll release/; cp $ROOTMSYS/bin/libfreetype*.dll release/; cp $ROOTMSYS/bin/libbrotlidec*.dll release/; cp $ROOTMSYS/bin/libbrotlicommon*.dll release/; cp $ROOTMSYS/bin/libbz*.dll release/; cp $ROOTMSYS/bin/libpng*.dll release/; cp $ROOTMSYS/bin/libglib*.dll release/; cp $ROOTMSYS/bin/libintl*.dll release/; cp $ROOTMSYS/bin/libiconv*.dll release/; cp $ROOTMSYS/bin/libpcre*.dll release/;
