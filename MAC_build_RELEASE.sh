@@ -5,7 +5,7 @@ QT_DIR="$QT_DIR""$(ls $QT_DIR)"
 QMAKE=$QT_DIR/bin/qmake
 MAC_DEPLOY_TOOL=$QT_DIR/bin/macdeployqt
 
-appget="$(cat adbexample.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')"
+appget="$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')"
 
 BIN_DIR="./build-$appget-Release/"
 APP_NAME=$appget
