@@ -72,7 +72,7 @@ jobs:
           cp translations/*.qm appdir/usr/bin/
           cp ${{ steps.build.outputs.APP_NAME }} appdir/usr/bin/${{ steps.build.outputs.APP_NAME }}
           mkdir -p appdir/usr/share/icons/
-          cp images/drone.png appdir/usr/share/icons/
+          cp images/qtrfpowermeter.png appdir/usr/share/icons/
           mkdir -p appdir/usr/share/applications/
           cp ${{ steps.build.outputs.APP_NAME }}.desktop appdir/usr/share/applications/
           wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
