@@ -20,5 +20,23 @@ Status tab contains diplays with on-fly data and box with possibility to set dev
 
 ![image](https://github.com/coozoo/qtrfpowermeter/assets/25594311/b71a20ff-38fb-4361-9710-ce44f0b54d50)
 
+## Installation
+
+Precompiled RPMs (Fedora,RHEL etc) can be found in COPR click below:
+
+[<img src="https://copr.fedorainfracloud.org/coprs/yura/qtrfpowermeter/package/qtrfpowermeter/status_image/last_build.png"></img>](https://copr.fedorainfracloud.org/coprs/yura/qtrfpowermeter/)
+
+```
+$ sudo dnf copr enable yura/qtrfpowermeter
+$ sudo dnf install qtrfpowermeter
+```
+
+You can get precompiled package for other OS here:
+
+https://github.com/coozoo/qtrfpowermeter/releases
+
+[<img src="https://github.com/coozoo/qtrfpowermeter/workflows/Release_Version/badge.svg"></img>](https://github.com/coozoo/qtrfpowermeter/releases/latest)
+
+
 
 
