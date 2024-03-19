@@ -79,7 +79,7 @@ jobs:
           chmod a+x linuxdeployqt-continuous-x86_64.AppImage
           ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
           ls -l
-          cp ./BOOM*.AppImage ./boomtools.AppImage
+          cp ./qtrfpowermeter*.AppImage ./qtrfpowermeter.AppImage
           ls -l
       - name: Upload Release Asset Linux AppImage
         if: matrix.config.os == 'ubuntu-20.04'
@@ -89,8 +89,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./boomtools.AppImage
-          asset_name: boomtools-x86_64.AppImage
+          asset_path: ./qtrfpowermeter.AppImage
+          asset_name: qtrfpowermeter-x86_64.AppImage
           asset_content_type: application/octet-stream
       - name: get app version
         if: matrix.config.os == 'macos-latest'
