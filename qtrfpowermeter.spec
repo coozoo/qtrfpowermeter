@@ -61,13 +61,13 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %build
 # don't know maybe it's stupid me but lrelease in qt looks like runs after make file generation as result automatic file list inside qmake doesn't work
 # so what I need just run it twice...
-%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version} || 0%{?mageia}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
     qmake-qt5
     make
     qmake-qt5
     make
 %endif
-%if 0%{?suse_version} || 0%{?sle_version}
+%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
     %qmake5
     %make_build
     %qmake5
@@ -75,10 +75,10 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %endif
 
 %install
-%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version} || 0%{?mageia}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
     make INSTALL_ROOT=%{buildroot} -j$(nproc) install
 %endif
-%if 0%{?suse_version} || 0%{?sle_version}
+%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
     %qmake5_install
     %suse_update_desktop_file -G "QT RF Power Meter" -r qtrfpowermeter Electronics
 %endif
