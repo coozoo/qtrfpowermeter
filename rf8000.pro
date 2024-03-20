@@ -5,13 +5,17 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = qtrfpowermeter
 
 TRANSLATIONS = ./translations/$${TARGET}_en_US.ts ./translations/$${TARGET}_uk_UA.ts
+TEMPLATE = app
 
 CONFIG += c++17
+# do not show qDebug() messages in release builds
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 CONFIG += lrelease
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
 
 SOURCES += \
     chartmanager.cpp \
@@ -33,6 +37,8 @@ FORMS += \
 
 win32:RC_FILE = icon.rc
 macx:RC_FILE = icon.icns
+
+DISTFILES +=
 
 RESOURCES += \
     resources.qrc
