@@ -28,7 +28,7 @@ BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  libqt5-qtbase-devel
 BuildRequires:  libqt5-linguist
 BuildRequires:  libqt5-qtserialport-devel
-BuildRequires:  libqt5-qtcharts-devel
+BuildRequires:  libQt5Charts5-devel
 BuildRequires:  update-desktop-files
 Requires(post): update-desktop-files
 Requires(postun): update-desktop-files
