@@ -33,7 +33,7 @@ BuildRequires:  update-desktop-files
 Requires(post): update-desktop-files
 Requires(postun): update-desktop-files
 %endif
-%if 0%{?mageia}
+%if 0%{?mageia} || 0%{?mdkversion}
 BuildRequires: lib64qt5base5-devel >= 5.9
 BuildRequires: lib64qt5help-devel >= 5.9
 BuildRequires: lib64qt5serialport-devel >= 5.9
@@ -67,7 +67,7 @@ Allows on fly visualization, build charts of measured power and log data in csv 
     qmake-qt5
     make
 %endif
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
+%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version} || 0%{?mdkversion}
     %qmake5
     %make_build
     %qmake5
@@ -78,7 +78,7 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
     make INSTALL_ROOT=%{buildroot} -j$(nproc) install
 %endif
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
+%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version} || 0%{?mdkversion}
     %qmake5_install
     %suse_update_desktop_file -G "QT RF Power Meter" -r qtrfpowermeter Electronics
 %endif
@@ -94,7 +94,7 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %endif
 
 %files
-%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version} || 0%{?mageia}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version} || 0%{?mageia} || 0%{?mdkversion}
     %{_bindir}/*
     %{_datadir}/*
 %endif
