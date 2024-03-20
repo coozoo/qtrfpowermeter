@@ -10,7 +10,7 @@ Summary: QT Radio Frequency Power Meter application UI for logarithmic detector 
 Name: %{name}
 Version: %{version}
 Release: %{build_timestamp}%{?dist}
-Source0: https://github.com/coozoo/qtrfpowermeter/archive/main.zip#/%{name}-%{version}-%{release}.tar.gz
+Source0: https://github.com/coozoo/qtrfpowermeter/archive/main.zip#/%{name}-%{version}.tar.gz
 
 
 License: MIT
