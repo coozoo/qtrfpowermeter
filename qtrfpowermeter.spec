@@ -22,8 +22,8 @@ BuildRequires: qt5-linguist >= 5.9
 BuildRequires: qt5-qtserialport-devel >= 5.9
 BuildRequires: qt5-qtcharts-devel >= 5.9
 %endif
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
-Group:          Development/Tools/Other
+%if 0%{?suse_version} || 0%{?sle_version}
+Group:          Electronics
 BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  libqt5-qtbase-devel
 BuildRequires:  libqt5-linguist
@@ -32,6 +32,12 @@ BuildRequires:  libqt5-qtcharts-devel
 BuildRequires:  update-desktop-files
 Requires(post): update-desktop-files
 Requires(postun): update-desktop-files
+%endif
+%if 0%{?mageia}
+BuildRequires: lib64qt5base5-devel >= 5.9
+BuildRequires: lib64qt5help-devel >= 5.9
+BuildRequires: lib64qt5serialport-devel >= 5.9
+BuildRequires: lib64qt5charts-devel >= 5.9
 %endif
 
 
@@ -55,13 +61,13 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %build
 # don't know maybe it's stupid me but lrelease in qt looks like runs after make file generation as result automatic file list inside qmake doesn't work
 # so what I need just run it twice...
-%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version} || 0%{?mageia}
     qmake-qt5
     make
     qmake-qt5
     make
 %endif
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
+%if 0%{?suse_version} || 0%{?sle_version}
     %qmake5
     %make_build
     %qmake5
@@ -69,35 +75,35 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %endif
 
 %install
-%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version} || 0%{?mageia}
     make INSTALL_ROOT=%{buildroot} -j$(nproc) install
 %endif
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
+%if 0%{?suse_version} || 0%{?sle_version}
     %qmake5_install
     %suse_update_desktop_file -G "QT RF Power Meter" -r qtrfpowermeter Electronics
 %endif
 
 %post
-%if 0%{?mageia} || 0%{?suse_version} ||  0%{?sle_version}
+%if 0%{?suse_version} ||  0%{?sle_version}
     %desktop_database_post
 %endif
 
 %postun
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
+%if 0%{?suse_version} || 0%{?sle_version}
     %desktop_database_postun
 %endif
 
 %files
-%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version} || 0%{?mageia}
     %{_bindir}/*
     %{_datadir}/*
 %endif
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version}
+%if 0%{?suse_version} || 0%{?sle_version}
     %license LICENSE
     %doc README.md
     %{_bindir}/*
     %{_datadir}/*
-    %{_datadir}/applications/qtjsondiff.desktop
+    %{_datadir}/applications/qtrfpowermeter.desktop
 %endif
 
 %changelog
