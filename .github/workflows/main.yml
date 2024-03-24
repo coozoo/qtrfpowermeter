@@ -149,7 +149,6 @@ jobs:
             p7zip
             ruby
             mingw-w64-x86_64-qt5
-            mingw-w64-qt5
             mingw-w64-i686-toolchain
             mingw-w64-i686-qwt-qt5
             mingw-w64-x86_64-zlib
@@ -185,20 +184,21 @@ jobs:
           make clean
           ls -l
         shell: msys2 {0}
-      - name: make 32 win app
-        if: matrix.config.os == 'windows-latest'
-        run: |
-          set MSYSTEM=MINGW32
-          ROOTMSYS=/d/a/_temp/msys64/mingw32
-          export PATH=$ROOTMSYS/bin:$PATH
-          qmake
-          make
-          rm -f release/*.o; rm -f release/*.cpp; rm -f release/*.h;
-          windeployqt.exe --no-translations release/${{ steps.buildwin.outputs.APP_NAME }}.exe
-          cp $ROOTMSYS/bin/zlib*.dll release/; cp $ROOTMSYS/bin/libgcc*.dll release/; cp $ROOTMSYS/bin/libwinpthread*.dll release/; cp $ROOTMSYS/bin/libstdc*.dll release/; cp $ROOTMSYS/bin/libdouble*.dll release/; cp $ROOTMSYS/bin/libicuin*.dll release/; cp $ROOTMSYS/bin/libicuuc*.dll release/; cp $ROOTMSYS/bin/libicudt*.dll release/; cp $ROOTMSYS/bin/libpcre*.dll release/; cp $ROOTMSYS/bin/libzstd*.dll release/; cp $ROOTMSYS/bin/libharfbuzz*.dll release/; cp $ROOTMSYS/bin/libgraphite*.dll release/; cp $ROOTMSYS/bin/libfreetype*.dll release/; cp $ROOTMSYS/bin/libbrotlidec*.dll release/; cp $ROOTMSYS/bin/libbrotlicommon*.dll release/; cp $ROOTMSYS/bin/libbz*.dll release/; cp $ROOTMSYS/bin/libpng*.dll release/; cp $ROOTMSYS/bin/libglib*.dll release/; cp $ROOTMSYS/bin/libintl*.dll release/; cp $ROOTMSYS/bin/libiconv*.dll release/; cp $ROOTMSYS/bin/libpcre*.dll release/;
-          cp $ROOTMSYS/bin/libcrypto*.dll release/; cp $ROOTMSYS/bin/libssl*.dll release/; cp $ROOTMSYS/bin/libmd4c.dll release/
-          mv release ${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32; 7z -tzip a ${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32.zip ./${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32/
-        shell: msys2 {0}
+      # mingw32 dropping 32bit support. so install it now a bit headache looks like no more builds for 32bit
+      # - name: make 32 win app
+      #   if: matrix.config.os == 'windows-latest'
+      #   run: |
+      #     set MSYSTEM=MINGW32
+      #     ROOTMSYS=/d/a/_temp/msys64/mingw32
+      #     export PATH=$ROOTMSYS/bin:$PATH
+      #     qmake
+      #     make
+      #     rm -f release/*.o; rm -f release/*.cpp; rm -f release/*.h;
+      #     windeployqt.exe --no-translations release/${{ steps.buildwin.outputs.APP_NAME }}.exe
+      #     cp $ROOTMSYS/bin/zlib*.dll release/; cp $ROOTMSYS/bin/libgcc*.dll release/; cp $ROOTMSYS/bin/libwinpthread*.dll release/; cp $ROOTMSYS/bin/libstdc*.dll release/; cp $ROOTMSYS/bin/libdouble*.dll release/; cp $ROOTMSYS/bin/libicuin*.dll release/; cp $ROOTMSYS/bin/libicuuc*.dll release/; cp $ROOTMSYS/bin/libicudt*.dll release/; cp $ROOTMSYS/bin/libpcre*.dll release/; cp $ROOTMSYS/bin/libzstd*.dll release/; cp $ROOTMSYS/bin/libharfbuzz*.dll release/; cp $ROOTMSYS/bin/libgraphite*.dll release/; cp $ROOTMSYS/bin/libfreetype*.dll release/; cp $ROOTMSYS/bin/libbrotlidec*.dll release/; cp $ROOTMSYS/bin/libbrotlicommon*.dll release/; cp $ROOTMSYS/bin/libbz*.dll release/; cp $ROOTMSYS/bin/libpng*.dll release/; cp $ROOTMSYS/bin/libglib*.dll release/; cp $ROOTMSYS/bin/libintl*.dll release/; cp $ROOTMSYS/bin/libiconv*.dll release/; cp $ROOTMSYS/bin/libpcre*.dll release/;
+      #     cp $ROOTMSYS/bin/libcrypto*.dll release/; cp $ROOTMSYS/bin/libssl*.dll release/; cp $ROOTMSYS/bin/libmd4c.dll release/
+      #     mv release ${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32; 7z -tzip a ${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32.zip ./${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32/
+      #   shell: msys2 {0}
       - name: Upload Release Asset Win64
         if: matrix.config.os == 'windows-latest'
         id: upload-release-asset-win64
@@ -210,15 +210,15 @@ jobs:
           asset_path: ./${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN64.zip
           asset_name: ${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN64.zip
           asset_content_type: application/zip
-      - name: Upload Release Asset Win32
-        if: matrix.config.os == 'windows-latest'
-        id: upload-release-asset-win32
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32.zip
-          asset_name: ${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32.zip
-          asset_content_type: application/zip
+      # - name: Upload Release Asset Win32
+      #   if: matrix.config.os == 'windows-latest'
+      #   id: upload-release-asset-win32
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ needs.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+      #     asset_path: ./${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32.zip
+      #     asset_name: ${{ steps.buildwin.outputs.APP_NAME }}_${{ steps.buildwin.outputs.VER_TAG_NAME }}_WIN32.zip
+      #     asset_content_type: application/zip
       
