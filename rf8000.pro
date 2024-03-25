@@ -50,10 +50,10 @@ RESOURCES += \
 
 binary.files += $$TARGET
 binary.path = /usr/bin
-translations.files += ./translations/$$files(.qm/*.qm,true)
+translations.files += ./translations/$$files(*.qm/*.qm,true)
 translations.path = /usr/share/$$TARGET
-icon.files += images/qtrfpowermeeter.png
-icon.path += /usr/share/icons
+icon.files += images/qtrfpowermeter.svg
+icon.path += /usr/share/icons/hicolor/scalable/apps
 desktop.files += $${TARGET}.desktop
 desktop.path += /usr/share/applications/
 INSTALLS += binary translations icon desktop
