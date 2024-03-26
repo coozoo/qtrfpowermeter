@@ -67,6 +67,7 @@ jobs:
         if: matrix.config.os == 'ubuntu-20.04'
         run: |
           source /opt/qt*/bin/qt*-env.sh || true
+          dpkg-buildpackage -us -uc
           #echo "::set-output name=VER_TAG_NAME::$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')"
           echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
           echo "::set-output name=APP_NAME::$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')"
@@ -87,14 +88,14 @@ jobs:
           ls -l
           cp ./qtrfpowermeter*.AppImage ./qtrfpowermeter.AppImage
           ls -l
-      - name: buil deb in the same os
-        if: matrix.config.os == 'ubuntu-20.04'
-        run: |
-          ls -l
-          make clean
-          dpkg-buildpackage -us -uc
-          ls -l
-          ls -l ../
+      # - name: buil deb in the same os
+      #   if: matrix.config.os == 'ubuntu-20.04'
+      #   run: |
+      #     ls -l
+      #     make clean
+      #     dpkg-buildpackage -us -uc
+      #     ls -l
+      #     ls -l ../
       - name: Upload Release Asset Linux AppImage
         if: matrix.config.os == 'ubuntu-20.04'
         id: upload-release-asset-linux-appimage
