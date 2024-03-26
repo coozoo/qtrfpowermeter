@@ -81,6 +81,13 @@ jobs:
           ls -l
           cp ./qtrfpowermeter*.AppImage ./qtrfpowermeter.AppImage
           ls -l
+      - name: buil deb in the same os
+        if: matrix.config.os == 'ubuntu-20.04'
+        run: |
+          ls -l
+          dpkg-buildpackage -us -uc
+          ls -l
+          ls -l ../
       - name: Upload Release Asset Linux AppImage
         if: matrix.config.os == 'ubuntu-20.04'
         id: upload-release-asset-linux-appimage
@@ -91,6 +98,16 @@ jobs:
           upload_url: ${{ needs.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: ./qtrfpowermeter.AppImage
           asset_name: qtrfpowermeter-x86_64.AppImage
+          asset_content_type: application/octet-stream
+      - name: Upload deb to release
+        if: matrix.config.os == 'ubuntu-20.04'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./*.deb
+          # asset_name: qtrfpowermeter-x86_64.AppImage
           asset_content_type: application/octet-stream
       - name: get app version
         if: matrix.config.os == 'macos-latest'
