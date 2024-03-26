@@ -60,7 +60,7 @@ jobs:
         run:  sudo apt-get -y install qt515base qt515tools libgl1-mesa-dev qt515charts-no-lgpl qt515serialport
       - name: install deb deps into the same linux
         if: matrix.config.os == 'ubuntu-20.04'
-        run: apt -y install debhelper
+        run: apt-get -y install debhelper
       - name: build on linux
         if: matrix.config.os == 'ubuntu-20.04'
         run: |
