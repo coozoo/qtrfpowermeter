@@ -12,4 +12,4 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, qt515base, qt515tools, libgl1-mesa-
 Description: Application to visualize measured RF power and work with Chinese serial port RF power meters, 
  labeled as RF-Power500, RF-Power3000, RF-Power8000 (RF-500, RF-3000, RF-8000) Allows on fly visualization, 
  build charts of measured power and log data in csv format.
- Icons: ../qtrfpowermeter.svg
+ Icons: images/qtrfpowermeter.svg
