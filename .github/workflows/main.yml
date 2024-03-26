@@ -21,7 +21,7 @@ jobs:
       - name: get app version
         run: |
           # echo "::set-output name=VER_TAG_NAME::$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')"
-          echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')" >> $GITHUB_OUTPUT
+          echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
           echo "::set-output name=APP_NAME::$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')"
         id: build
       - name: Create release
@@ -49,7 +49,7 @@ jobs:
         if: matrix.config.os == 'ubuntu-20.04'
         run: |
           #echo "::set-output name=VER_TAG_NAME::$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')"
-          echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')" >> $GITHUB_OUTPUT
+          echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
           echo "::set-output name=APP_NAME::$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')"
         id: build
       - name: add qt repo to linux
@@ -68,7 +68,7 @@ jobs:
         run: |
           source /opt/qt*/bin/qt*-env.sh || true
           #echo "::set-output name=VER_TAG_NAME::$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')"
-          echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')" >> $GITHUB_OUTPUT
+          echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
           echo "::set-output name=APP_NAME::$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')"
           qmake CONFIG+=release PREFIX=/usr
           make -j$(nproc)
@@ -187,7 +187,7 @@ jobs:
         if: matrix.config.os == 'windows-latest'
         run: |
           #echo "::set-output name=VER_TAG_NAME::$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')"
-          echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')" >> $GITHUB_OUTPUT
+          echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
           echo "::set-output name=APP_NAME::$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')"
         shell: msys2 {0}
         id: buildwin
