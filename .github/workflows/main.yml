@@ -91,6 +91,7 @@ jobs:
         if: matrix.config.os == 'ubuntu-20.04'
         run: |
           ls -l
+          make clean
           dpkg-buildpackage -us -uc
           ls -l
           ls -l ../
