@@ -72,9 +72,9 @@ jobs:
 #         sudo add-apt-repository ppa:beineri/opt-qt-5.15.4-focal -y
       - name: Check for qt6charts package
         run: |
-          apt update
-          apt search libqt6charts6-dev || true
-          apt show libqt6charts6-dev || true
+          sudo apt update
+          sudo apt search libqt6charts6-dev || true
+          sudo apt show libqt6charts6-dev || true
       - name: install qt into linux
         if: matrix.config.os == 'ubuntu-22.04'
         run:  sudo apt-get -y install debhelper qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools libgl1-mesa-dev libssl-dev libqt6charts6-dev libqt6serialport6-dev
