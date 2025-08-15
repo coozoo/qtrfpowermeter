@@ -59,7 +59,7 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 #%setup -q -n %{reponame}-main
 %setup -q -c
 
-dir=$(ls -d qtrfpowermeter* | head -n 1)
+dir=$(ls -d qtrfpowermeter* | grep -v tar | head -n 1)
 if [ -d "$dir" ]; then
   cd "$dir"
 else
