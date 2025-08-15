@@ -59,12 +59,11 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 #%setup -q -n %{reponame}-main
 %setup -q -c
 
-if [ -d "%{name}-%{version}" ]; then
-  cd "%{name}-%{version}"
-elif [ -d "%{reponame}-main" ]; then
-  cd "%{reponame}-main"
+dir=$(ls -d qtrfpowermeter* | head -n 1)
+if [ -d "$dir" ]; then
+  cd "$dir"
 else
-  echo "ERROR: Neither %{name}-%{version} nor %{reponame}-main found after extraction!"
+  echo "ERROR: Source directory not found after extraction"
   exit 1
 fi
 
