@@ -345,9 +345,20 @@ void MainWindow::updateDeviceList()
     const auto infos = QSerialPortInfo::availablePorts();
     for (const QSerialPortInfo &info : infos)
     {
+        if (info.isNull())
+            continue;
+
         qDebug()<<info.hasVendorIdentifier() <<QString::number(info.vendorIdentifier());
         if(info.hasVendorIdentifier() && QString::number(info.vendorIdentifier(),16)=="1a86")
         {
+            QString busyText;
+            QSerialPort serialPort(info);
+            if (!serialPort.open(QIODevice::ReadWrite)) {
+                busyText = tr(" [Busy]");
+            } else {
+                serialPort.close(); // Close immediately if opened
+                busyText = "";
+            }
             QString s = tr("Port: ") + info.portName() +
                         tr(" (") + info.systemLocation() +
                         tr(") ") + info.description() +
@@ -355,7 +366,7 @@ void MainWindow::updateDeviceList()
                         tr(" ") + info.serialNumber() +
                         tr(" (") + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
                         tr(":") + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+
-                        (info.isBusy()?QString(tr(" [Busy]")):QString(""));
+                        busyText;
             qInfo()<<info.portName();
 
             qInfo()<<s;

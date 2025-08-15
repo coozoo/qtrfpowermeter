@@ -4,7 +4,6 @@
 #include <QSerialPort>
 #include <QObject>
 #include <QWidget>
-#include <QRegExp>
 #include <QRegularExpression>
 
 
