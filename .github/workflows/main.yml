@@ -70,11 +70,6 @@ jobs:
         run: |
           sudo apt-get update -qq
 #         sudo add-apt-repository ppa:beineri/opt-qt-5.15.4-focal -y
-      - name: Check for qt6charts package
-        run: |
-          sudo apt update
-          sudo apt search libqt6charts6-dev || true
-          sudo apt show libqt6charts6-dev || true
       - name: install qt into linux
         if: matrix.config.os == 'ubuntu-22.04'
         run:  sudo apt-get -y install debhelper qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools libgl1-mesa-dev libssl-dev libqt6charts6-dev libqt6serialport6-dev
@@ -93,7 +88,9 @@ jobs:
           echo "APP_NAME=$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')" >> $GITHUB_OUTPUT
           qmake6 CONFIG+=release PREFIX=/usr
           make -j$(nproc)
-          lrelease $(ls *.pro)
+          # lrelease $(ls *.pro)
+          LRELEASE_BIN=$(dpkg -L qt6-l10n-tools | grep '/lrelease$' | head -n1)
+          "$LRELEASE_BIN"  $(ls *.pro)
           mkdir -p appdir/usr/bin
           ls -lR
           cp translations/*.qm appdir/usr/bin/
