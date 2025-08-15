@@ -2,14 +2,15 @@ Source: qtrfpowermeter
 Section: devel
 Priority: optional
 Maintainer: Yuriy Kuzin
-Build-Depends: debhelper (>= 9), qt515base, qt515tools, libgl1-mesa-dev, qt515charts-no-lgpl, qt515serialport
+Build-Depends: debhelper (>= 9), qt6-base-dev, qt6-tools-dev, libgl1-mesa-dev, libqt6charts6-dev, libqt6serialport6-dev
 Standards-Version: 3.9.8
 Homepage: https://github.com/coozoo/qtrfpowermeter
 
 Package: qtrfpowermeter
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, qt515base, qt515tools, libgl1-mesa-dev, qt515charts-no-lgpl, qt515serialport
+Depends: ${shlibs:Depends}, ${misc:Depends}, qt6-base | libqt6core6, qt6-tools | qt6-tools-bin, libgl1-mesa-dev, libqt6charts6, libqt6serialport6
 Description: Application to visualize measured RF power and work with Chinese serial port RF power meters, 
  labeled as RF-Power500, RF-Power3000, RF-Power8000 (RF-500, RF-3000, RF-8000) Allows on fly visualization, 
  build charts of measured power and log data in csv format.
  Icons: images/qtrfpowermeter.svg
+ 
