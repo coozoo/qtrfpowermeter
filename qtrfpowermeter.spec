@@ -17,27 +17,27 @@ License: MIT
 Url: https://github.com/coozoo/qtrfpowermeter
 
 %if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
-BuildRequires: qt5-qtbase-devel >= 5.9
-BuildRequires: qt5-linguist >= 5.9
-BuildRequires: qt5-qtserialport-devel >= 5.9
-BuildRequires: qt5-qtcharts-devel >= 5.9
+BuildRequires: qt6-qtbase-devel >= 6.2
+BuildRequires: qt6-linguist >= 6.2
+BuildRequires: qt6-qtserialport-devel >= 6.2
+BuildRequires: qt6-qtcharts-devel >= 6.2
 %endif
 %if 0%{?suse_version} || 0%{?sle_version}
 Group:          Electronics
-BuildRequires:  pkgconfig(Qt5Widgets)
-BuildRequires:  libqt5-qtbase-devel
-BuildRequires:  libqt5-linguist
-BuildRequires:  libqt5-qtserialport-devel
-BuildRequires:  libQt5Charts5-devel
+BuildRequires:  pkgconfig(Qt6Widgets)
+BuildRequires:  libqt6-qtbase-devel
+BuildRequires:  libqt6-linguist
+BuildRequires:  libqt6-qtserialport-devel
+BuildRequires:  libQt6Charts-devel
 BuildRequires:  update-desktop-files
 Requires(post): update-desktop-files
 Requires(postun): update-desktop-files
 %endif
 %if 0%{?mageia} || 0%{?mdkversion}
-BuildRequires: lib64qt5base5-devel >= 5.9
-BuildRequires: lib64qt5help-devel >= 5.9
-BuildRequires: lib64qt5serialport-devel >= 5.9
-BuildRequires: lib64qt5charts-devel >= 5.9
+BuildRequires: lib64qt6base6-devel >= 6.2
+BuildRequires: lib64qt6help-devel >= 6.2
+BuildRequires: lib64qt6serialport-devel >= 6.2
+BuildRequires: lib64qt6charts-devel >= 6.2
 %endif
 
 
@@ -62,15 +62,15 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 # don't know maybe it's stupid me but lrelease in qt looks like runs after make file generation as result automatic file list inside qmake doesn't work
 # so what I need just run it twice...
 %if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
-    qmake-qt5
+    qmake6
     make
-    qmake-qt5
+    qmake6
     make
 %endif
 %if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version} || 0%{?mdkversion}
-    %qmake5
+    %qmake6
     %make_build
-    %qmake5
+    %qmake6
     %make_build
 %endif
 
@@ -79,7 +79,7 @@ Allows on fly visualization, build charts of measured power and log data in csv 
     make INSTALL_ROOT=%{buildroot} -j$(nproc) install
 %endif
 %if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version} || 0%{?mdkversion}
-    %qmake5_install
+    %qmake6_install
     %suse_update_desktop_file -G "QT RF Power Meter" -r qtrfpowermeter Electronics
 %endif
 
