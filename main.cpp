@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QLoggingCategory>
 
-const QString APP_VERSION = "0.2b";
+const QString APP_VERSION = "0.3b";
 
 void qtLogger(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
