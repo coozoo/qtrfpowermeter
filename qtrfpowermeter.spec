@@ -53,19 +53,11 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %global debug_package %{nil}
 
 %prep
-#copr build
-#%setup -q -n %{name}-%{version}
-#local build
-#%setup -q -n %{reponame}-main
-%setup -q -c
-
-dir=$(ls -d qtrfpowermeter* | grep -v tar | head -n 1)
-if [ -d "$dir" ]; then
-  cd "$dir"
-else
-  echo "ERROR: Source directory not found after extraction"
-  exit 1
-fi
+%if 0%{?fedora}
+    %setup -q -n %{reponame}-main
+%else
+    %setup -q -n %{name}-%{version}
+%endif
 
 %build
 # don't know maybe it's stupid me but lrelease in qt looks like runs after make file generation as result automatic file list inside qmake doesn't work
