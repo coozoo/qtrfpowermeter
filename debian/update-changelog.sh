@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # 1. Extract version from main.cpp
-VERSION=$(curl --silent 'https://raw.githubusercontent.com/coozoo/qtjsondiff/master/main.cpp' | grep 'QString APP_VERSION' | tr -d ' ' | grep -oP '(?<=constQStringAPP_VERSION=").*(?=\";)')
+VERSION=$(curl --silent 'https://raw.githubusercontent.com/coozoo/qtrfpowermeter/master/main.cpp' | grep 'QString APP_VERSION' | tr -d ' ' | grep -oP '(?<=constQStringAPP_VERSION=").*(?=\";)')
 
 # 2. Get commit info
 COMMIT_HASH=$(git rev-parse --short HEAD)

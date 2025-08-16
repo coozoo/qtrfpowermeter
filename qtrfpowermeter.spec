@@ -25,10 +25,10 @@ BuildRequires: qt6-qtcharts-devel >= 6.2
 %if 0%{?suse_version} || 0%{?sle_version}
 Group:          Electronics
 BuildRequires:  pkgconfig(Qt6Widgets)
-BuildRequires:  libqt6-qtbase-devel
-BuildRequires:  libqt6-linguist
-BuildRequires:  libqt6-qtserialport-devel
-BuildRequires:  libQt6Charts-devel
+BuildRequires:  qt6-base-devel
+BuildRequires:  qt6-tools-devel
+BuildRequires:  qt6-serialport-devel
+BuildRequires:  qt6-charts-devel
 BuildRequires:  update-desktop-files
 Requires(post): update-desktop-files
 Requires(postun): update-desktop-files
