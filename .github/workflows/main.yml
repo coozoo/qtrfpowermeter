@@ -77,6 +77,9 @@ jobs:
       #- name: install deb deps into the same linux
       #  if: matrix.config.os == 'ubuntu-22.04'
       #  run: apt-get -y install debhelper
+      - name: Update changelog
+        if: matrix.config.os == 'ubuntu-22.04'
+        run: bash debian/update-changelog.sh
       - name: build on linux
         if: matrix.config.os == 'ubuntu-22.04'
         id: buildlinux
