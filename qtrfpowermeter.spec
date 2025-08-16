@@ -43,7 +43,7 @@ BuildRequires: lib64qt6charts-devel >= 6.2
 %endif
 
 
-# Requires: qt5 >= 6.2
+# Requires: qt6 >= 6.2
 
 %description
 
@@ -66,10 +66,16 @@ Allows on fly visualization, build charts of measured power and log data in csv 
     qmake6
     make
 %endif
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version} || 0%{?mdkversion}
+%if 0%{?suse_version} || 0%{?sle_version} || 0%{?mdkversion}
     %qmake6
     %make_build
     %qmake6
+    %make_build
+%endif
+%if 0%{?mageia}
+    qmake6
+    %make_build
+    qmake6
     %make_build
 %endif
 
