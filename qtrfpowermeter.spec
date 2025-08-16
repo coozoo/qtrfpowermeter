@@ -35,10 +35,10 @@ Requires(post): update-desktop-files
 Requires(postun): update-desktop-files
 %endif
 %if 0%{?mageia} || 0%{?mdkversion}
-BuildRequires:  qt6-base-devel
-BuildRequires:  qt6-charts-devel
-BuildRequires:  qt6-serialport-devel
-BuildRequires:  qt6-tools-devel
+BuildRequires: lib64qt6base6-devel >= 6.2
+BuildRequires: lib64qt6help-devel >= 6.2
+BuildRequires: lib64qt6serialport-devel >= 6.2
+BuildRequires: lib64qt6charts-devel >= 6.2
 %endif
 
 
