@@ -41,7 +41,7 @@ BuildRequires: lib64qt6charts-devel >= 6.2
 %endif
 
 
-# Requires: qt5 >= 5.5
+# Requires: qt5 >= 6.2
 
 %description
 
@@ -53,11 +53,7 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %global debug_package %{nil}
 
 %prep
-%if 0%{?fedora}
-    %setup -q -n %{reponame}-main
-%else
-    %setup -q -n %{name}-%{version}
-%endif
+%setup -q -n %{reponame}-main
 
 %build
 # don't know maybe it's stupid me but lrelease in qt looks like runs after make file generation as result automatic file list inside qmake doesn't work
