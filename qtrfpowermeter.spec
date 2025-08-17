@@ -83,8 +83,12 @@ Allows on fly visualization, build charts of measured power and log data in csv 
 %if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
     make INSTALL_ROOT=%{buildroot} -j$(nproc) install
 %endif
-%if 0%{?mageia} || 0%{?suse_version} || 0%{?sle_version} || 0%{?mdkversion}
+%if 0%{?suse_version} || 0%{?sle_version} || 0%{?mdkversion}
     %qmake6_install
+    %suse_update_desktop_file -G "QT RF Power Meter" -r qtrfpowermeter Electronics
+%endif
+%if 0%{?mageia}
+    make INSTALL_ROOT=%{buildroot} -j$(nproc) install
     %suse_update_desktop_file -G "QT RF Power Meter" -r qtrfpowermeter Electronics
 %endif
 
