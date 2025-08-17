@@ -72,11 +72,17 @@ jobs:
 #         sudo add-apt-repository ppa:beineri/opt-qt-5.15.4-focal -y
       - name: install qt into linux
         if: matrix.config.os == 'ubuntu-22.04'
-        run:  sudo apt-get -y install debhelper dput qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools libgl1-mesa-dev libssl-dev libqt6charts6-dev libqt6serialport6-dev libssl-dev libfuse2
+        run:  sudo apt-get -y install debhelper dput devscripts qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools libgl1-mesa-dev libssl-dev libqt6charts6-dev libqt6serialport6-dev libssl-dev libfuse2
       #   run:  sudo apt-get -y install debhelper qt515base qt515tools libgl1-mesa-dev qt515charts-no-lgpl qt515serialport
       #- name: install deb deps into the same linux
       #  if: matrix.config.os == 'ubuntu-22.04'
       #  run: apt-get -y install debhelper
+      - name: Set up GPG
+        run: |
+          echo "${{ secrets.LAUNCHPAD_GPG_KEY }}" | gpg --batch --import
+          # Trust the imported key
+          KEYID=${{ secrets.LAUNCHPAD_GPG_KEY_ID }}
+          echo -e "5\ny\n" | gpg --command-fd 0 --edit-key "$KEYID" trust
       - name: Setup SSH for Launchpad
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
@@ -92,7 +98,9 @@ jobs:
         id: buildlinux
         run: |
           # source /opt/qt*/bin/qt*-env.sh || true
-          dpkg-buildpackage -us -uc
+          # dpkg-buildpackage -us -uc
+          dpkg-buildpackage -k"$GPG_KEY_ID" -S -sa
+          echo "CHANGES_NAME=$(ls ../*.changes | head -1 | xargs -n 1 basename)" >> $GITHUB_OUTPUT
           echo "DEB_PACK_NAME=$(ls ../*.deb|head -1|xargs -n 1 basename)" >> $GITHUB_OUTPUT
           echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
           echo "APP_NAME=$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')" >> $GITHUB_OUTPUT
@@ -126,8 +134,7 @@ jobs:
       - name: Upload package to Launchpad PPA
         if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
         run: |
-          CHANGES_FILE=$(ls ../*.changes | head -1)
-          dput ppa:coozoo/qtrfpowermeter "$CHANGES_FILE"
+          dput ppa:coozoo/qtrfpowermeter ../${{ steps.buildlinux.outputs.CHANGES_NAME }}
       - name: Upload Release Asset Linux AppImage
         if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
         id: upload-release-asset-linux-appimage
