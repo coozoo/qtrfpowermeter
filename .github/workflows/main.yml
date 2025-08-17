@@ -88,21 +88,28 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.LAUNCHPAD_SSH_KEY }}" > ~/.ssh/launchpad-ci_id_rsa
           chmod 600 ~/.ssh/launchpad-ci_id_rsa
-          ssh-keyscan -t rsa git.launchpad.net >> ~/.ssh/known_host
+          ssh-keyscan -t rsa git.launchpad.net >> ~/.ssh/known_hosts
       - name: Update changelog
         if: matrix.config.os == 'ubuntu-22.04'
         run: bash debian/update-changelog.sh
+      - name: Prep launchpad
+        if: matrix.config.os == 'ubuntu-22.04'
+        env:
+          GPG_KEY_ID: ${{ secrets.LAUNCHPAD_GPG_KEY_ID }}
+        id: launchpadid
+        run: |
+          dpkg-buildpackage -k"$GPG_KEY_ID" -S -sa
+          echo "CHANGES_NAME=$(ls ../*.changes | head -1 | xargs -n 1 basename)" >> $GITHUB_OUTPUT
+      - name: Upload package to Launchpad PPA
+        if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
+        run: |
+          dput ppa:coozoo/qtrfpowermeter ../${{ steps.launchpadid.outputs.CHANGES_NAME }}
       - name: build on linux
         if: matrix.config.os == 'ubuntu-22.04'
         id: buildlinux
-        env:
-          GPG_KEY_ID: ${{ secrets.LAUNCHPAD_GPG_KEY_ID }}
         run: |
           # source /opt/qt*/bin/qt*-env.sh || true
-          # dpkg-buildpackage -us -uc
-          dpkg-buildpackage -us -uc -k"$GPG_KEY_ID"
-          dpkg-buildpackage -S -sa -k"$GPG_KEY_ID"
-          echo "CHANGES_NAME=$(ls ../*.changes | head -1 | xargs -n 1 basename)" >> $GITHUB_OUTPUT
+          dpkg-buildpackage -us -uc
           echo "DEB_PACK_NAME=$(ls ../*.deb|head -1|xargs -n 1 basename)" >> $GITHUB_OUTPUT
           echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
           echo "APP_NAME=$(cat *.pro |grep 'TARGET ='|awk -F\= '{print $2;}'| tr -d ' ')" >> $GITHUB_OUTPUT
@@ -155,10 +162,6 @@ jobs:
           asset_path: ../${{ steps.buildlinux.outputs.DEB_PACK_NAME }}
           asset_name: ${{ steps.buildlinux.outputs.DEB_PACK_NAME }}
           asset_content_type: application/octet-stream
-      - name: Upload package to Launchpad PPA
-        if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
-        run: |
-          dput ppa:coozoo/qtrfpowermeter ../${{ steps.buildlinux.outputs.CHANGES_NAME }}
       - name: get app version
         if: matrix.config.os == 'macos-latest'
         run: |
