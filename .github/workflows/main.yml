@@ -143,7 +143,7 @@ jobs:
       - name: Upload Release Asset Linux AppImage
         if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
         id: upload-release-asset-linux-appimage
-        uses: alexellis/upload-assets@v0.4.0
+        uses: alexellis/upload-assets@0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -154,7 +154,7 @@ jobs:
       - name: Upload deb to release
         if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
         id: upload-release-asset-linux-deb
-        uses: alexellis/upload-assets@v0.4.0
+        uses: alexellis/upload-assets@0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -189,7 +189,7 @@ jobs:
       - name: Upload Release Asset dmg
         if: matrix.config.os == 'macos-latest'
         id: upload-release-asset-dmg
-        uses: alexellis/upload-assets@v0.4.0
+        uses: alexellis/upload-assets@0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -200,7 +200,7 @@ jobs:
       - name: Upload Release Asset zip
         if: matrix.config.os == 'macos-latest' && github.ref == 'refs/heads/main'
         id: upload-release-asset-zip
-        uses: alexellis/upload-assets@v0.4.0
+        uses: alexellis/upload-assets@0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -270,7 +270,7 @@ jobs:
       - name: Upload Release Asset Win64
         if: matrix.config.os == 'windows-latest' && github.ref == 'refs/heads/main'
         id: upload-release-asset-win64
-        uses: alexellis/upload-assets@v0.4.0
+        uses: alexellis/upload-assets@0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
