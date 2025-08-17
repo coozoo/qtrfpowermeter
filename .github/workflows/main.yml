@@ -78,11 +78,10 @@ jobs:
       #  if: matrix.config.os == 'ubuntu-22.04'
       #  run: apt-get -y install debhelper
       - name: Set up GPG
+        if: matrix.config.os == 'ubuntu-22.04'
         run: |
           echo "${{ secrets.LAUNCHPAD_GPG_KEY }}" | gpg --batch --import
-          # Trust the imported key
-          KEYID=${{ secrets.LAUNCHPAD_GPG_KEY_ID }}
-          echo -e "5\ny\n" | gpg --command-fd 0 --edit-key "$KEYID" trust
+          echo "${{ secrets.LAUNCHPAD_GPG_KEY_ID }}:6:" | gpg --import-ownertrust
       - name: Setup SSH for Launchpad
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
