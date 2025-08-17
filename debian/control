@@ -1,7 +1,7 @@
 Source: qtrfpowermeter
 Section: devel
 Priority: optional
-Maintainer: Yuriy Kuzin
+Maintainer: Yuriy Kuzin <yuriykuzin@yahoo.com>
 Build-Depends: debhelper (>= 9), qt6-base-dev, qt6-tools-dev, libgl1-mesa-dev, libqt6charts6-dev, libqt6serialport6-dev
 Standards-Version: 3.9.8
 Homepage: https://github.com/coozoo/qtrfpowermeter
