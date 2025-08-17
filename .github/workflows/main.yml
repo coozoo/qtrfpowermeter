@@ -100,7 +100,8 @@ jobs:
         run: |
           # source /opt/qt*/bin/qt*-env.sh || true
           # dpkg-buildpackage -us -uc
-          dpkg-buildpackage -k"$GPG_KEY_ID" -S -sa
+          dpkg-buildpackage -us -uc -k"$GPG_KEY_ID"
+          dpkg-buildpackage -S -sa -k"$GPG_KEY_ID"
           echo "CHANGES_NAME=$(ls ../*.changes | head -1 | xargs -n 1 basename)" >> $GITHUB_OUTPUT
           echo "DEB_PACK_NAME=$(ls ../*.deb|head -1|xargs -n 1 basename)" >> $GITHUB_OUTPUT
           echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
