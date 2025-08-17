@@ -96,7 +96,7 @@ jobs:
         if: matrix.config.os == 'ubuntu-22.04'
         id: buildlinux
         env:
-          GPG_KEY_ID: ${{ secrets.LAUNCHPAD_GPG_KEY_ID }
+          GPG_KEY_ID: ${{ secrets.LAUNCHPAD_GPG_KEY_ID }}
         run: |
           # source /opt/qt*/bin/qt*-env.sh || true
           # dpkg-buildpackage -us -uc
