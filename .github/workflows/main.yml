@@ -132,10 +132,6 @@ jobs:
       #     dpkg-buildpackage -us -uc
       #     ls -l
       #     ls -l ../
-      - name: Upload package to Launchpad PPA
-        if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
-        run: |
-          dput ppa:coozoo/qtrfpowermeter ../${{ steps.buildlinux.outputs.CHANGES_NAME }}
       - name: Upload Release Asset Linux AppImage
         if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
         id: upload-release-asset-linux-appimage
@@ -158,6 +154,10 @@ jobs:
           asset_path: ../${{ steps.buildlinux.outputs.DEB_PACK_NAME }}
           asset_name: ${{ steps.buildlinux.outputs.DEB_PACK_NAME }}
           asset_content_type: application/octet-stream
+      - name: Upload package to Launchpad PPA
+        if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
+        run: |
+          dput ppa:coozoo/qtrfpowermeter ../${{ steps.buildlinux.outputs.CHANGES_NAME }}
       - name: get app version
         if: matrix.config.os == 'macos-latest'
         run: |

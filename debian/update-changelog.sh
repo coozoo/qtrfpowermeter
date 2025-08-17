@@ -5,15 +5,16 @@ VERSION=$(curl --silent 'https://raw.githubusercontent.com/coozoo/qtrfpowermeter
 
 # 2. Get commit info
 COMMIT_HASH=$(git rev-parse --short HEAD)
-COMMIT_DATE=$(git log -1 --format=%cd --date=short)
+COMMIT_DATE=$(date -R)  # RFC 2822 format for Debian changelog
 AUTHOR=$(git log -1 --format=%an)
+EMAIL="yuriykuzin@yahoo.com"  # Set your maintainer email here
 
-# 3. Format changelog entry
+# 3. Format changelog entry (Debian-compliant)
 CHANGELOG_ENTRY="qtrfpowermeter (${VERSION}) unstable; urgency=low
 
-  * Automated update: version from source, commit ${COMMIT_HASH} (${COMMIT_DATE}), author ${AUTHOR}
+  * Automated update: version from source, commit ${COMMIT_HASH}, author ${AUTHOR}
 
- -- ${AUTHOR}  ${COMMIT_DATE}
+ -- ${AUTHOR} <${EMAIL}>  ${COMMIT_DATE}
 "
 
 # 4. Prepend to debian/changelog
@@ -24,3 +25,4 @@ fi
 echo "$CHANGELOG_ENTRY" > debian/changelog.tmp
 cat debian/changelog >> debian/changelog.tmp 2>/dev/null
 mv debian/changelog.tmp debian/changelog
+
