@@ -9,9 +9,10 @@ COMMIT_DATE=$(date -R)  # RFC 2822 format for Debian changelog
 AUTHOR=$(git log -1 --format=%an)
 EMAIL="yuriykuzin@yahoo.com"  # Set your maintainer email here
 DISTRO=$(lsb_release -sc)
+DATEVER=$(date +'%Y%m%d%H%M')
 
 # 3. Format changelog entry (Debian-compliant)
-CHANGELOG_ENTRY="qtrfpowermeter (${VERSION}) ${DISTRO}; urgency=low
+CHANGELOG_ENTRY="qtrfpowermeter (${VERSION}-$DATEVER) ${DISTRO}; urgency=low
 
   * Automated update: version from source, commit ${COMMIT_HASH}, author ${AUTHOR}
 
