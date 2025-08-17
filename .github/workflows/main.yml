@@ -143,22 +143,22 @@ jobs:
       - name: Upload Release Asset Linux AppImage
         if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
         id: upload-release-asset-linux-appimage
-        uses: shogo82148/actions-create-release@v1
+        uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ./qtrfpowermeter-x86_64.AppImage
           asset_name: qtrfpowermeter-x86_64.AppImage
           asset_content_type: application/octet-stream
       - name: Upload deb to release
         if: matrix.config.os == 'ubuntu-22.04' && github.ref == 'refs/heads/main'
         id: upload-release-asset-linux-deb
-        uses: shogo82148/actions-create-release@v1
+        uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ../${{ steps.buildlinux.outputs.DEB_PACK_NAME }}
           asset_name: ${{ steps.buildlinux.outputs.DEB_PACK_NAME }}
           asset_content_type: application/octet-stream
@@ -189,7 +189,7 @@ jobs:
       - name: Upload Release Asset dmg
         if: matrix.config.os == 'macos-latest'
         id: upload-release-asset-dmg
-        uses: shogo82148/actions-create-release@v1
+        uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -200,7 +200,7 @@ jobs:
       - name: Upload Release Asset zip
         if: matrix.config.os == 'macos-latest' && github.ref == 'refs/heads/main'
         id: upload-release-asset-zip
-        uses: shogo82148/actions-create-release@v1
+        uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -270,7 +270,7 @@ jobs:
       - name: Upload Release Asset Win64
         if: matrix.config.os == 'windows-latest' && github.ref == 'refs/heads/main'
         id: upload-release-asset-win64
-        uses: shogo82148/actions-create-release@v1
+        uses: shogo82148/actions-upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
