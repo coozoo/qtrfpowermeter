@@ -8,7 +8,7 @@ Homepage: https://github.com/coozoo/qtrfpowermeter
 
 Package: qtrfpowermeter
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, qt6-base | libqt6core6, qt6-tools | qt6-tools-bin, libgl1-mesa-dev, libqt6charts6, libqt6serialport6
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt6core6, libqt6gui6, libqt6widgets6, libqt6charts6, libqt6serialport6, libqt6opengl6, libgl1-mesa-dev, libssl3
 Description: Application to visualize measured RF power and work with Chinese serial port RF power meters, 
  labeled as RF-Power500, RF-Power3000, RF-Power8000 (RF-500, RF-3000, RF-8000) Allows on fly visualization, 
  build charts of measured power and log data in csv format.
