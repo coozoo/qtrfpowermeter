@@ -21,6 +21,8 @@ BuildRequires: qt6-qtbase-devel >= 6.2
 BuildRequires: qt6-linguist >= 6.2
 BuildRequires: qt6-qtserialport-devel >= 6.2
 BuildRequires: qt6-qtcharts-devel >= 6.2
+BuildRequires: desktop-file-utils
+Requires:      desktop-file-utils
 %endif
 %if 0%{?suse_version} || 0%{?sle_version}
 Group:          Electronics
