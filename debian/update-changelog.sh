@@ -8,9 +8,10 @@ COMMIT_HASH=$(git rev-parse --short HEAD)
 COMMIT_DATE=$(date -R)  # RFC 2822 format for Debian changelog
 AUTHOR=$(git log -1 --format=%an)
 EMAIL="yuriykuzin@yahoo.com"  # Set your maintainer email here
+DISTRO=$(lsb_release -sc)
 
 # 3. Format changelog entry (Debian-compliant)
-CHANGELOG_ENTRY="qtrfpowermeter (${VERSION}) unstable; urgency=low
+CHANGELOG_ENTRY="qtrfpowermeter (${VERSION}) ${DISTRO}; urgency=low
 
   * Automated update: version from source, commit ${COMMIT_HASH}, author ${AUTHOR}
 
