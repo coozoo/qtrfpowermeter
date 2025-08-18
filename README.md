@@ -37,6 +37,19 @@ https://github.com/coozoo/qtrfpowermeter/releases
 
 [<img src="https://github.com/coozoo/qtrfpowermeter/workflows/Release_Version/badge.svg"></img>](https://github.com/coozoo/qtrfpowermeter/releases/latest)
 
+There is deb repo on launchpad, use next commands to install it
 
+```
+sudo add-apt-repository ppa:coozoo/qtrfpowermeter
+sudo apt update
+sudo apt-get install qtrfpowermeter
+```
 
+If you still need to buil it by your own.
 
+It is required qt6 so adjust qmake accorddingly to your system.
+
+```
+qmake6
+make -j$(nproc)
+```
