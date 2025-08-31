@@ -53,3 +53,24 @@ It is required qt6 so adjust qmake accorddingly to your system.
 qmake6
 make -j$(nproc)
 ```
+
+
+### Supported Build Tags
+
+You can trigger or control specific build jobs by including one or more of these tags in your commit message or pull request title/body:
+
+| Tag                 | Effect                                                       |
+|---------------------|--------------------------------------------------------------|
+| `[build mac dmg]`   | Builds a macOS DMG package                                   |
+| `[build mac zip]`   | Builds a macOS ZIP package                                   |
+| `[build mac]`       | Builds a macOS DMG package (alias for `[build mac dmg]`)     |
+| `[build win]`       | Builds the Windows release                                   |
+| `[build linux]`     | Builds the Linux release                                     |
+| `[skip ci]`         | Skips all CI jobs for this commit or PR                      |
+
+**Note:**  
+If no build tags are present, the system will build **all platforms** by default.  
+Use `[skip ci]` to intentionally skip the build and workflow runs.
+
+
+
