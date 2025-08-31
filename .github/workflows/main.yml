@@ -194,7 +194,7 @@ jobs:
         if: matrix.config.os == 'ubuntu-22.04' && github.ref != 'refs/heads/main' && needs.create_release.outputs.build_lin == '1'
         uses: actions/upload-artifact@v4.4.3
         with:
-          name: ./qtrfpowermeter-x86_64.AppImage
+          name: qtrfpowermeter-x86_64.AppImage
           path: qtrfpowermeter-x86_64.AppImage
           overwrite: true
       - name: get app version
