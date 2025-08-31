@@ -47,7 +47,7 @@ void chartManager::on_jsonChartRuleObjectChanged()
     int startrow=0;
     int numberinrow=2;
     //add charts
-    foreach (const QJsonValue & chartItem, jsonRuleArr)
+    for (const QJsonValue &chartItem : jsonRuleArr)
     {
         qDebug()<<"chartItem"<<chartItem;
         //place each chart into mainwindow
@@ -94,7 +94,7 @@ void chartManager::on_jsonChartRuleObjectChanged()
         // add graphs (lines) to chart
         QStringList graphs=QStringList();
         QJsonArray jsonGraphsArr=chartItem.toObject()["graphs"].toArray();
-        foreach (const QJsonValue & graphItem, jsonGraphsArr)
+        for (const QJsonValue &graphItem : jsonGraphsArr)
         {
             qDebug()<<"graphItem"<<graphItem;
             graphs.append(graphItem.toObject()["name"].toString());
@@ -126,14 +126,14 @@ void chartManager::dataIncome(QString headersString, QString dataString)
     QJsonArray jsonRuleArr=jsonRuleObj["charts"].toArray();
     // very stupid attempt to sum and multiply items
     // it works on simple conditions but it really should be changed
-    foreach (const QJsonValue & chartItem, jsonRuleArr)
+    for (const QJsonValue &chartItem : jsonRuleArr)
     {
         qDebug()<<"chartItem"<<chartItem;
         //chartItem.toObject()["chart"].toString()
         QStringList graphs=QStringList();
         QJsonArray jsonGraphsArr=chartItem.toObject()["graphs"].toArray();
-        QList<int> dataset;
-        foreach (const QJsonValue & graphItem, jsonGraphsArr)
+        QList<double> dataset;
+        for (const QJsonValue &graphItem : jsonGraphsArr)
         {
             qDebug()<<"graphItem"<<graphItem;
             QString graphrule=graphItem.toObject()["rule"].toString();
@@ -342,4 +342,16 @@ bool chartManager::eventFilter(QObject* obj, QEvent *event)
       return false;
 }
 
+
+void chartManager::connectTracers()
+{
+    for (int i = 0; i < listCharts.count(); ++i) {
+        for (int j = 0; j < listCharts.count(); ++j) {
+            if (i != j) {
+                connect(listCharts[i], &chartRealTime::tracerIndexChanged,
+                        listCharts[j], &chartRealTime::showTracerAtIndex);
+            }
+        }
+    }
+}
 
