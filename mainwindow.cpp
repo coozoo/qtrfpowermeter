@@ -102,6 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
     charts->setstrDateTimeFile(datetimefile);
     charts->setjsonChartRuleObject(jsonChartsRuleStr);
     charts->setisflow(ui->flow_checkBox->isChecked());
+    charts->connectTracers();
     connect(this, SIGNAL(newData(QString, QString)), charts, SLOT(dataIncome(QString, QString)));
     Q_EMIT(on_set_pushButton_clicked());
 

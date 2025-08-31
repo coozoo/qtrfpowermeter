@@ -67,6 +67,7 @@ public slots:
     void resetAllCharts();
     void setAllRanges(int range);
     void setisflow(bool flow);
+    void connectTracers();
 
 protected:
      bool eventFilter(QObject* obj, QEvent *event) override;
