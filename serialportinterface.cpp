@@ -84,5 +84,6 @@ void SerialPortInterface::serialError(
         emit serialPortErrorSignal("Error " + m_serialPort->portName() + " " +
                                    m_serialPort->errorString());
         qDebug()<<m_serialPort->portName()<<m_serialPort->errorString();
+        stopPort();
     }
 }
