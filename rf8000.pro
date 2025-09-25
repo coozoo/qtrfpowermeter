@@ -19,21 +19,36 @@ INCLUDEPATH += $$PWD/3rdparty/qcustomplot
 
 SOURCES += \
     3rdparty/qcustomplot/qcustomplot.cpp \
+    attdevice.cpp \
+    attenuationmanager.cpp \
+    attenuatorwidget.cpp \
     chartmanager.cpp \
     chartrealtime.cpp \
+    fixedattenuatorcontrol.cpp \
     main.cpp \
     mainwindow.cpp \
-    serialportinterface.cpp
+    qtdigitalattenuator.cpp \
+    serialportinterface.cpp \
+    targetpowercalculator.cpp \
+    unitconverter.cpp
 
 HEADERS += \
     3rdparty/qcustomplot/qcustomplot.h \
+    attdevice.h \
+    attenuationmanager.h \
+    attenuatorwidget.h \
     chartmanager.h \
     chartrealtime.h \
+    fixedattenuatorcontrol.h \
     mainwindow.h \
-    serialportinterface.h
+    qtdigitalattenuator.h \
+    serialportinterface.h \
+    targetpowercalculator.h \
+    unitconverter.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    qtdigitalattenuator.ui
 
 win32:RC_FILE = icon.rc
 macx:RC_FILE = icon.icns

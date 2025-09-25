@@ -4,6 +4,9 @@
         <file>images/document-save.svg</file>
         <file>images/process-stop.svg</file>
         <file>images/sine-graphdBm.svg</file>
+        <file>images/digiattcontrol.svg</file>
+        <file>images/AttenuatorRF.svg</file>
+        <file>images/document-open.svg</file>
         <file>chart_rules.json</file>
     </qresource>
 </RCC>

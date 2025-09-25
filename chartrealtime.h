@@ -38,23 +38,23 @@ public:
     void setupRealtimeDataDemo(QCustomPlot *customPlot);
     QCustomPlot *customPlot;
     QDockWidget *chart_dockwidget;
-    void dataSlot(QDateTime dateTime, QList<double> data);
+    void dataSlot(QDateTime dateTime, const QList<double> &data);
     void addGraphs(QStringList graphs);
     void setYAxisLabel(QString yAxisLabel);
     void setPlotTitle(QString plotTitle);
-    void saveImage(QString imagePath, QString imageType, int width, int height);
+    void saveImage(const QString &imagePath, const QString &imageType, int width, int height);
 
     //list of colors to use by graphs tried to select unique
     QList<QColor> uniColor={ QColor(40,110,255),  QColor(0,183,48),    QColor(255,0,0),
                           QColor(0,128,64),    QColor(255,200,20),  QColor(0,155,175),
                           QColor(145,0,140),   QColor(205,125,0),   QColor(0,0,0)};
 
-    void setWindowTitle(QString m_windowTitle)
+    void setWindowTitle(const QString &m_windowTitle)
     {
         windowTitle = m_windowTitle;
         emit on_setWindowTitle();
     }
-    QString getWindowTitle() const
+    const QString &getWindowTitle() const
     { return windowTitle; }
 
     void setRange(int m_range)
@@ -87,10 +87,14 @@ private:
   QCPItemText *cursorLabel = nullptr;
   QList<QCPItemTracer*> tracers;
 
+  QTimer *m_tooltipHideTimer;
+  bool m_isFrozen = false;
+  int m_frozenIndex = -1;
+
   qint64 lastTracerTime = -1;
 
 signals:
-  void datacoming(QDateTime dateTime, QList<double> data);
+  void datacoming(QDateTime dateTime, const QList<double> &data);
   void dockLocationChanged(bool state);
   void tracerTimeChanged(qint64 time);
   void tracerIndexChanged(int foundDataIndex);
@@ -103,12 +107,14 @@ public slots:
 private slots:
   //void realtimeDataSlot();
   void on_setWindowTitle();
-  void on_datacoming(QDateTime dateTime, QList<double> data);
+  void on_datacoming(QDateTime dateTime, const QList<double> &data);
   void on_visibilityChanged(bool);
   void showPointToolTip(QMouseEvent *event);
   void on_dockLocationChanged(bool state);
   void on_setRange();
   void on_setisflow();
+  void hideTooltipAndTracers();
+  void on_chartClicked(QMouseEvent *event);
 
 protected:
      bool eventFilter(QObject* obj, QEvent *event) override;

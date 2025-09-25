@@ -11,10 +11,14 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QRandomGenerator>
+#include <QDebug>
 #include <QtMath>
 #include "serialportinterface.h"
 #include "qcustomplot.h"
 #include "chartmanager.h"
+#include "attenuationmanager.h"
+#include "unitconverter.h"
+#include "targetpowercalculator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -28,7 +32,10 @@ enum dataColumns {
     dataValuemVppColumnID,
     dataValuemWColumnID,
     dataValueFreqColumnID,
-    dataValueCorrectColumnID
+    dataValueCorrectColumnID,
+    dataValueAttenuationColumnID,
+    dataValueTotalDbmColumnID,
+    dataValueTotalMwColumnID
 };
 
 
@@ -57,34 +64,34 @@ public:
     chartManager *charts;
     QString datetimefile;
 
-    void setFrequency(QString m_Frequency)
+    void setFrequency(const QString &m_Frequency)
     {
         curFrequency = m_Frequency;
     }
-    QString getFrequency() const
+    const QString &getFrequency() const
     { return curFrequency; }
 
-    void setOffset(QString m_Offset)
+    void setOffset(const QString &m_Offset)
     {
         curOffset = m_Offset;
     }
-    QString getOffset() const
+    const QString &getOffset() const
     { return curOffset; }
 
-    void setstrDateTimeFile(QString m_strDateTimeFile)
+    void setstrDateTimeFile(const QString &m_strDateTimeFile)
     {
         strDateTimeFile = m_strDateTimeFile;
     }
-    QString getstrDateTimeFile() const
+    const QString &getstrDateTimeFile() const
     { return strDateTimeFile; }
 
     bool createDir(QString path);
+    AttenuationManager *attenuationMgr;
 
 private:
     Ui::MainWindow *ui;
     void updateDeviceList();
     SerialPortInterface *serialPortPowerMeter;
-    double dBmTomW(double dbm);
     QTimer simulatorTimer;
     QString curFrequency="0";
     QString curOffset="0";
@@ -92,19 +99,26 @@ private:
     QString rootstatsdir;
     QString statsdirlocation;
     QString filepath;
+    double m_current_atteuation=0;
+    TargetPowerCalculator *m_attenuatorCalculator;
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:
     void ondevice_comboBox_currentIndexChanged();
-    void updateData(QString data);
+    void updateData(const QString &data);
     void on_connect_pushButton_clicked();
     void on_disconnect_pushButton_clicked();
+    void on_resetMax_toolButton_clicked();
     void on_refreshDevices_toolbutton_clicked();
-    void on_data_model_rowsInserted(const QModelIndex & parent, int start, int end);
+    void ondata_model_rowsInserted(const QModelIndex & parent, int start, int end);
     void on_simulate_checkBox_clicked();
     void on_set_pushButton_clicked();
     void on_simulatorTimer();
     void on_serialPortError(QString error);
-    void writeStatCSV(QString appendFileName, QString logLine, QString headersList);
+    void writeStatCSV(const QString &appendFileName, const QString &logLine, const QString &headersList);
+    void onTotalAttenuationChanged(double totalAttenuation);
 
 public slots:
     void on_range_spinBox_valueChanged(int range);

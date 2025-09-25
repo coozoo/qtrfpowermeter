@@ -11,7 +11,7 @@ chartManager::chartManager(QWidget *parent) : QWidget(parent)
     for(int i=0;i<listCharts.count();i++)
     {
        chartRealTime *chart=listCharts.at(i);
-        qDebug()<<chart;
+       qDebug()<<chart;
     }
     //connect if property for json rules changed
     connect(this,SIGNAL(jsonChartRuleObjectChanged()),this,SLOT(on_jsonChartRuleObjectChanged()));
@@ -108,7 +108,7 @@ void chartManager::on_jsonChartRuleObjectChanged()
     for(int i=0;i<listCharts.count();i++)
     {
        chartRealTime *chart=listCharts.at(i);
-        qDebug()<<chart->getWindowTitle();
+       qDebug()<<chart->getWindowTitle();
     }
 
 }
@@ -118,7 +118,7 @@ void chartManager::on_jsonChartRuleObjectChanged()
  * dataString - values for Process
  * headersString and dataString elements count should be identical
  */
-void chartManager::dataIncome(QString headersString, QString dataString)
+void chartManager::dataIncome(const QString &headersString, const QString &dataString)
 {
 
     QJsonDocument jsonRuleDoc=QJsonDocument::fromJson(getjsonChartRuleObject().toUtf8());
@@ -143,7 +143,7 @@ void chartManager::dataIncome(QString headersString, QString dataString)
                 if(graphrule.contains("\\/"))
                 {
                 QStringList divPartsList=graphrule.split("\\/");
-                 foreach (QString divstr, divPartsList)
+                 foreach (const QString &divstr, divPartsList)
                 {
                     bool ok;
                     int divel = divstr.toInt(&ok);
@@ -164,7 +164,7 @@ void chartManager::dataIncome(QString headersString, QString dataString)
                         if(divstr.contains("\\+"))
                         {
                             QStringList sumPartsList=graphrule.split("\\+");
-                            foreach (QString sumstr, sumPartsList)
+                            foreach (const QString &sumstr, sumPartsList)
                             {
                                 bool ok;
                                 int sumel = sumstr.toInt(&ok);
@@ -198,7 +198,7 @@ void chartManager::dataIncome(QString headersString, QString dataString)
                 else if(!graphrule.contains("\\/") && graphrule.contains("\\+"))
                 {
                     QStringList sumPartsList=graphrule.split("\\+");
-                    foreach (QString sumstr, sumPartsList)
+                    foreach (const QString &sumstr, sumPartsList)
                     {
                         bool ok;
                         int sumel = sumstr.toInt(&ok);
@@ -239,7 +239,7 @@ void chartManager::dataIncome(QString headersString, QString dataString)
  * dataString - string with commaseparated values
  * return: id  (-1 if not found)
  */
-double chartManager::getValueByHeader(QString header, QString headersString, QString dataString)
+double chartManager::getValueByHeader(QString header, const QString &headersString, const QString &dataString)
 {
     QStringList headersStringList=headersString.split(",");
     QStringList dataStringList=dataString.split(",");
@@ -320,7 +320,7 @@ void chartManager::setisflow(bool flow)
  * width - image width
  * height - image height
  */
-void chartManager::saveAllCharts(QString imagePath, QString imageType, int width, int height)
+void chartManager::saveAllCharts(const QString &imagePath, QString imageType, int width, int height)
 {
     qDebug()<<"saveAllCharts"<<imagePath<<imageType<<width<<height;
     for(int i=0;i<listCharts.count();i++)

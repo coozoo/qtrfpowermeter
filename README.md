@@ -1,5 +1,5 @@
 # QT RF Power Meter
-This application few hours project intended to improve usage of chinese RF power meter RF8000. Chinese default application is terrible unreliable with no functionality and lot of crashes.
+This application few hours project (not anymore now add week to that) intended to improve usage of chinese RF power meter RF8000. Chinese default application is terrible unreliable with no functionality and lot of crashes.
 
 Device shown on image below.
 
@@ -18,7 +18,13 @@ On data tab there is parsed and calculated data exactly in the same way it's wri
 
 Status tab contains diplays with on-fly data and box with possibility to set device offset and frequency, there is chart with posibility to save images.
 
-![image](https://github.com/coozoo/qtrfpowermeter/assets/25594311/b71a20ff-38fb-4361-9710-ce44f0b54d50)
+Supports adding fixed and digital attenuators of one kind https://github.com/coozoo/digiattcontrol. So in such way the range of mesurement is now defined only by attenuators that you have available.
+
+For convenient measurement there is attenuation calculator to prevent mixing and damaging your equipment but still you need to be cautious.
+
+
+<img width="1919" height="1044" alt="image" src="https://github.com/user-attachments/assets/8f672b0a-70af-47a0-99fd-940c8c621d2a" />
+
 
 ## Installation
 

@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QLoggingCategory>
 
-const QString APP_VERSION = "0.40";
+const QString APP_VERSION = "0.41";
 
 void qtLogger(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -41,9 +41,39 @@ void qtLogger(QtMsgType type, const QMessageLogContext &context, const QString &
 
 int main(int argc, char *argv[])
 {
+    QTextStream cout(stdout);
     qInstallMessageHandler(qtLogger);
-
     QApplication a(argc, argv);
+    cout << QLocale::system().name() << Qt::endl;
+    QStringList translations;
+    QDir dir(a.applicationDirPath());
+    if (dir.cdUp() && dir.cd("share"))
+    {
+        translations.append(dir.absolutePath() + "/" + a.applicationName());
+    }
+    translations.append(QStandardPaths::standardLocations(QStandardPaths::AppDataLocation));
+    translations.append(QCoreApplication::applicationDirPath());
+    translations.append(a.applicationDirPath() + "/.qm");
+    translations.append(a.applicationDirPath() + "/lang");
+    QString translationFilePath = "";
+    cout << "Search for translations" << Qt::endl;
+    foreach (const QString &str, translations)
+    {
+        QFileInfo fileinfo(str + "/" + a.applicationName() + "_" + QLocale::system().name() + ".qm");
+        cout << fileinfo.filePath() << Qt::endl;
+        if (fileinfo.exists() && fileinfo.isFile())
+        {
+            translationFilePath = fileinfo.filePath();
+            cout << "Translation found in: " + translationFilePath << Qt::endl;
+            break;
+        }
+    }
+
+    QTranslator translator;
+    cout << translator.load(translationFilePath) << Qt::endl;
+    a.installTranslator(&translator);
+
+
     QString platform = "";
     Q_UNUSED(platform)
 #if __GNUC__

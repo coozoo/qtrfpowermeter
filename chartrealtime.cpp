@@ -66,7 +66,13 @@ chartRealTime::chartRealTime(QMainWindow *parent) : QMainWindow(parent)
     //connect when dock undocked
     connect(chart_dockwidget,SIGNAL(topLevelChanged(bool)),this,SLOT(on_dockLocationChanged(bool)));
 
-
+    // --- New connections for improved interaction ---
+    m_tooltipHideTimer = new QTimer(this);
+    m_tooltipHideTimer->setSingleShot(true);
+    m_tooltipHideTimer->setInterval(10000); // 10 seconds
+    connect(m_tooltipHideTimer, &QTimer::timeout, this, &chartRealTime::hideTooltipAndTracers);
+    connect(customPlot, &QCustomPlot::mousePress, this, &chartRealTime::on_chartClicked);
+    // ---
 }
 
 chartRealTime::~chartRealTime()
@@ -75,6 +81,44 @@ chartRealTime::~chartRealTime()
     customPlot->deleteLater();
 
 }
+
+// --- New Slot Implementations ---
+
+void chartRealTime::hideTooltipAndTracers()
+{
+    if (cursorLabel) {
+        cursorLabel->setVisible(false);
+    }
+    for (QCPItemTracer *tracer : tracers) {
+        if (tracer) {
+            tracer->setVisible(false);
+        }
+    }
+    cursorLine->setVisible(false);
+    customPlot->replot();
+}
+
+void chartRealTime::on_chartClicked(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+
+    // Toggle the frozen state
+    m_isFrozen = !m_isFrozen;
+
+    if (m_isFrozen) {
+        // Stop the timer so the tooltip doesn't hide
+        m_tooltipHideTimer->stop();
+        // The currently visible tracer is now the frozen one.
+        // We can find its index from the last `showPointToolTip` call.
+        // `lastDataIndex` is a static variable in that function.
+    } else {
+        // Unfrozen, so hide everything until the mouse moves again.
+        hideTooltipAndTracers();
+    }
+}
+
+// --- End of New Slot Implementations ---
+
 
 /* slot to emit signal when dock is undocked
  *
@@ -215,7 +259,7 @@ void chartRealTime::setPlotTitle(QString plotTitle)
  * dateTime - not used currently (in future maybe will be posibility to use it, currently only internal chart timer)
  * data - values list should match with graph values amount
  */
-void chartRealTime::on_datacoming(QDateTime dateTime, QList<double> data)
+void chartRealTime::on_datacoming(QDateTime dateTime, const QList<double> &data)
 {
     Q_UNUSED(dateTime)
     //if bool flag to reset timer is raised
@@ -261,7 +305,7 @@ void chartRealTime::on_datacoming(QDateTime dateTime, QList<double> data)
  * dateTime - not used currently (in future maybe will be posibility to use it, currently only internal chart timer)
  * data - values list should match with graph values amount
  */
-void chartRealTime::dataSlot(QDateTime dateTime, QList<double> data)
+void chartRealTime::dataSlot(QDateTime dateTime, const QList<double> &data)
 {
     emit datacoming(dateTime,data);
 }
@@ -343,6 +387,11 @@ void chartRealTime::on_visibilityChanged(bool)
 void chartRealTime::showPointToolTip(QMouseEvent *event)
 {
 
+    // If frozen, ignore mouse movement
+    if (m_isFrozen) {
+        return;
+    }
+
     // //int x = customPlot->xAxis->pixelToCoord(event->pos().x());
     // int y = customPlot->yAxis->pixelToCoord(event->pos().y());
 
@@ -367,6 +416,7 @@ void chartRealTime::showPointToolTip(QMouseEvent *event)
     double mouseX = customPlot->xAxis->pixelToCoord(event->pos().x());
     cursorLine->point1->setCoords(mouseX, 0);
     cursorLine->point2->setCoords(mouseX, 1);
+    cursorLine->setVisible(true); // Make sure cursor line is visible
 
     QString xLabel = customPlot->xAxis->label();
 
@@ -465,7 +515,13 @@ void chartRealTime::showPointToolTip(QMouseEvent *event)
         emit tracerTimeChanged((qint64)traceTime);
         emit tracerIndexChanged(foundDataIndex);
         lastDataIndex = foundDataIndex;
+        m_frozenIndex = foundDataIndex; // Store the current index in case of a click
         qDebug()<<"tracer datapoint changed index:"<<foundDataIndex<<" time:"<<traceTime;
+    }
+
+    // If any data was found, (re)start the hide timer
+    if (anyData) {
+        m_tooltipHideTimer->start();
     }
 
     customPlot->replot();
@@ -494,7 +550,7 @@ void chartRealTime::on_setisflow()
  * width - image width
  * height - image height
  */
-void chartRealTime::saveImage(QString imagePath, QString imageType, int width,int height)
+void chartRealTime::saveImage(const QString &imagePath, const QString &imageType, int width, int height)
 {
     //replace charachters which posibly incorrect for filename in chart name with underscore
     QString chartname=chart_dockwidget->windowTitle()+"_"+QString::number(static_cast<double>(timer.elapsed()),'g',10);
@@ -533,75 +589,7 @@ bool chartRealTime::eventFilter(QObject* obj, QEvent *event)
 }
 
 
-// void chartRealTime::showTracerAtTime(qint64 time)
-// {
-//     // Find nearest dot to time on each graph
-//     int tracerIndex = 0;
-//     double labelX = 0, labelY = 0;
-//     bool found = false;
-//     QString labelText;
-//     QString xLabel = customPlot->xAxis->label();
 
-//     for (int i = 0; i < customPlot->graphCount(); ++i)
-//     {
-//         QCPGraph *graph = customPlot->graph(i);
-//         double minDist = std::numeric_limits<double>::max();
-//         double nearestX = 0, nearestY = 0;
-//         bool foundData = false;
-//         if (graph && graph->data()->size() > 0)
-//         {
-//             for (auto it = graph->data()->constBegin(); it != graph->data()->constEnd(); ++it)
-//             {
-//                 double dist = std::abs(it->key - time);
-//                 if (dist < minDist)
-//                 {
-//                     minDist = dist;
-//                     nearestX = it->key;
-//                     nearestY = it->value;
-//                     foundData = true;
-//                 }
-//             }
-//             if (foundData && tracers.size() > tracerIndex && tracers[tracerIndex]) {
-//                 tracers[tracerIndex]->setGraph(graph);
-//                 tracers[tracerIndex]->setGraphKey(nearestX);
-//                 tracers[tracerIndex]->setInterpolating(false);
-//                 tracers[tracerIndex]->setVisible(true);
-//                 if (!found) {
-//                     labelX = nearestX;
-//                     labelY = nearestY;
-//                     found = true;
-//                 }
-//                 labelText += QString("%1: %2\n")
-//                                  .arg(graph->name().isEmpty() ? QString("Graph %1").arg(i + 1) : graph->name())
-//                                  .arg(QString::number(nearestY, 'g', 6));
-//             }
-//             else if (tracers.size() > tracerIndex && tracers[tracerIndex]) {
-//                 tracers[tracerIndex]->setVisible(false);
-//                 labelText += QString("%1: ---\n")
-//                                  .arg(graph->name().isEmpty() ? QString("Graph %1").arg(i + 1) : graph->name());
-//             }
-//         }
-//         tracerIndex++;
-//     }
-//     // Show label beside tracer dot
-//     if (cursorLabel && found) {
-//         QString timeStr;
-//         if (xLabel.toLower().contains("time") || xLabel.toLower().contains("date"))
-//             timeStr = QDateTime::fromMSecsSinceEpoch((qint64)labelX).toString("yyyy-MM-dd HH:mm:ss");
-//         else
-//             timeStr = QString::number(labelX, 'f', 2);
-//         QString header = QString("%1: %2\n").arg(xLabel.isEmpty() ? "Time" : xLabel).arg(timeStr);
-//         labelText = header + labelText;
-//         cursorLabel->setText(labelText.trimmed());
-//         cursorLabel->setVisible(true);
-//         cursorLabel->setPositionAlignment(Qt::AlignLeft | Qt::AlignTop);
-//         cursorLabel->setTextAlignment(Qt::AlignLeft);
-//         cursorLabel->position->setCoords(labelX, labelY);
-//     } else if (cursorLabel) {
-//         cursorLabel->setVisible(false);
-//     }
-//     customPlot->replot();
-// }
 
 //usually shows a bit off
 void chartRealTime::showTracerAtTime(qint64 time)
