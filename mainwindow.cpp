@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QDebug>
-
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -25,11 +23,20 @@ MainWindow::MainWindow(QWidget *parent)
     serialPortPowerMeter= new SerialPortInterface();
     Q_EMIT(ondevice_comboBox_currentIndexChanged());
     connect(ui->device_comboBox, &QComboBox::currentTextChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
-    connect(serialPortPowerMeter,&SerialPortInterface::serialPortNewData,this,&MainWindow::updateData);
+    connect(serialPortPowerMeter,&SerialPortInterface::serialPortNewRFData,this,&MainWindow::updateData);
     connect(serialPortPowerMeter,&SerialPortInterface::serialPortErrorSignal,this,&MainWindow::on_serialPortError);
 
+    ui->resetMax_toolButton->setToolTip(tr("Reset max values"));
+    ui->resetMax_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
 
+    ui->browse_toolButton->setToolTip(tr("Browse saved data directory"));
+    ui->browse_toolButton->setIcon(QIcon::fromTheme("document-open",QIcon(":/images/document-open.svg")));
 
+    connect(ui->browse_toolButton, &QToolButton::clicked, this, [=]() {
+        if (QDir(filepath).exists()) QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
+        else if(QDir(rootstatsdir+statsdirlocation).exists()) QDesktopServices::openUrl(QUrl::fromLocalFile(rootstatsdir+statsdirlocation));
+        else QToolTip::showText(QCursor::pos(), tr("Session data not saved yet"), ui->browse_toolButton);
+    });
 
     data_model=new QStandardItemModel(0,0,this);
     data_model->setHorizontalHeaderItem(dataTimeColumnID,new QStandardItem(QString(tr("Time"))));
@@ -38,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent)
     data_model->setHorizontalHeaderItem(dataValuemWColumnID,new QStandardItem(QString(tr("mW"))));
     data_model->setHorizontalHeaderItem(dataValueFreqColumnID,new QStandardItem(QString(tr("Frequency MHz"))));
     data_model->setHorizontalHeaderItem(dataValueCorrectColumnID,new QStandardItem(QString(tr("Correction dB"))));
+    data_model->setHorizontalHeaderItem(dataValueAttenuationColumnID,new QStandardItem(QString(tr("Attenuation dB"))));
+    data_model->setHorizontalHeaderItem(dataValueTotalDbmColumnID,new QStandardItem(QString(tr("Total dBm"))));
+    data_model->setHorizontalHeaderItem(dataValueTotalMwColumnID,new QStandardItem(QString(tr("Total mW"))));
 
 
     ui->data_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -46,9 +56,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->data_tableView->setColumnWidth(dataTimeColumnID,200);
     ui->data_tableView->setColumnWidth(dataValueFreqColumnID,200);
     ui->data_tableView->setColumnWidth(dataValueCorrectColumnID,200);
+    ui->data_tableView->setColumnWidth(dataValuemWColumnID,200);
+    ui->data_tableView->setColumnWidth(dataValueAttenuationColumnID,200);
+    ui->data_tableView->setColumnWidth(dataValueTotalDbmColumnID,200);
+    ui->data_tableView->setColumnWidth(dataValueTotalMwColumnID,200);
 
-
-    connect(ui->data_tableView->model(),SIGNAL(rowsInserted(QModelIndex,int,int)),SLOT(on_data_model_rowsInserted(QModelIndex,int,int)));
+    connect(ui->data_tableView->model(),SIGNAL(rowsInserted(QModelIndex,int,int)),SLOT(ondata_model_rowsInserted(QModelIndex,int,int)));
 
     ui->dbm_lcdNumber->setSegmentStyle(QLCDNumber::Flat );
     ui->dbm_lcdNumber->setStyleSheet("QLCDNumber{ background-color: green; color: yellow;}");
@@ -68,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
 #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     configpath = QStandardPaths::standardLocations(QStandardPaths::ConfigLocation)[0] + "/" + qAppName();
 #endif
-    QFile file(configpath + "/chart_rules.json");
+ /*   QFile file(configpath + "/chart_rules.json");
     QDir().mkpath(configpath) ;
     if (!QFileInfo::exists(configpath + "/chart_rules.json"))
     {
@@ -79,6 +92,34 @@ MainWindow::MainWindow(QWidget *parent)
     file.open(QIODevice::ReadOnly);
     QString jsonRules = file.readAll();
     file.close();
+*/
+    const QString overrideFilePath = configpath + "/force_chart_rules.json";
+    const QString resourceFilePath = ":/chart_rules.json";
+    QString jsonRules;
+    QFile file;
+
+    if (QFileInfo::exists(overrideFilePath))
+    {
+        qDebug()<<"Loading user override chart rules from:"<<overrideFilePath;
+        file.setFileName(overrideFilePath);
+    }
+    else
+    {
+        qDebug()<<"Loading default chart rules from resources:"<<resourceFilePath;
+        file.setFileName(resourceFilePath);
+    }
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+        jsonRules = file.readAll();
+        file.close();
+    }
+    else
+    {
+        qWarning()<<"Could not open chart rules file:"<<file.fileName()<<file.errorString();
+    }
+
+
     QString jsonChartsRuleStr;
     QJsonParseError e;
     QJsonDocument jsonDocRules = QJsonDocument::fromJson(jsonRules.toUtf8(), &e);
@@ -87,13 +128,13 @@ MainWindow::MainWindow(QWidget *parent)
         if (!jsonDocRules.isNull() && !jsonDocRules.isEmpty())
         {
             jsonChartsRuleStr = QJsonDocument::fromVariant(jsonDocRules.object()["chartrules"].toObject().toVariantMap()).toJson(QJsonDocument::Compact);
-            qDebug() << jsonChartsRuleStr;
+            qDebug()<<jsonChartsRuleStr;
         }
 
     }
     else
     {
-        qWarning() << "Error incorrect json chartrules!!! " << e.errorString() << " " << e.offset;
+        qWarning()<<"Error incorrect json chartrules!!! "<<e.errorString()<<" "<<e.offset;
     }
 
 
@@ -104,6 +145,34 @@ MainWindow::MainWindow(QWidget *parent)
     charts->setisflow(ui->flow_checkBox->isChecked());
     charts->connectTracers();
     connect(this, SIGNAL(newData(QString, QString)), charts, SLOT(dataIncome(QString, QString)));
+
+    attenuationMgr = new AttenuationManager(this);
+    ui->att_gridLayout->addWidget(attenuationMgr, 1, 0, 1, 1);
+    connect(attenuationMgr, &AttenuationManager::totalAttenuationChanged, this, &MainWindow::onTotalAttenuationChanged);
+    ui->att_pushButton->setText(tr("Attenuation:") + " " + QString::number(m_current_atteuation,'f',2) + " dB");
+
+    m_attenuatorCalculator = new TargetPowerCalculator(this);
+    // Configure the calculator externally
+    m_attenuatorCalculator->setMinDbm(-45.0);
+    m_attenuatorCalculator->setMaxDbm(-5.0);
+    m_attenuatorCalculator->setTargetDbm(-20.0);
+    ui->att_gridLayout->addWidget(m_attenuatorCalculator, 2, 0, 1, 1);
+
+
+    // Connect the AttenuationManager to the calculator
+    connect(attenuationMgr, &AttenuationManager::totalAttenuationChanged, m_attenuatorCalculator, &TargetPowerCalculator::onActualAttenuationChanged);
+
+    ui->gridLayout_6->setColumnStretch(0, 1);
+    ui->gridLayout_6->setColumnStretch(1, 0);
+
+
+    connect(ui->att_pushButton, &QPushButton::toggled, ui->attenuation_dockWidget, &QWidget::setVisible);
+    ui->attenuation_dockWidget->installEventFilter(this);
+
+    // Set initial state
+    ui->att_pushButton->setChecked(false);
+    ui->attenuation_dockWidget->setVisible(false);
+
     Q_EMIT(on_set_pushButton_clicked());
 
 
@@ -146,6 +215,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->resetCharts_toolButton,&QToolButton::clicked,charts,&chartManager::resetAllCharts);
     connect(ui->flow_checkBox,&QCheckBox::stateChanged,charts,&chartManager::setisflow);
+    ui->flow_checkBox->setChecked(true);
+
     //autoconnector works fine
     //connect(ui->range_spinBox, SIGNAL(valueChanged(int)), this, SLOT(on_range_spinBox_valueChanged(int)));
     //connect(ui->saveCharts_toolButton, SIGNAL(clicked()), this, SLOT(on_saveCharts_toolButton_clicked()));
@@ -156,7 +227,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/* slot to coll range changing */
+/* slot to call range changing */
 void MainWindow::on_range_spinBox_valueChanged(int range)
 {
     qDebug()<<"on_range_spinBox_valueChanged";
@@ -172,7 +243,7 @@ int MainWindow::on_saveCharts_toolButton_clicked()
     QString chart_filepath = filepath + "/" + chartfoldername + "/" + chartdatetime + "/";
     if (!createDir(chart_filepath))
     {
-        qDebug() << "no such directory"<<chart_filepath;
+        qDebug()<<"no such directory"<<chart_filepath;
     }
     else
     {
@@ -209,7 +280,7 @@ void MainWindow::ondevice_comboBox_currentIndexChanged()
     }
 }
 
-void MainWindow::updateData(QString data)
+void MainWindow::updateData(const QString &data)
 {
     qDebug()<<"updateData"<<data;
     QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
@@ -223,59 +294,90 @@ void MainWindow::updateData(QString data)
         while (i.hasNext())
         {
             QRegularExpressionMatch match = i.next();
-            qDebug()<<match.captured(1);
-            ui->dbm_lcdNumber->display(match.captured(1));
+
             bool ok;
-            double mw=0;
-            double dbm=match.captured(1).toDouble(&ok);
-            mw=dBmTomW(dbm);
-            if(ok)
+            double dbm = match.captured(1).toDouble(&ok);
+            double milliwatts = 0; // Will be calculated if 'ok'
+
+            if (ok)
             {
-                ui->mW_lcdNumber->display(mw);
-                if(ui->maxdbm_lineEdit->text().toDouble()<dbm || ui->maxdbm_lineEdit->text().isEmpty())
+                // Calculate actual power for LCDs and MAX
+                double actual_dbm = dbm + m_current_atteuation;
+                double actual_milliwatts = UnitConverter::dBmToMilliwatts(actual_dbm);
+
+                // Update main displays with actual values
+                ui->dbm_lcdNumber->display(actual_dbm);
+                QPair<double, QString> formattedPower = UnitConverter::formatPower(actual_milliwatts);
+                ui->mW_lcdNumber->display(formattedPower.first);
+                ui->wattage_groupBox->setTitle(formattedPower.second);
+
+                // Use UnitConverter to get Vpp from actual power
+                double vpp = UnitConverter::milliwattsToVpp(actual_milliwatts);
+                QPair<double, QString> formattedVoltage = UnitConverter::formatVoltage(vpp);
+                ui->mVpp_lcdNumber->display(formattedVoltage.first);
+                // Correctly append "Vpp" to the prefix (k, "", m, µ, n)
+                ui->mvpp_groupBox->setTitle(formattedVoltage.second + "Vpp");
+
+                // Update MAX displays with actual values
+                if(ui->maxdbm_lineEdit->text().toDouble() < actual_dbm || ui->maxdbm_lineEdit->text().isEmpty())
                 {
-                    ui->maxmw_lineEdit->setText(QString::number(mw,'f',4));
-                    ui->maxdbm_lineEdit->setText(match.captured(1));
+                    ui->maxdbm_lineEdit->setText(QString::number(actual_dbm, 'f', 2));
+                    QPair<double, QString> formattedMaxPower = UnitConverter::formatPower(actual_milliwatts);
+                    ui->maxmw_lineEdit->setText(QString::number(formattedMaxPower.first, 'f', 4));
+                    ui->maxmw_label->setText(formattedMaxPower.second + ":");
                 }
             }
             else
             {
+                // Display error on LCDs if parsing failed
+                ui->dbm_lcdNumber->display(tr("Error"));
                 ui->mW_lcdNumber->display(tr("Error"));
+                ui->mVpp_lcdNumber->display(tr("Error"));
+                ui->wattage_groupBox->setTitle("mW");
+                ui->mvpp_groupBox->setTitle("mVpp");
             }
 
-            double mvpp=0;
-            QString mvppformatted="0";
-            qDebug()<<match.captured(2)<<match.captured(3);
-            if(match.captured(3)=='u')
-            {
-                mvpp=match.captured(2).toDouble()/1000;
-                mvppformatted=QString::number(mvpp,'f',4);
-            }
-            else
-            {
-                mvpp=match.captured(2).toDouble();
-                mvppformatted=QString::number(mvpp,'f',1);
-            }
-            ui->mVpp_lcdNumber->display(mvppformatted);
-            int row=data_model->rowCount();
+            // --- Table Population Logic ---
+            int row = data_model->rowCount();
             data_model->setItem(row,dataTimeColumnID,new QStandardItem(curdate));
             data_model->setItem(row,dataValuedBmColumnID,new QStandardItem(match.captured(1)));
             data_model->setData(data_model->index(row,dataValuedBmColumnID),match.captured(1),Qt::UserRole);
-            emit newData(data_model->headerData(dataValuedBmColumnID, Qt::Horizontal ).toString(), match.captured(1));
+
+
             if(ok)
             {
-                data_model->setItem(row,dataValuemWColumnID,new QStandardItem(QString::number(mw,'g',5)));
-                data_model->setData(data_model->index(row,dataValuemWColumnID),QString::number(mw,'g',5),Qt::UserRole);
+                milliwatts = UnitConverter::dBmToMilliwatts(dbm);
+                data_model->setItem(row,dataValuemWColumnID,new QStandardItem(QString::number(milliwatts,'f',8)));
+                data_model->setData(data_model->index(row,dataValuemWColumnID),QString::number(milliwatts,'f',8),Qt::UserRole);
             }
-            data_model->setItem(row,dataValuemVppColumnID,new QStandardItem(mvppformatted));
-            data_model->setData(data_model->index(row,dataValuemVppColumnID),mvppformatted,Qt::UserRole);
+            else
+            {
+                data_model->setItem(row,dataValuemWColumnID,new QStandardItem(tr("Error")));
+            }
+
+            double mvpp_raw=match.captured(2).toDouble();
+            if(match.captured(3)=='u') mvpp_raw /= 1000.0;
+            data_model->setItem(row,dataValuemVppColumnID,new QStandardItem(QString::number(mvpp_raw,'f',4)));
+            data_model->setData(data_model->index(row,dataValuemVppColumnID),mvpp_raw,Qt::UserRole);
+
             data_model->setItem(row,dataValueFreqColumnID,new QStandardItem(getFrequency()));
             data_model->setData(data_model->index(row,dataValueFreqColumnID),getFrequency(),Qt::UserRole);
             data_model->setItem(row,dataValueCorrectColumnID,new QStandardItem(getOffset()));
             data_model->setData(data_model->index(row,dataValueCorrectColumnID),getOffset(),Qt::UserRole);
 
-            if(ui->writeCSV_checkBox->isChecked())
-            {
+            data_model->setItem(row, dataValueAttenuationColumnID, new QStandardItem(QString::number(m_current_atteuation, 'f', 2)));
+
+            if (ok) {
+                double total_dbm = dbm + m_current_atteuation;
+                double total_mw = UnitConverter::dBmToMilliwatts(total_dbm);
+
+                data_model->setItem(row, dataValueTotalDbmColumnID, new QStandardItem(QString::number(total_dbm, 'f', 2)));
+                data_model->setItem(row, dataValueTotalMwColumnID, new QStandardItem(QString::number(total_mw, 'f', 8)));
+            } else {
+                data_model->setItem(row, dataValueTotalDbmColumnID, new QStandardItem(tr("Error")));
+                data_model->setItem(row, dataValueTotalMwColumnID, new QStandardItem(tr("Error")));
+            }
+
                 QString logLine="";
                 QString headersList="";
                 for (int i = 0; i < data_model->columnCount(); i++)
@@ -300,8 +402,13 @@ void MainWindow::updateData(QString data)
                 }
                 qDebug()<<headersList;
                 qDebug()<<logLine;
+
+
+            if(ui->writeCSV_checkBox->isChecked())
+            {
                 writeStatCSV("power", logLine, headersList);
             }
+            emit newData(headersList, logLine);
         }
     }
     else
@@ -314,22 +421,22 @@ void MainWindow::on_connect_pushButton_clicked()
 {
     qDebug()<<"on_connect_pushButton_clicked";
 
-        if(!ui->device_comboBox->currentData().toString().isEmpty())
-        {
+    if(!ui->device_comboBox->currentData().toString().isEmpty())
+    {
         serialPortPowerMeter->setportName(ui->device_comboBox->currentData().toString());
         serialPortPowerMeter->setbaudRate(9600);
         serialPortPowerMeter->startPort();
         Q_EMIT(on_set_pushButton_clicked());
         updateDeviceList();
-       }
+    }
 
 }
 
 void MainWindow::on_disconnect_pushButton_clicked()
 {
-       qDebug()<<"on_disconnect_pushButton_clicked";
-       serialPortPowerMeter->stopPort();
-       updateDeviceList();
+    qDebug()<<"on_disconnect_pushButton_clicked";
+    serialPortPowerMeter->stopPort();
+    updateDeviceList();
 
 }
 
@@ -377,7 +484,7 @@ void MainWindow::updateDeviceList()
 }
 
 
-void MainWindow::on_data_model_rowsInserted(const QModelIndex & parent, int start, int end)
+void MainWindow::ondata_model_rowsInserted(const QModelIndex & parent, int start, int end)
 {
     Q_UNUSED(parent)
     Q_UNUSED(start)
@@ -390,29 +497,23 @@ void MainWindow::on_data_model_rowsInserted(const QModelIndex & parent, int star
 
 }
 
-double MainWindow::dBmTomW(double dbm)
-{
-    double conv=qPow(10,(dbm/10));
-    return conv;
-}
-
 void MainWindow::on_simulate_checkBox_clicked()
 {
     qDebug()<<"on_simulate_checkBox_clicked";
     if(ui->simulate_checkBox->isChecked())
     {
 
-    if (!simulatorTimer.isActive())
-    {
-        simulatorTimer.start(500);
-    }
+        if (!simulatorTimer.isActive())
+        {
+            simulatorTimer.start(500);
+        }
     }
     else
     {
-    if (simulatorTimer.isActive())
-    {
-        simulatorTimer.stop();
-    }
+        if (simulatorTimer.isActive())
+        {
+            simulatorTimer.stop();
+        }
     }
 }
 
@@ -443,10 +544,7 @@ void MainWindow::on_set_pushButton_clicked()
 {
     qDebug()<<"on_set_pushButton_clicked";
     setFrequency(QString::number(ui->frequency_spinBox->value(),'d',0).rightJustified(4, '0'));
-    //if(ui->correctionplus_radioButton->isChecked())
-    //{
     setOffset(QString(ui->correctionplus_radioButton->isChecked()?"+":"-")+QString::number(ui->offset_doubleSpinBox->value(),'f',1).rightJustified(4, '0'));
-    //}
     qDebug()<<getFrequency();
     qDebug()<<getOffset();
     serialPortPowerMeter->writeData(("$"+getFrequency()+getOffset()+"#").toLatin1());
@@ -459,12 +557,12 @@ void MainWindow::on_serialPortError(QString error)
     Q_EMIT(ondevice_comboBox_currentIndexChanged());
 }
 
-void MainWindow::writeStatCSV(QString appendFileName, QString logLine, QString headersList)
+void MainWindow::writeStatCSV(const QString &appendFileName, const QString &logLine, const QString &headersList)
 {
     QTextStream cout(stdout);
     if (!createDir(filepath))
     {
-        qDebug() << "no such directory"<<filepath;
+        qDebug()<<"no such directory"<<filepath;
     }
     QString statfilepath = filepath + appendFileName + ".csv";
     bool exists = false;
@@ -488,20 +586,20 @@ void MainWindow::writeStatCSV(QString appendFileName, QString logLine, QString h
         int inputcolumns = headersList.split(",").count();
         if (inputcolumns > filecolumns)
         {
-        //int addcommaamount=inputcolumns-filecolumns;
-        //call rewrite file
-        QFile newFile(statfilepath + ".new");
-        if (!(outFile.open(QIODevice::ReadOnly | QIODevice::Text) && newFile.open(QIODevice::WriteOnly | QIODevice::Append)))return;
-        {
+            //int addcommaamount=inputcolumns-filecolumns;
+            //call rewrite file
+            QFile newFile(statfilepath + ".new");
+            if (!(outFile.open(QIODevice::ReadOnly | QIODevice::Text) && newFile.open(QIODevice::WriteOnly | QIODevice::Append)))return;
+            {
                 QTextStream textdata(&outFile);
                 QTextStream textStream(&newFile);
-                textStream << headersList << Qt::endl;
+                textStream<<headersList<<Qt::endl;
                 int linecnt = 0;
                 while (!textdata.atEnd())
                 {
                     if (linecnt > 0)
                     {
-                        textStream << textdata.readLine();
+                        textStream<<textdata.readLine();
                     }
                     else
                     {
@@ -513,7 +611,7 @@ void MainWindow::writeStatCSV(QString appendFileName, QString logLine, QString h
                 outFile.remove();
                 newFile.rename(statfilepath);
 
-        }
+            }
 
         }
     }
@@ -521,11 +619,11 @@ void MainWindow::writeStatCSV(QString appendFileName, QString logLine, QString h
     QTextStream textStream(&outFile);
     if (!exists)
     {
-        textStream << headersList << Qt::endl << logLine << Qt::endl;
+        textStream<<headersList<<Qt::endl<<logLine<<Qt::endl;
     }
     else
     {
-        textStream << logLine << Qt::endl;
+        textStream<<logLine<<Qt::endl;
     }
     outFile.close();
 }
@@ -534,23 +632,23 @@ bool MainWindow::createDir(QString path)
 {
     if (!QDir(path).exists())
     {
-        qDebug()  << "Creating stats dir: " << path;
+        qDebug() <<"Creating stats dir: "<<path;
         if (QDir().mkpath(path))
         {
-        qDebug()  << "Creating succesfull!";
+            qDebug() <<"Creating succesfull!";
         }
         else
         {
-        qDebug()  << "unable to create: " << path;
+            qDebug() <<"unable to create: "<<path;
         }
     }
     else
     {
-        qDebug()  << "Directory alredy exists: " << path;
+        qDebug() <<"Directory alredy exists: "<<path;
     }
     if (!QFile(path).exists())
     {
-        qDebug() << "imposible to create folder";
+        qDebug()<<"imposible to create folder";
         return false;
     }
     else
@@ -560,3 +658,28 @@ bool MainWindow::createDir(QString path)
 }
 
 
+void MainWindow::onTotalAttenuationChanged(double totalAttenuation)
+{
+    qDebug()<<"Total attenuation changed:"<<totalAttenuation;
+    ui->att_pushButton->setText(tr("Attenuation:") + " " + QString::number(totalAttenuation,'f',2) + " dB");
+    m_current_atteuation=totalAttenuation;
+
+}
+
+void MainWindow::on_resetMax_toolButton_clicked()
+{
+    qDebug()<<Q_FUNC_INFO;
+    ui->maxdbm_lineEdit->setText("");
+    ui->maxmw_lineEdit->setText("");
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == ui->attenuation_dockWidget && event->type() == QEvent::Close)
+    {
+        ui->att_pushButton->setChecked(false);
+        return false;
+    }
+
+    return QMainWindow::eventFilter(watched, event);
+}
