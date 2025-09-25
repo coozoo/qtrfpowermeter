@@ -36,22 +36,22 @@ public:
     //all created charts list
     QList<chartRealTime*> listCharts;
 
-    double getValueByHeader(QString header, QString headersString, QString dataString);
-    void saveAllCharts(QString imagePath, QString imageType, int width, int height);
+    double getValueByHeader(QString header, const QString &headersString, const QString &dataString);
+    void saveAllCharts(const QString &imagePath, QString imageType, int width, int height);
 
-    void setjsonChartRuleObject(QString m_jsonChartRuleObject)
+    void setjsonChartRuleObject(const QString &m_jsonChartRuleObject)
     {
         jsonChartRuleObject = m_jsonChartRuleObject;
         emit jsonChartRuleObjectChanged();
     }
-    QString getjsonChartRuleObject() const
+    const QString &getjsonChartRuleObject() const
     { return jsonChartRuleObject; }
 
-    void setstrDateTimeFile(QString m_strDateTimeFile)
+    void setstrDateTimeFile(const QString &m_strDateTimeFile)
     {
         strDateTimeFile = m_strDateTimeFile;
     }
-    QString getstrDateTimeFile() const
+    const QString &getstrDateTimeFile() const
     { return strDateTimeFile; }
 
 private:
@@ -62,7 +62,7 @@ signals:
     void jsonChartRuleObjectChanged();
 
 public slots:
-    void dataIncome(QString headersString, QString dataString);
+    void dataIncome(const QString &headersString, const QString &dataString);
     void on_jsonChartRuleObjectChanged();
     void resetAllCharts();
     void setAllRanges(int range);

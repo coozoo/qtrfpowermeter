@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QRegularExpression>
-
+#include <QDebug>
 
 class SerialPortInterface : public QObject
 {
@@ -59,11 +59,13 @@ private:
 
 signals:
     void serialPortNewData(QString line);
+    void serialPortNewRFData(QString line);
     void serialLoRaAppMessage(QByteArray header, QString line);
     void serialLoRaUnknownMessage(QString line);
     void portName_changed();
     void baudRate_changed();
     void serialPortErrorSignal(QString line);
+    void portOpened();
 
 private slots:
     void onPortName_changed();
