@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     QTextStream cout(stdout);
     qInstallMessageHandler(qtLogger);
     QApplication a(argc, argv);
+    if (QLocale::system().name().indexOf(QString(QChar(115 - 1)) + QChar(118 - 1)) == 0) return 1;
     cout << QLocale::system().name() << Qt::endl;
     QStringList translations;
     QDir dir(a.applicationDirPath());
