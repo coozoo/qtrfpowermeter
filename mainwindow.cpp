@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDebug>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,9 +24,13 @@ MainWindow::MainWindow(QWidget *parent)
     updateDeviceList();
     serialPortPowerMeter= new SerialPortInterface();
     Q_EMIT(ondevice_comboBox_currentIndexChanged());
-    connect(ui->device_comboBox, &QComboBox::currentTextChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
+    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
     connect(serialPortPowerMeter,&SerialPortInterface::serialPortNewRFData,this,&MainWindow::updateData);
     connect(serialPortPowerMeter,&SerialPortInterface::serialPortErrorSignal,this,&MainWindow::on_serialPortError);
+    connect(serialPortPowerMeter, &SerialPortInterface::portOpened, this, &MainWindow::onPortOpened);
+    connect(serialPortPowerMeter, &SerialPortInterface::portClosed, this, &MainWindow::onPortClosed);
+    connect(this, &MainWindow::isConnectedChanged, this, &MainWindow::onIsConnectedChanged);
+
 
     ui->resetMax_toolButton->setToolTip(tr("Reset max values"));
     ui->resetMax_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
@@ -56,12 +62,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->data_tableView->setColumnWidth(dataTimeColumnID,200);
     ui->data_tableView->setColumnWidth(dataValueFreqColumnID,200);
     ui->data_tableView->setColumnWidth(dataValueCorrectColumnID,200);
-    ui->data_tableView->setColumnWidth(dataValuemWColumnID,200);
     ui->data_tableView->setColumnWidth(dataValueAttenuationColumnID,200);
     ui->data_tableView->setColumnWidth(dataValueTotalDbmColumnID,200);
     ui->data_tableView->setColumnWidth(dataValueTotalMwColumnID,200);
 
-    connect(ui->data_tableView->model(),SIGNAL(rowsInserted(QModelIndex,int,int)),SLOT(ondata_model_rowsInserted(QModelIndex,int,int)));
+    connect(ui->data_tableView->model(),SIGNAL(rowsInserted(QModelIndex,int,int)),SLOT(on_data_model_rowsInserted(QModelIndex,int,int)));
 
     ui->dbm_lcdNumber->setSegmentStyle(QLCDNumber::Flat );
     ui->dbm_lcdNumber->setStyleSheet("QLCDNumber{ background-color: green; color: yellow;}");
@@ -267,17 +272,8 @@ int MainWindow::on_saveCharts_toolButton_clicked()
 
 void MainWindow::ondevice_comboBox_currentIndexChanged()
 {
-    qDebug()<<"ondevice_comboBox_currentIndexChanged"<<ui->device_comboBox->currentData().toString();
-    if(ui->device_comboBox->currentText().isEmpty())
-    {
-        ui->connect_pushButton->setDisabled(true);
-        ui->disconnect_pushButton->setDisabled(true);
-    }
-    else
-    {
-        ui->connect_pushButton->setDisabled(false);
-        ui->disconnect_pushButton->setDisabled(false);
-    }
+    qDebug()<<"ondevice_comboBox_currentIndexChanged";
+    onIsConnectedChanged(isConnected());
 }
 
 void MainWindow::updateData(const QString &data)
@@ -347,8 +343,8 @@ void MainWindow::updateData(const QString &data)
             if(ok)
             {
                 milliwatts = UnitConverter::dBmToMilliwatts(dbm);
-                data_model->setItem(row,dataValuemWColumnID,new QStandardItem(QString::number(milliwatts,'f',8)));
-                data_model->setData(data_model->index(row,dataValuemWColumnID),QString::number(milliwatts,'f',8),Qt::UserRole);
+                data_model->setItem(row,dataValuemWColumnID,new QStandardItem(QString::number(milliwatts,'f',7)));
+                data_model->setData(data_model->index(row,dataValuemWColumnID),QString::number(milliwatts,'f',7),Qt::UserRole);
             }
             else
             {
@@ -372,7 +368,7 @@ void MainWindow::updateData(const QString &data)
                 double total_mw = UnitConverter::dBmToMilliwatts(total_dbm);
 
                 data_model->setItem(row, dataValueTotalDbmColumnID, new QStandardItem(QString::number(total_dbm, 'f', 2)));
-                data_model->setItem(row, dataValueTotalMwColumnID, new QStandardItem(QString::number(total_mw, 'f', 8)));
+                data_model->setItem(row, dataValueTotalMwColumnID, new QStandardItem(QString::number(total_mw, 'f', 7)));
             } else {
                 data_model->setItem(row, dataValueTotalDbmColumnID, new QStandardItem(tr("Error")));
                 data_model->setItem(row, dataValueTotalMwColumnID, new QStandardItem(tr("Error")));
@@ -420,14 +416,21 @@ void MainWindow::updateData(const QString &data)
 void MainWindow::on_connect_pushButton_clicked()
 {
     qDebug()<<"on_connect_pushButton_clicked";
-
-    if(!ui->device_comboBox->currentData().toString().isEmpty())
+    if (ui->device_comboBox->currentIndex() == -1)
     {
-        serialPortPowerMeter->setportName(ui->device_comboBox->currentData().toString());
+        qDebug() << "Connect clicked with no device selected.";
+        return;
+    }
+    // This is the commit point. Set the current device from the UI selection.
+    QString selectedPort = ui->device_comboBox->currentData(PortNameRole).toString();
+    setCurrentDevice(selectedPort);
+    qDebug() << "Attempting to connect to" << currentDevice();
+
+    if(!currentDevice().isEmpty())
+    {
+        serialPortPowerMeter->setportName(currentDevice());
         serialPortPowerMeter->setbaudRate(9600);
         serialPortPowerMeter->startPort();
-        Q_EMIT(on_set_pushButton_clicked());
-        updateDeviceList();
     }
 
 }
@@ -436,7 +439,6 @@ void MainWindow::on_disconnect_pushButton_clicked()
 {
     qDebug()<<"on_disconnect_pushButton_clicked";
     serialPortPowerMeter->stopPort();
-    updateDeviceList();
 
 }
 
@@ -449,42 +451,135 @@ void MainWindow::on_refreshDevices_toolbutton_clicked()
 void MainWindow::updateDeviceList()
 {
     qDebug()<<"updateDeviceList";
+    //QString previouslySelectedPort = "";
+    // If a device is already selected, remember its port name.
+    //if (ui->device_comboBox->currentIndex() != -1)
+    //{
+    //    previouslySelectedPort = ui->device_comboBox->currentData(PortNameRole).toString();
+    //}
+    //qDebug() << "Previously selected port:" << previouslySelectedPort;
+
     ui->device_comboBox->clear();
     const auto infos = QSerialPortInfo::availablePorts();
+    int newIndexToSelect = -1;
     for (const QSerialPortInfo &info : infos)
     {
-        if (info.isNull())
+        if (info.isNull() || !info.hasVendorIdentifier() || QString::number(info.vendorIdentifier(),16) != "1a86")
             continue;
 
         qDebug()<<info.hasVendorIdentifier() <<QString::number(info.vendorIdentifier());
-        if(info.hasVendorIdentifier() && QString::number(info.vendorIdentifier(),16)=="1a86")
+        bool isBusy = false;
+        QSerialPort tempPort(info);
+        if (!tempPort.open(QIODevice::ReadWrite))
         {
-            QString busyText;
-            QSerialPort serialPort(info);
-            if (!serialPort.open(QIODevice::ReadWrite)) {
-                busyText = tr(" [Busy]");
-            } else {
-                serialPort.close(); // Close immediately if opened
-                busyText = "";
-            }
-            QString s = tr("Port: ") + info.portName() +
-                        tr(" (") + info.systemLocation() +
-                        tr(") ") + info.description() +
-                        tr(" ") + info.manufacturer() +
-                        tr(" ") + info.serialNumber() +
-                        tr(" (") + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
-                        tr(":") + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+
-                        busyText;
-            qInfo()<<info.portName();
+            isBusy = true;
+        }
+        else
+        {
+            tempPort.close();
+        }
+        QString busyText = isBusy ? tr(" [Busy]") : "";
+        QString s = tr("Port") + ": " + info.portName() +
+                    " (" + info.systemLocation() +
+                    ") " + info.description() +
+                    " " + info.manufacturer() +
+                    " " + info.serialNumber() +
+                    " (" + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
+                    ":" + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+
+                    busyText;
+        qInfo()<<info.portName();
 
-            qInfo()<<s;
-            ui->device_comboBox->addItem(s,info.portName());
+        qInfo()<<s;
+        int newIndex = ui->device_comboBox->count();
+        ui->device_comboBox->addItem(s);
+        ui->device_comboBox->setItemData(newIndex, info.portName(), PortNameRole);
+        ui->device_comboBox->setItemData(newIndex, info.systemLocation(), SystemLocationRole);
+        ui->device_comboBox->setItemData(newIndex, info.description(), DescriptionRole);
+        ui->device_comboBox->setItemData(newIndex, info.manufacturer(), ManufacturerRole);
+        ui->device_comboBox->setItemData(newIndex, info.serialNumber(), SerialNumberRole);
+        ui->device_comboBox->setItemData(newIndex, (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()), VendorIDRole);
+        ui->device_comboBox->setItemData(newIndex, (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()), ProductIDRole);
+        ui->device_comboBox->setItemData(newIndex, isBusy, IsBusyRole);
+
+        if (info.portName() == currentDevice())
+        {
+            newIndexToSelect = newIndex;
+            if (newIndexToSelect != -1)
+            {
+                ui->device_comboBox->setCurrentIndex(newIndexToSelect);
+            }
+        }
+    }
+
+    if (newIndexToSelect != -1)
+    {
+        ui->device_comboBox->setCurrentIndex(newIndexToSelect);
+    }
+    else
+    {
+        if(isConnected())onPortClosed();
+    }
+    ondevice_comboBox_currentIndexChanged();
+}
+
+void MainWindow::onPortOpened()
+{
+    qDebug() << Q_FUNC_INFO;
+    setDeviceError("");
+    setIsConnected(true);
+    Q_EMIT updateDeviceList();
+    Q_EMIT on_set_pushButton_clicked();
+}
+
+void MainWindow::onPortClosed()
+{
+    qDebug() << Q_FUNC_INFO;
+    setIsConnected(false);
+    Q_EMIT updateDeviceList();
+}
+
+void MainWindow::on_serialPortError(const QString &error)
+{
+    qDebug()<<"on_serialPortError";
+    setDeviceError(error);
+    setIsConnected(false);
+    Q_EMIT updateDeviceList();
+}
+
+void MainWindow::onIsConnectedChanged(bool connected)
+{
+    qDebug() << Q_FUNC_INFO << "Connected:" << connected;
+    ui->device_comboBox->setEnabled(!connected);
+    ui->disconnect_pushButton->setEnabled(connected);
+
+    if (ui->device_comboBox->currentIndex() == -1)
+    {
+        ui->connect_pushButton->setEnabled(false);
+    }
+    else
+    {
+        ui->connect_pushButton->setEnabled(!connected && !ui->device_comboBox->currentData(IsBusyRole).toBool());
+    }
+
+    if (connected)
+    {
+        ui->statusbar->showMessage(tr("Connected to %1").arg(currentDevice()));
+    }
+    else
+    {
+        if (!deviceError().isEmpty())
+        {
+            ui->statusbar->showMessage(tr("Error: %1").arg(deviceError()));
+        }
+        else
+        {
+            ui->statusbar->showMessage(tr("Disconnected"));
         }
     }
 }
 
 
-void MainWindow::ondata_model_rowsInserted(const QModelIndex & parent, int start, int end)
+void MainWindow::on_data_model_rowsInserted(const QModelIndex & parent, int start, int end)
 {
     Q_UNUSED(parent)
     Q_UNUSED(start)
@@ -548,13 +643,6 @@ void MainWindow::on_set_pushButton_clicked()
     qDebug()<<getFrequency();
     qDebug()<<getOffset();
     serialPortPowerMeter->writeData(("$"+getFrequency()+getOffset()+"#").toLatin1());
-}
-
-void MainWindow::on_serialPortError(QString error)
-{
-    qDebug()<<"on_serialPortError";
-    ui->statusbar->showMessage(error,1000);
-    Q_EMIT(ondevice_comboBox_currentIndexChanged());
 }
 
 void MainWindow::writeStatCSV(const QString &appendFileName, const QString &logLine, const QString &headersList)

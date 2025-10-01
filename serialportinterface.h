@@ -22,12 +22,12 @@ public:
     explicit SerialPortInterface(QObject *parent = nullptr);
     ~SerialPortInterface();
 
-    void setportName(QString m_portName)
+    void setportName(const QString &m_portName)
     {
         portName = m_portName;
         //emit portName_changed();
     }
-    QString getportName() const
+    const QString &getportName() const
     {
         return portName;
     }
@@ -61,11 +61,11 @@ signals:
     void serialPortNewData(QString line);
     void serialPortNewRFData(QString line);
     void serialLoRaAppMessage(QByteArray header, QString line);
-    void serialLoRaUnknownMessage(QString line);
     void portName_changed();
     void baudRate_changed();
-    void serialPortErrorSignal(QString line);
+    void serialPortErrorSignal(QString error);
     void portOpened();
+    void portClosed();
 
 private slots:
     void onPortName_changed();

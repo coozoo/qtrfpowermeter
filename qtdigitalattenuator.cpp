@@ -22,10 +22,13 @@ QtDigitalAttenuator::QtDigitalAttenuator(QWidget *parent)
     ui->refreshDevices_toolbutton->setIcon(QIcon::fromTheme("view-refresh",QIcon(":/images/view-refresh.svg")));
     serialAttenuator= new AttDevice();
     Q_EMIT(ondevice_comboBox_currentIndexChanged());
-    connect(ui->device_comboBox, &QComboBox::currentTextChanged, this, &QtDigitalAttenuator::ondevice_comboBox_currentIndexChanged);
+    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &QtDigitalAttenuator::ondevice_comboBox_currentIndexChanged);
     connect(serialAttenuator,&AttDevice::serialPortNewData,this,&QtDigitalAttenuator::updateData);
     connect(serialAttenuator,&AttDevice::serialPortErrorSignal,this,&QtDigitalAttenuator::on_serialPortError);
     connect(serialAttenuator,&AttDevice::currentValueChanged,this,&QtDigitalAttenuator::on_currentAttenuation_changed);
+    connect(serialAttenuator, &AttDevice::portOpened, this, &QtDigitalAttenuator::onPortOpened);
+    connect(serialAttenuator, &AttDevice::portClosed, this, &QtDigitalAttenuator::onPortClosed);
+    connect(this, &QtDigitalAttenuator::isConnectedChanged, this, &QtDigitalAttenuator::onIsConnectedChanged);
     connect(serialAttenuator,&AttDevice::detectedDevice,this,&QtDigitalAttenuator::ondetectedDevice);
     connect(ui->attenuation_doubleSpinBox,&QDoubleSpinBox::valueChanged,this,&QtDigitalAttenuator::onattenuation_doubleSpinBox_valueChanged);
     connect(ui->deviceConsole_pushButton,&QPushButton::clicked,this,&QtDigitalAttenuator::ondeviceConsole_pushButton_clicked);
@@ -39,19 +42,31 @@ QtDigitalAttenuator::~QtDigitalAttenuator()
     delete ui;
 }
 
+
+
+void QtDigitalAttenuator::onPortOpened()
+{
+    qDebug() << Q_FUNC_INFO;
+    setDeviceError("");
+    setIsConnected(true);
+    updateDeviceList();
+}
+
+void QtDigitalAttenuator::onPortClosed()
+{
+    qDebug() << Q_FUNC_INFO;
+    ui->model_lineEdit->setText("");
+    emit modelChanged(tr("Disconnected"));
+    setIsConnected(false);
+    updateDeviceList();
+    ui->statusSet_label->setText("----");
+    serialAttenuator->setCurrentValue(0);
+}
+
 void QtDigitalAttenuator::ondevice_comboBox_currentIndexChanged()
 {
-    qDebug()<<"ondevice_comboBox_currentIndexChanged"<<ui->device_comboBox->currentData().toString();
-    if(ui->device_comboBox->currentText().isEmpty())
-    {
-        ui->connect_pushButton->setDisabled(true);
-        ui->disconnect_pushButton->setDisabled(true);
-    }
-    else
-    {
-        ui->connect_pushButton->setDisabled(false);
-        ui->disconnect_pushButton->setDisabled(false);
-    }
+    qDebug()<<"ondevice_comboBox_currentIndexChanged";
+    onIsConnectedChanged(isConnected());
 }
 
 void QtDigitalAttenuator::updateData(const QString &data)
@@ -65,26 +80,30 @@ void QtDigitalAttenuator::on_connect_pushButton_clicked()
 {
     qDebug()<<"on_connect_pushButton_clicked";
 
-    if(!ui->device_comboBox->currentData().toString().isEmpty())
+    if (ui->device_comboBox->currentIndex() == -1)
     {
-        serialAttenuator->setportName(ui->device_comboBox->currentData().toString());
+        qDebug() << "Connect clicked with no device selected.";
+        return;
+    }
+    // This is the commit point. Set the current device from the UI selection.
+    QString selectedPort = ui->device_comboBox->currentData(PortNameRole).toString();
+    QString selectedSerial = ui->device_comboBox->currentData(SerialNumberRole).toString();
+
+    setCurrentDevice(selectedSerial);
+    qDebug() << "Attempting to connect to" << selectedPort << "with S/N" << currentDevice();
+
+    if(!selectedPort.isEmpty())
+    {
+        serialAttenuator->setportName(selectedPort);
         serialAttenuator->setbaudRate(115200);
         serialAttenuator->startPort();
-
-        //Q_EMIT(on_set_pushButton_clicked());
-       updateDeviceList();
     }
-
 }
 
 void QtDigitalAttenuator::on_disconnect_pushButton_clicked()
 {
     qDebug()<<"on_disconnect_pushButton_clicked";
     serialAttenuator->stopPort();
-    ui->model_lineEdit->setText("");
-    emit modelChanged(tr("Disconnected"));
-    updateDeviceList();
-
 }
 
 void QtDigitalAttenuator::on_refreshDevices_toolbutton_clicked()
@@ -98,39 +117,65 @@ void QtDigitalAttenuator::updateDeviceList()
     qDebug()<<"updateDeviceList";
     ui->device_comboBox->clear();
     const auto infos = QSerialPortInfo::availablePorts();
+    int newIndexToSelect = -1;
     for (const QSerialPortInfo &info : infos)
     {
-
         if(info.hasVendorIdentifier() && QString::number(info.vendorIdentifier(),16)=="483")
         {
             qDebug()<<info.hasVendorIdentifier() <<QString::number(info.vendorIdentifier());
+            bool isBusy = false;
             QString busyText;
             QSerialPort serialPort(info);
             if (!serialPort.open(QIODevice::ReadWrite)) {
                 busyText = tr(" [Busy]");
+                isBusy = true;
             } else {
                 serialPort.close();
                 busyText = "           ";
             }
             QString s = info.portName() +
-                        tr(" ") + info.manufacturer() +
-                        tr(" ") + info.serialNumber() +
-                        tr(" (") + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
-                        tr(":") + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+
+                        " " + info.manufacturer() +
+                        " " + info.serialNumber() +
+                        " (" + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
+                        ":" + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+
                         busyText;
-            qInfo()<<info.portName();
+            qInfo() << info.portName();
+            qInfo() << s;
 
-            qInfo()<<s;
-            ui->device_comboBox->addItem(s,info.portName());
+            int newIndex = ui->device_comboBox->count();
+            ui->device_comboBox->addItem(s, info.portName()); // Default data is port name for logging in updateData
+            ui->device_comboBox->setItemData(newIndex, info.portName(), PortNameRole);
+            ui->device_comboBox->setItemData(newIndex, info.systemLocation(), SystemLocationRole);
+            ui->device_comboBox->setItemData(newIndex, info.description(), DescriptionRole);
+            ui->device_comboBox->setItemData(newIndex, info.manufacturer(), ManufacturerRole);
+            ui->device_comboBox->setItemData(newIndex, info.serialNumber(), SerialNumberRole);
+            ui->device_comboBox->setItemData(newIndex, (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()), VendorIDRole);
+            ui->device_comboBox->setItemData(newIndex, (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()), ProductIDRole);
+            ui->device_comboBox->setItemData(newIndex, isBusy, IsBusyRole);
+
+            if (info.serialNumber() == currentDevice())
+            {
+                newIndexToSelect = newIndex;
+            }
         }
     }
+
+    if (newIndexToSelect != -1)
+    {
+        ui->device_comboBox->setCurrentIndex(newIndexToSelect);
+    }
+    ondevice_comboBox_currentIndexChanged();
 }
 
-void QtDigitalAttenuator::on_serialPortError(QString error)
+void QtDigitalAttenuator::on_serialPortError(const QString &error)
 {
     qDebug()<<"on_serialPortError";
-    ui->statusbar->showMessage(error,1000);
-    Q_EMIT(ondevice_comboBox_currentIndexChanged());
+    setDeviceError(error);
+    setIsConnected(false);
+    updateDeviceList();
+    ui->statusSet_label->setStyleSheet("QLabel { background-color: #F44336; color: white; border-radius: 10px; padding: 3px 9px; font-weight: bold; }");
+    ui->statusSet_label->setText("----");
+    serialAttenuator->setCurrentValue(0);
 }
 
 void QtDigitalAttenuator::on_send_pushButton_clicked()
@@ -200,4 +245,38 @@ void QtDigitalAttenuator::ondeviceSetStatus(bool status)
         ui->statusSet_label->setStyleSheet("QLabel { background-color: #F44336; color: white; border-radius: 10px; padding: 3px 9px; font-weight: bold; }");
     }
     emit valueSetStatus(status);
+}
+
+void QtDigitalAttenuator::onIsConnectedChanged(bool connected)
+{
+    qDebug() << Q_FUNC_INFO << "Connected:" << connected;
+    ui->device_comboBox->setEnabled(!connected);
+    ui->disconnect_pushButton->setEnabled(connected);
+
+    if (ui->device_comboBox->currentIndex() == -1)
+    {
+        ui->connect_pushButton->setEnabled(false);
+    }
+    else
+    {
+        ui->connect_pushButton->setEnabled(!connected && !ui->device_comboBox->currentData(IsBusyRole).toBool());
+    }
+
+    if (connected)
+    {
+        if (ui->device_comboBox->currentIndex() != -1) {
+             ui->statusbar->showMessage(tr("Connected to %1").arg(ui->device_comboBox->currentData(PortNameRole).toString()));
+        } else {
+             ui->statusbar->showMessage(tr("Connected"));
+        }
+    }
+    else
+    {
+        if (!deviceError().isEmpty())
+        {
+            ui->statusbar->showMessage(tr("Error: %1").arg(deviceError()));
+        } else {
+            ui->statusbar->showMessage(tr("Disconnected"));
+        }
+    }
 }
