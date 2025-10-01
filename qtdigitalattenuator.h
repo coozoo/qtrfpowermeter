@@ -108,6 +108,8 @@ private slots:
     void ondetectedDevice(const QString &model, double step, double max, const QString &format);
     void ondeviceConsole_pushButton_clicked();
     void ondeviceSetStatus(bool status);
+    void on_useHardButtons_checkBox_stateChanged(int state);
+
 signals:
     void currentValueChanged(double value);
     void valueSetStatus(bool status);

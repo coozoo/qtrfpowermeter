@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>834</width>
-    <height>634</height>
+    <width>836</width>
+    <height>636</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -216,6 +216,13 @@
                     </widget>
                    </item>
                   </layout>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QCheckBox" name="useHardButtons_checkBox">
+                   <property name="text">
+                    <string>Use Hardware Set Buttons</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>

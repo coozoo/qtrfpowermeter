@@ -43,6 +43,8 @@ public:
         return baudRate;
     }
 
+    bool isPortOpen() const;
+
 
 public slots:
     void startPort();

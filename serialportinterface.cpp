@@ -39,6 +39,11 @@ void SerialPortInterface::startPort()
     }
 }
 
+bool SerialPortInterface::isPortOpen() const
+{
+    return m_serialPort->isOpen();
+}
+
 void SerialPortInterface::stopPort()
 {
     if (m_serialPort->isOpen())

@@ -62,6 +62,8 @@
 #include <QRegularExpression>
 #include <QDebug>
 
+constexpr int hardwareReadIntervalMs = 5000;
+
 enum class AttFormat
 {
     Format000_00, // "att-%06.2f\r\n"
@@ -176,6 +178,7 @@ public:
     Q_INVOKABLE void probeDeviceType();
     Q_INVOKABLE void readValue();
     Q_INVOKABLE void writeValue(double value);
+    Q_INVOKABLE void setPollingEnabled(bool enabled);
 
 signals:
     void modelChanged(const QString &model);
@@ -196,6 +199,7 @@ private slots:
     void onDevicePort_started();
     void onProbeTimeout();
     void tryUnknownFormat();
+    void onPortClosed();
 
 private:
     enum ProbeState
@@ -224,6 +228,7 @@ private:
     int m_unknownFormatIdx = 0;
     QTimer m_unknownFormatTimer;
     bool    m_isProbingUnknownFormats = false;
+    QTimer* m_pollingTimer;
 };
 
 #endif // ATTDEVICE_H

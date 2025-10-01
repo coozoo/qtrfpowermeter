@@ -17,6 +17,9 @@ QtDigitalAttenuator::QtDigitalAttenuator(QWidget *parent)
             serialAttenuator->writeValue(ui->attenuation_doubleSpinBox->value());
         }
     });
+
+    ui->useHardButtons_checkBox->setToolTip(tr("Periodically read the attenuation value from the device every %1 ms.").arg(hardwareReadIntervalMs));
+
     updateDeviceList();
     ui->statusSet_label->setAlignment(Qt::AlignCenter);
     ui->refreshDevices_toolbutton->setIcon(QIcon::fromTheme("view-refresh",QIcon(":/images/view-refresh.svg")));
@@ -33,6 +36,7 @@ QtDigitalAttenuator::QtDigitalAttenuator(QWidget *parent)
     connect(ui->attenuation_doubleSpinBox,&QDoubleSpinBox::valueChanged,this,&QtDigitalAttenuator::onattenuation_doubleSpinBox_valueChanged);
     connect(ui->deviceConsole_pushButton,&QPushButton::clicked,this,&QtDigitalAttenuator::ondeviceConsole_pushButton_clicked);
     connect(serialAttenuator,&AttDevice::valueSetStatus,this,&QtDigitalAttenuator::ondeviceSetStatus);
+    connect(ui->useHardButtons_checkBox, &QCheckBox::stateChanged, this, &QtDigitalAttenuator::on_useHardButtons_checkBox_stateChanged);
 }
 
 QtDigitalAttenuator::~QtDigitalAttenuator()
@@ -197,6 +201,12 @@ void QtDigitalAttenuator::on_currentAttenuation_changed(double value)
     qDebug()<<Q_FUNC_INFO<<value;
     ui->currentattenuation_lcdNumber->display(value);
 
+    if (ui->useHardButtons_checkBox->isChecked()) {
+        ui->attenuation_doubleSpinBox->blockSignals(true);
+        ui->attenuation_doubleSpinBox->setValue(value);
+        ui->attenuation_doubleSpinBox->blockSignals(false);
+    }
+
     emit currentValueChanged(value);
 }
 
@@ -279,4 +289,14 @@ void QtDigitalAttenuator::onIsConnectedChanged(bool connected)
             ui->statusbar->showMessage(tr("Disconnected"));
         }
     }
+}
+
+void QtDigitalAttenuator::on_useHardButtons_checkBox_stateChanged(int state)
+{
+    bool checked = (state == Qt::Checked);
+    ui->attenuation_doubleSpinBox->setEnabled(!checked);
+    ui->set_pushButton->setEnabled(!checked);
+    ui->autoset_checkBox->setEnabled(!checked);
+
+    serialAttenuator->setPollingEnabled(checked && isConnected());
 }

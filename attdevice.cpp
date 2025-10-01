@@ -6,11 +6,28 @@ AttDevice::AttDevice(QObject *parent)
     connect(this, &SerialPortInterface::serialPortNewData, this, &AttDevice::onSerialPortNewData);
     connect(this, &AttDevice::expectedValueChanged, this, &AttDevice::onExpectedValueChanged);
     connect(this, &SerialPortInterface::portOpened, this, &AttDevice::onDevicePort_started);
+    connect(this, &SerialPortInterface::portClosed, this, &AttDevice::onPortClosed);
     connect(&m_probeTimer, &QTimer::timeout, this, &AttDevice::onProbeTimeout);
     connect(this, &AttDevice::unknownDevice, this, &AttDevice::tryUnknownFormat);
     connect(&m_unknownFormatTimer, &QTimer::timeout, this, &AttDevice::tryUnknownFormat);
     m_probeTimer.setSingleShot(true);
     m_unknownFormatTimer.setSingleShot(true);
+
+    m_pollingTimer = new QTimer(this);
+    m_pollingTimer->setInterval(hardwareReadIntervalMs);
+    connect(m_pollingTimer, &QTimer::timeout, this, &AttDevice::readValue);
+}
+
+void AttDevice::setPollingEnabled(bool enabled)
+{
+    if (enabled) {
+        if (isPortOpen()) {
+            m_pollingTimer->start();
+            readValue();
+        }
+    } else {
+        m_pollingTimer->stop();
+    }
 }
 
 void AttDevice::writeValue(double value)
@@ -38,6 +55,12 @@ void AttDevice::onDevicePort_started()
 {
     qDebug()<<Q_FUNC_INFO;
     probeDeviceType();
+}
+
+void AttDevice::onPortClosed()
+{
+    qDebug() << Q_FUNC_INFO;
+    m_pollingTimer->stop();
 }
 
 void AttDevice::probeDeviceType()
@@ -230,7 +253,10 @@ void AttDevice::onSerialPortNewData(const QString &line)
                             else
                                 {
                                     emit valueMismatched(m_expectedValue, val);
-                                    emit valueSetStatus(false);
+                                    if(!m_pollingTimer->isActive())
+                                    {
+                                         emit valueSetStatus(false);
+                                    }
                                 }
                         }
                     continue;
