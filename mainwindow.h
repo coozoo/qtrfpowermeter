@@ -18,6 +18,7 @@
 #include "attenuationmanager.h"
 #include "unitconverter.h"
 #include "targetpowercalculator.h"
+#include "calibrationmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -159,6 +160,7 @@ private:
     QString filepath;
     double m_current_atteuation=0;
     TargetPowerCalculator *m_attenuatorCalculator;
+    CalibrationManager *m_calibrationManager;
 
     QString m_currentDevice;
     bool m_isConnected = false;
@@ -184,7 +186,9 @@ private slots:
     void onPortOpened();
     void onPortClosed();
     void onIsConnectedChanged(bool connected);
-
+    // --- Calibration Slots ---
+    void on_calibration_pushButton_toggled(bool checked);
+    void onCalibrationFrequencySelected(double frequencyMHz);
 
 public slots:
     void on_range_spinBox_valueChanged(int range);
@@ -192,6 +196,7 @@ public slots:
 
 signals:
     void newData(QString headersList,QString dataList);
+    void newMeasurement(double dbmValue);
     void currentDeviceChanged();
     void isConnectedChanged(bool connected);
     void deviceErrorChanged();

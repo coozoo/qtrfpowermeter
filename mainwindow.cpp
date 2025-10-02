@@ -149,7 +149,7 @@ MainWindow::MainWindow(QWidget *parent)
     charts->setjsonChartRuleObject(jsonChartsRuleStr);
     charts->setisflow(ui->flow_checkBox->isChecked());
     charts->connectTracers();
-    connect(this, SIGNAL(newData(QString, QString)), charts, SLOT(dataIncome(QString, QString)));
+    connect(this, &MainWindow::newData, charts, &chartManager::dataIncome);
 
     attenuationMgr = new AttenuationManager(this);
     ui->att_gridLayout->addWidget(attenuationMgr, 1, 0, 1, 1);
@@ -177,6 +177,18 @@ MainWindow::MainWindow(QWidget *parent)
     // Set initial state
     ui->att_pushButton->setChecked(false);
     ui->attenuation_dockWidget->setVisible(false);
+
+    // --- Calibration Setup ---
+    m_calibrationManager = new CalibrationManager(this);
+    ui->calibration_dockWidget->setWidget(m_calibrationManager);
+    ui->calibration_dockWidget->setVisible(false);
+    connect(ui->calibration_pushButton, &QPushButton::toggled, this, &MainWindow::on_calibration_pushButton_toggled);
+    connect(m_calibrationManager, &CalibrationManager::frequencySelected, this, &MainWindow::onCalibrationFrequencySelected);
+    ui->calibration_dockWidget->installEventFilter(this);
+
+    // This is the key connection for your improved design
+    connect(this, &MainWindow::newMeasurement, m_calibrationManager, &CalibrationManager::onNewMeasurement);
+
 
     Q_EMIT(on_set_pushButton_clicked());
 
@@ -297,12 +309,16 @@ void MainWindow::updateData(const QString &data)
 
             if (ok)
             {
-                // Calculate actual power for LCDs and MAX
-                double actual_dbm = dbm + m_current_atteuation;
+                // --- Apply Corrections for Display ---
+                double current_freq_mhz = getFrequency().toDouble();
+                double calibration_correction = m_calibrationManager->getCorrection(current_freq_mhz);
+
+                double actual_dbm = dbm + m_current_atteuation + calibration_correction;
                 double actual_milliwatts = UnitConverter::dBmToMilliwatts(actual_dbm);
 
                 // Update main displays with actual values
                 ui->dbm_lcdNumber->display(actual_dbm);
+                emit newMeasurement(dbm);
                 QPair<double, QString> formattedPower = UnitConverter::formatPower(actual_milliwatts);
                 ui->mW_lcdNumber->display(formattedPower.first);
                 ui->wattage_groupBox->setTitle(formattedPower.second);
@@ -364,7 +380,8 @@ void MainWindow::updateData(const QString &data)
             data_model->setItem(row, dataValueAttenuationColumnID, new QStandardItem(QString::number(m_current_atteuation, 'f', 2)));
 
             if (ok) {
-                double total_dbm = dbm + m_current_atteuation;
+                double calibration_correction_for_table = m_calibrationManager->getCorrection(getFrequency().toDouble());
+                double total_dbm = dbm + m_current_atteuation + calibration_correction_for_table;
                 double total_mw = UnitConverter::dBmToMilliwatts(total_dbm);
 
                 data_model->setItem(row, dataValueTotalDbmColumnID, new QStandardItem(QString::number(total_dbm, 'f', 2)));
@@ -768,6 +785,23 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         ui->att_pushButton->setChecked(false);
         return false;
     }
+    if (watched == ui->calibration_dockWidget && event->type() == QEvent::Close)
+    {
+        ui->calibration_pushButton->setChecked(false);
+        return false;
+    }
 
     return QMainWindow::eventFilter(watched, event);
+}
+
+void MainWindow::on_calibration_pushButton_toggled(bool checked)
+{
+    ui->calibration_dockWidget->setVisible(checked);
+}
+
+void MainWindow::onCalibrationFrequencySelected(double frequencyMHz)
+{
+    qDebug() << "Calibration: A frequency was selected:" << frequencyMHz << "MHz. Please set your signal generator accordingly.";
+    ui->frequency_spinBox->setValue(static_cast<int>(frequencyMHz));
+    on_set_pushButton_clicked();
 }
