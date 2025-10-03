@@ -21,6 +21,11 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    // --- Connect model changes to the plot ---
+    connect(m_model, &QAbstractItemModel::modelReset, this, &CalibrationManager::updatePlot);
+    connect(m_model, &QAbstractItemModel::dataChanged, this, &CalibrationManager::updatePlot);
+
+
     // Connect UI signals to slots
     connect(ui->generateButton, &QPushButton::clicked, this, &CalibrationManager::on_generateButton_clicked);
     connect(ui->pickAverageButton, &QPushButton::clicked, this, &CalibrationManager::on_pickAverageButton_clicked);
@@ -35,13 +40,149 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
     ui->endUnitComboBox->addItems({"MHz", "GHz"});
     ui->stepUnitComboBox->addItems({"MHz", "GHz"});
 
+    // --- Set initial precision for MHz ---
+    ui->startFreqSpinBox->setDecimals(0);
+    ui->endFreqSpinBox->setDecimals(0);
+    ui->stepFreqSpinBox->setDecimals(0);
+    ui->stepFreqSpinBox->setMinimum(5);
+
+    // --- Connect each control to its own dedicated slot ---
+    connect(ui->startFreqSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &CalibrationManager::onStartFreqChanged);
+    connect(ui->endFreqSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &CalibrationManager::onEndFreqChanged);
+    connect(ui->startUnitComboBox, &QComboBox::currentTextChanged, this, &CalibrationManager::onStartUnitChanged);
+    connect(ui->endUnitComboBox, &QComboBox::currentTextChanged, this, &CalibrationManager::onEndUnitChanged);
+    connect(ui->stepUnitComboBox, &QComboBox::currentTextChanged, this, &CalibrationManager::onStepUnitChanged);
+
     loadProfiles();
+    setupPlot();
+    onStartFreqChanged(ui->startFreqSpinBox->value());
+    onEndFreqChanged(ui->endFreqSpinBox->value());
 }
 
 CalibrationManager::~CalibrationManager()
 {
     delete ui;
 }
+
+void CalibrationManager::setupPlot()
+{
+    ui->plotWidget->addGraph();
+    ui->plotWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->plotWidget->addGraph();
+    ui->plotWidget->graph(1)->setPen(QPen(Qt::red));
+    ui->plotWidget->graph(1)->setLineStyle(QCPGraph::lsNone);
+    ui->plotWidget->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+
+    ui->plotWidget->xAxis->setLabel("Frequency (MHz)");
+    ui->plotWidget->yAxis->setLabel("Correction (dB)");
+    ui->plotWidget->setInteractions({});
+}
+
+void CalibrationManager::updatePlot()
+{
+    QVector<double> measuredFreqs, measuredCorrections;
+    QVector<double> lineFreqs, lineCorrections;
+
+    const auto& points = m_model->getPoints();
+    if (points.isEmpty()) {
+        ui->plotWidget->graph(0)->setData({}, {});
+        ui->plotWidget->graph(1)->setData({}, {});
+        ui->plotWidget->replot();
+        return;
+    }
+
+    for (const auto& point : points) {
+        if (point.isSet) {
+            measuredFreqs.append(point.frequencyMHz);
+            measuredCorrections.append(point.correctionDb);
+        }
+    }
+
+    const int lineSteps = 200;
+    double minFreq = points.first().frequencyMHz;
+    double maxFreq = points.last().frequencyMHz;
+    double step = (maxFreq - minFreq) / lineSteps;
+
+    if (step > 0) {
+        for (int i = 0; i <= lineSteps; ++i) {
+            double freq = minFreq + i * step;
+            lineFreqs.append(freq);
+            lineCorrections.append(m_model->getCorrection(freq));
+        }
+    } else if (!points.isEmpty()) {
+        lineFreqs.append(minFreq);
+        lineCorrections.append(m_model->getCorrection(minFreq));
+    }
+
+    ui->plotWidget->graph(0)->setData(lineFreqs, lineCorrections);
+    ui->plotWidget->graph(1)->setData(measuredFreqs, measuredCorrections);
+    ui->plotWidget->rescaleAxes();
+    ui->plotWidget->replot();
+}
+
+void CalibrationManager::onStartFreqChanged(double value)
+{
+    double startValMHz = value * (ui->startUnitComboBox->currentText() == "GHz" ? 1000.0 : 1.0);
+    double newEndMin = (startValMHz + 1.0) / (ui->endUnitComboBox->currentText() == "GHz" ? 1000.0 : 1.0);
+
+    ui->endFreqSpinBox->blockSignals(true);
+    ui->endFreqSpinBox->setMinimum(newEndMin);
+    ui->endFreqSpinBox->blockSignals(false);
+}
+
+void CalibrationManager::onEndFreqChanged(double value)
+{
+    double endValMHz = value * (ui->endUnitComboBox->currentText() == "GHz" ? 1000.0 : 1.0);
+    double newStartMax = (endValMHz - 1.0) / (ui->startUnitComboBox->currentText() == "GHz" ? 1000.0 : 1.0);
+
+    ui->startFreqSpinBox->blockSignals(true);
+    ui->startFreqSpinBox->setMaximum(newStartMax);
+    ui->startFreqSpinBox->blockSignals(false);
+}
+
+void CalibrationManager::onStartUnitChanged(const QString &newUnit)
+{
+    ui->startFreqSpinBox->blockSignals(true);
+    double currentVal = ui->startFreqSpinBox->value();
+    double multiplier = (newUnit == "GHz") ? 0.001 : 1000.0;
+    double newCalculatedValue = currentVal * multiplier;
+    ui->startFreqSpinBox->setDecimals( (newUnit == "MHz") ? 0 : 3 );
+    double storedMaxLimit = ui->startFreqSpinBox->maximum();
+    ui->startFreqSpinBox->setMaximum(100000.0);
+    ui->startFreqSpinBox->setValue(newCalculatedValue);
+    ui->startFreqSpinBox->setMaximum(storedMaxLimit * multiplier);
+    ui->startFreqSpinBox->blockSignals(false);
+}
+
+void CalibrationManager::onEndUnitChanged(const QString &newUnit)
+{
+    ui->endFreqSpinBox->blockSignals(true);
+    double currentVal = ui->endFreqSpinBox->value();
+    double multiplier = (newUnit == "GHz") ? 0.001 : 1000.0;
+    double newCalculatedValue = currentVal * multiplier;
+    ui->endFreqSpinBox->setDecimals( (newUnit == "MHz") ? 0 : 3 );
+    double storedMinLimit = ui->endFreqSpinBox->minimum();
+    ui->endFreqSpinBox->setMinimum(0);
+    ui->endFreqSpinBox->setValue(newCalculatedValue);
+    ui->endFreqSpinBox->setMinimum(storedMinLimit * multiplier);
+    ui->endFreqSpinBox->blockSignals(false);
+}
+
+
+void CalibrationManager::onStepUnitChanged(const QString &newUnit)
+{
+    ui->stepFreqSpinBox->blockSignals(true);
+    double currentVal = ui->stepFreqSpinBox->value();
+    double multiplier = (newUnit == "GHz") ? 0.001 : 1000.0;
+    double newCalculatedValue = currentVal * multiplier;
+    ui->stepFreqSpinBox->setDecimals( (newUnit == "MHz") ? 0 : 3 );
+    double storedMinLimit = ui->stepFreqSpinBox->minimum();
+    ui->stepFreqSpinBox->setMinimum(0);
+    ui->stepFreqSpinBox->setValue(newCalculatedValue);
+    ui->stepFreqSpinBox->setMinimum(storedMinLimit * multiplier);
+    ui->stepFreqSpinBox->blockSignals(false);
+}
+
 
 void CalibrationManager::onNewMeasurement(double dbmValue)
 {
@@ -62,8 +203,7 @@ void CalibrationManager::onNewMeasurement(double dbmValue)
 
         m_model->setData(m_model->index(m_selectedIndex.row(), CalibrationModel::Correction), correction, Qt::EditRole);
         QMessageBox::information(this, tr("Measurement Complete"), tr("Average measured power: %1 dBm\nCalculated correction: %2 dB").arg(averageDbm, 0, 'f', 2).arg(correction, 0, 'f', 2));
-
-        m_samplesToTake = 0; // Reset the state
+        m_samplesToTake = 0;
     }
 }
 
@@ -81,6 +221,10 @@ void CalibrationManager::on_generateButton_clicked()
 
     if (stepFreq <= 0) {
         QMessageBox::warning(this, tr("Invalid Step"), tr("Frequency step must be greater than zero."));
+        return;
+    }
+    if (startFreq >= endFreq) {
+        QMessageBox::warning(this, tr("Invalid Range"), tr("Start frequency must be less than end frequency."));
         return;
     }
     m_model->generateFrequencies(startFreq, endFreq, stepFreq);
@@ -103,7 +247,7 @@ void CalibrationManager::on_pickAverageButton_clicked()
         return;
     }
     m_measurements.clear();
-    m_samplesToTake = ui->sampleCountSpinBox->value(); // Set internal state
+    m_samplesToTake = ui->sampleCountSpinBox->value();
 }
 
 double CalibrationManager::getCorrection(double frequencyMHz) const

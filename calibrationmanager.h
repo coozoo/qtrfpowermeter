@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMap>
 #include "calibrationmodel.h"
+#include "qcustomplot.h"
 
 namespace Ui {
 class CalibrationManager;
@@ -36,10 +37,20 @@ private slots:
     void on_profileComboBox_currentIndexChanged(const QString &name);
     void on_table_clicked(const QModelIndex &index);
 
+    void onStartFreqChanged(double value);
+    void onEndFreqChanged(double value);
+    void onStartUnitChanged(const QString &newUnit);
+    void onEndUnitChanged(const QString &newUnit);
+    void onStepUnitChanged(const QString &newUnit);
+
+    // --- Automatic Plotting ---
+    void updatePlot();
+
 private:
     void loadProfiles();
     void saveProfile(const QString& name);
     QString getProfilesPath() const;
+    void setupPlot();
 
     Ui::CalibrationManager *ui;
     CalibrationModel *m_model;

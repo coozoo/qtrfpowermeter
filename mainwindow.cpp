@@ -305,7 +305,7 @@ void MainWindow::updateData(const QString &data)
 
             bool ok;
             double dbm = match.captured(1).toDouble(&ok);
-            double milliwatts = 0; // Will be calculated if 'ok'
+            double milliwatts = 0;
 
             if (ok)
             {

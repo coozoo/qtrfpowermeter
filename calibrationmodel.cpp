@@ -1,5 +1,6 @@
 #include "calibrationmodel.h"
 #include <QColor>
+#include <QtMath>
 
 CalibrationModel::CalibrationModel(QObject *parent)
     : QAbstractTableModel(parent)
@@ -92,16 +93,27 @@ void CalibrationModel::generateFrequencies(double startMHz, double endMHz, doubl
 {
     beginResetModel();
     m_points.clear();
-    if (stepMHz <= 0 || startMHz > endMHz) {
+    if (stepMHz <= 0 || startMHz >= endMHz) {
         endResetModel();
         return;
     }
 
-    for (double freq = startMHz; freq <= endMHz; freq += stepMHz) {
-        m_points.append({freq, 0.0, false});
+    // Always add the precise start frequency
+    m_points.append({startMHz, 0.0, false});
+
+    // Start generating "nice" intermediate points
+    double currentFreq = qCeil(startMHz / stepMHz) * stepMHz;
+    if (currentFreq <= startMHz) {
+        currentFreq += stepMHz;
     }
-    // Ensure the last point is exactly the end frequency
-    if (m_points.isEmpty() || m_points.last().frequencyMHz < endMHz) {
+
+    while (currentFreq < endMHz) {
+        m_points.append({currentFreq, 0.0, false});
+        currentFreq += stepMHz;
+    }
+
+    // Always add the precise end frequency
+    if (m_points.last().frequencyMHz < endMHz) {
         m_points.append({endMHz, 0.0, false});
     }
 
@@ -136,23 +148,35 @@ double CalibrationModel::getCorrection(double frequencyMHz) const
     // Find two adjacent points to interpolate between
     const CalibrationPoint *p1 = nullptr;
     const CalibrationPoint *p2 = nullptr;
+    const CalibrationPoint *firstSet = nullptr;
+    const CalibrationPoint *lastSet = nullptr;
 
+    // Find interpolation points and also the first/last calibrated points for extrapolation
     for (const auto &point : m_points) {
-        if (point.isSet && point.frequencyMHz <= frequencyMHz) {
-            p1 = &point;
-        }
-        if (point.isSet && point.frequencyMHz >= frequencyMHz && !p2) {
-            p2 = &point;
-            break;
+        if (point.isSet) {
+            if (!firstSet) firstSet = &point;
+            lastSet = &point;
+
+            if (point.frequencyMHz <= frequencyMHz) {
+                p1 = &point;
+            }
+            if (point.frequencyMHz >= frequencyMHz && !p2) {
+                p2 = &point;
+            }
         }
     }
 
-    if (!p1 && !p2) return 0.0; // No set points
-    if (p1 && !p2) return p1->correctionDb; // Extrapolate from last point
-    if (!p1 && p2) return p2->correctionDb; // Extrapolate from first point
+    if (!p1 && !p2) return 0.0; // No set points at all
+    if (!p1) return firstSet->correctionDb; // Extrapolate below range
+    if (!p2) return lastSet->correctionDb;  // Extrapolate above range
     if (p1 == p2) return p1->correctionDb; // Exact match
 
     // Linear interpolation
+    // Check for division by zero, though unlikely with the logic above
+    if (p2->frequencyMHz == p1->frequencyMHz) {
+        return p1->correctionDb;
+    }
+
     double x1 = p1->frequencyMHz;
     double y1 = p1->correctionDb;
     double x2 = p2->frequencyMHz;
