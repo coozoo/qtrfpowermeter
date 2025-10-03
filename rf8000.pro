@@ -22,6 +22,9 @@ SOURCES += \
     attdevice.cpp \
     attenuationmanager.cpp \
     attenuatorwidget.cpp \
+    calibrationmanager.cpp \
+    calibrationmodel.cpp \
+    calibrationpoint.cpp \
     chartmanager.cpp \
     chartrealtime.cpp \
     fixedattenuatorcontrol.cpp \
@@ -37,6 +40,9 @@ HEADERS += \
     attdevice.h \
     attenuationmanager.h \
     attenuatorwidget.h \
+    calibrationmanager.h \
+    calibrationmodel.h \
+    calibrationpoint.h \
     chartmanager.h \
     chartrealtime.h \
     fixedattenuatorcontrol.h \
@@ -47,6 +53,7 @@ HEADERS += \
     unitconverter.h
 
 FORMS += \
+    calibrationmanager.ui \
     mainwindow.ui \
     qtdigitalattenuator.ui
 

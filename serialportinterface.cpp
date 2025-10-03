@@ -31,8 +31,17 @@ void SerialPortInterface::startPort()
     if (!m_serialPort->open(QIODevice::ReadWrite))
     {
         qDebug()<<"failed to open";
+        emit serialPortErrorSignal("Failed to open " + getportName());
     }
-    emit portOpened();
+    else
+    {
+        emit portOpened();
+    }
+}
+
+bool SerialPortInterface::isPortOpen() const
+{
+    return m_serialPort->isOpen();
 }
 
 void SerialPortInterface::stopPort()
@@ -41,6 +50,7 @@ void SerialPortInterface::stopPort()
     {
         qDebug()<<"close current port";
         m_serialPort->close();
+        emit portClosed();
     }
 }
 
@@ -83,7 +93,7 @@ void SerialPortInterface::serialError(
     QSerialPort::SerialPortError serialPortError)
 {
     qDebug()<<"serialError";
-    if (serialPortError == QSerialPort::ReadError)
+    if (serialPortError != QSerialPort::NoError)
     {
         emit serialPortErrorSignal("Error " + m_serialPort->portName() + " " +
                                    m_serialPort->errorString());

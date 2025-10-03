@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>959</width>
-    <height>622</height>
+    <width>967</width>
+    <height>630</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -108,7 +108,7 @@
               <layout class="QGridLayout" name="gridLayout_8">
                <item row="0" column="2">
                 <layout class="QGridLayout" name="gridLayout_14">
-                 <item row="0" column="0">
+                 <item row="0" column="1">
                   <layout class="QGridLayout" name="gridLayout_18">
                    <item row="0" column="0">
                     <widget class="QGroupBox" name="groupBox_6">
@@ -216,18 +216,38 @@
                    </item>
                   </layout>
                  </item>
-                 <item row="1" column="0">
-                  <widget class="QPushButton" name="att_pushButton">
-                   <property name="text">
-                    <string>Attenuation:</string>
-                   </property>
-                   <property name="checkable">
-                    <bool>true</bool>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
+                 <item row="2" column="1">
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <item>
+                    <widget class="QPushButton" name="calibration_pushButton">
+                     <property name="text">
+                      <string>Calibration</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="att_pushButton">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Attenuation:</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                 </layout>
                </item>
@@ -375,8 +395,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>836</width>
-                    <height>165</height>
+                    <width>789</width>
+                    <height>173</height>
                    </rect>
                   </property>
                  </widget>
@@ -516,7 +536,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>959</width>
+     <width>967</width>
      <height>24</height>
     </rect>
    </property>
@@ -554,6 +574,12 @@
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QDockWidget" name="calibration_dockWidget">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2"/>
   </widget>
  </widget>
  <resources/>

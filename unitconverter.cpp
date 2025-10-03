@@ -14,7 +14,6 @@ double UnitConverter::milliwattsToDBm(double milliwatts)
     return 10 * qLn(milliwatts) / qLn(10);
 }
 
-// ADDED: Calculates Vpp in millivolts from milliwatts
 double UnitConverter::milliwattsToVpp(double milliwatts, double impedance)
 {
     if (milliwatts < 0 || impedance <= 0) {
@@ -79,7 +78,7 @@ QPair<double, QString> UnitConverter::formatPower(double milliwatts)
 
 QPair<double, QString> UnitConverter::formatVoltage(double millivolts)
 {
-    // Base unit is mV. Suffix "Vpp" will be added in the UI.
+    // Base unit is mV. Suffix "Vpp" add in the UI.
     // Returns the value and the metric prefix (k, "", m, µ, n)
     if (millivolts >= 1e6) // 1000V = 1e6 mV
     {
