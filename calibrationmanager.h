@@ -29,13 +29,13 @@ public slots:
     void setActiveProfile(const QString& name);
 
 private slots:
-    void on_generateButton_clicked();
-    void on_pickAverageButton_clicked();
-    void on_saveProfileButton_clicked();
-    void on_loadProfileButton_clicked();
-    void on_deleteProfileButton_clicked();
-    void on_profileComboBox_currentIndexChanged(const QString &name);
-    void on_table_clicked(const QModelIndex &index);
+    void ongenerateButton_clicked();
+    void onpickAverageButton_clicked();
+    void onsaveProfileButton_clicked();
+    void onloadProfileButton_clicked();
+    void ondeleteProfileButton_clicked();
+    void onprofileComboBox_currentIndexChanged(const QString &name);
+    void ontable_clicked(const QModelIndex &index);
 
     void onStartFreqChanged(double value);
     void onEndFreqChanged(double value);

@@ -27,13 +27,13 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
 
 
     // Connect UI signals to slots
-    connect(ui->generateButton, &QPushButton::clicked, this, &CalibrationManager::on_generateButton_clicked);
-    connect(ui->pickAverageButton, &QPushButton::clicked, this, &CalibrationManager::on_pickAverageButton_clicked);
-    connect(ui->saveProfileButton, &QPushButton::clicked, this, &CalibrationManager::on_saveProfileButton_clicked);
-    connect(ui->loadProfileButton, &QPushButton::clicked, this, &CalibrationManager::on_loadProfileButton_clicked);
-    connect(ui->deleteProfileButton, &QPushButton::clicked, this, &CalibrationManager::on_deleteProfileButton_clicked);
-    connect(ui->profileComboBox, &QComboBox::currentTextChanged, this, &CalibrationManager::on_profileComboBox_currentIndexChanged);
-    connect(ui->tableView, &QTableView::clicked, this, &CalibrationManager::on_table_clicked);
+    connect(ui->generateButton, &QPushButton::clicked, this, &CalibrationManager::ongenerateButton_clicked);
+    connect(ui->pickAverageButton, &QPushButton::clicked, this, &CalibrationManager::onpickAverageButton_clicked);
+    connect(ui->saveProfileButton, &QPushButton::clicked, this, &CalibrationManager::onsaveProfileButton_clicked);
+    connect(ui->loadProfileButton, &QPushButton::clicked, this, &CalibrationManager::onloadProfileButton_clicked);
+    connect(ui->deleteProfileButton, &QPushButton::clicked, this, &CalibrationManager::ondeleteProfileButton_clicked);
+    connect(ui->profileComboBox, &QComboBox::currentTextChanged, this, &CalibrationManager::onprofileComboBox_currentIndexChanged);
+    connect(ui->tableView, &QTableView::clicked, this, &CalibrationManager::ontable_clicked);
 
     // Setup unit comboboxes
     ui->startUnitComboBox->addItems({"MHz", "GHz"});
@@ -66,6 +66,7 @@ CalibrationManager::~CalibrationManager()
 
 void CalibrationManager::setupPlot()
 {
+    qDebug() << Q_FUNC_INFO;
     ui->plotWidget->addGraph();
     ui->plotWidget->graph(0)->setPen(QPen(Qt::blue));
     ui->plotWidget->addGraph();
@@ -80,6 +81,7 @@ void CalibrationManager::setupPlot()
 
 void CalibrationManager::updatePlot()
 {
+    qDebug() << Q_FUNC_INFO;
     QVector<double> measuredFreqs, measuredCorrections;
     QVector<double> lineFreqs, lineCorrections;
 
@@ -122,6 +124,7 @@ void CalibrationManager::updatePlot()
 
 void CalibrationManager::onStartFreqChanged(double value)
 {
+    qDebug() << Q_FUNC_INFO;
     double startValMHz = value * (ui->startUnitComboBox->currentText() == "GHz" ? 1000.0 : 1.0);
     double newEndMin = (startValMHz + 1.0) / (ui->endUnitComboBox->currentText() == "GHz" ? 1000.0 : 1.0);
 
@@ -132,6 +135,7 @@ void CalibrationManager::onStartFreqChanged(double value)
 
 void CalibrationManager::onEndFreqChanged(double value)
 {
+    qDebug() << Q_FUNC_INFO;
     double endValMHz = value * (ui->endUnitComboBox->currentText() == "GHz" ? 1000.0 : 1.0);
     double newStartMax = (endValMHz - 1.0) / (ui->startUnitComboBox->currentText() == "GHz" ? 1000.0 : 1.0);
 
@@ -142,6 +146,7 @@ void CalibrationManager::onEndFreqChanged(double value)
 
 void CalibrationManager::onStartUnitChanged(const QString &newUnit)
 {
+    qDebug() << Q_FUNC_INFO;
     ui->startFreqSpinBox->blockSignals(true);
     double currentVal = ui->startFreqSpinBox->value();
     double multiplier = (newUnit == "GHz") ? 0.001 : 1000.0;
@@ -156,6 +161,7 @@ void CalibrationManager::onStartUnitChanged(const QString &newUnit)
 
 void CalibrationManager::onEndUnitChanged(const QString &newUnit)
 {
+    qDebug() << Q_FUNC_INFO;
     ui->endFreqSpinBox->blockSignals(true);
     double currentVal = ui->endFreqSpinBox->value();
     double multiplier = (newUnit == "GHz") ? 0.001 : 1000.0;
@@ -171,6 +177,7 @@ void CalibrationManager::onEndUnitChanged(const QString &newUnit)
 
 void CalibrationManager::onStepUnitChanged(const QString &newUnit)
 {
+    qDebug() << Q_FUNC_INFO;
     ui->stepFreqSpinBox->blockSignals(true);
     double currentVal = ui->stepFreqSpinBox->value();
     double multiplier = (newUnit == "GHz") ? 0.001 : 1000.0;
@@ -208,8 +215,9 @@ void CalibrationManager::onNewMeasurement(double dbmValue)
 }
 
 
-void CalibrationManager::on_generateButton_clicked()
+void CalibrationManager::ongenerateButton_clicked()
 {
+    qDebug() << Q_FUNC_INFO;
     double startFreq = ui->startFreqSpinBox->value();
     if (ui->startUnitComboBox->currentText() == "GHz") startFreq *= 1000.0;
 
@@ -230,8 +238,9 @@ void CalibrationManager::on_generateButton_clicked()
     m_model->generateFrequencies(startFreq, endFreq, stepFreq);
 }
 
-void CalibrationManager::on_table_clicked(const QModelIndex &index)
+void CalibrationManager::ontable_clicked(const QModelIndex &index)
 {
+    qDebug() << Q_FUNC_INFO;
     if (!index.isValid()) return;
 
     m_selectedIndex = index;
@@ -240,8 +249,9 @@ void CalibrationManager::on_table_clicked(const QModelIndex &index)
     emit frequencySelected(freq);
 }
 
-void CalibrationManager::on_pickAverageButton_clicked()
+void CalibrationManager::onpickAverageButton_clicked()
 {
+    qDebug() << Q_FUNC_INFO;
     if (!m_selectedIndex.isValid()) {
         QMessageBox::information(this, tr("No Selection"), tr("Please select a frequency in the table first."));
         return;
@@ -257,6 +267,7 @@ double CalibrationManager::getCorrection(double frequencyMHz) const
 
 void CalibrationManager::setActiveProfile(const QString &name)
 {
+    qDebug() << Q_FUNC_INFO;
     if (ui->profileComboBox->findText(name) != -1) {
         ui->profileComboBox->setCurrentText(name);
     }
@@ -266,6 +277,7 @@ void CalibrationManager::setActiveProfile(const QString &name)
 
 QString CalibrationManager::getProfilesPath() const
 {
+    qDebug() << Q_FUNC_INFO;
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     QDir dir(path);
     if (!dir.exists("calibration")) {
@@ -276,6 +288,7 @@ QString CalibrationManager::getProfilesPath() const
 
 void CalibrationManager::loadProfiles()
 {
+    qDebug() << Q_FUNC_INFO;
     ui->profileComboBox->clear();
     QDir dir(getProfilesPath());
     QStringList filters;
@@ -287,8 +300,9 @@ void CalibrationManager::loadProfiles()
     }
 }
 
-void CalibrationManager::on_saveProfileButton_clicked()
+void CalibrationManager::onsaveProfileButton_clicked()
 {
+    qDebug() << Q_FUNC_INFO;
     QString name = ui->profileNameLineEdit->text();
     if (name.isEmpty()) {
         QMessageBox::warning(this, tr("Invalid Name"), tr("Please enter a profile name."));
@@ -302,8 +316,9 @@ void CalibrationManager::on_saveProfileButton_clicked()
     QMessageBox::information(this, tr("Success"), tr("Profile '%1' saved.").arg(name));
 }
 
-void CalibrationManager::on_loadProfileButton_clicked()
+void CalibrationManager::onloadProfileButton_clicked()
 {
+    qDebug() << Q_FUNC_INFO;
     QString name = ui->profileComboBox->currentText();
     if (name.isEmpty()) return;
 
@@ -328,8 +343,9 @@ void CalibrationManager::on_loadProfileButton_clicked()
     ui->profileNameLineEdit->setText(name);
 }
 
-void CalibrationManager::on_deleteProfileButton_clicked()
+void CalibrationManager::ondeleteProfileButton_clicked()
 {
+    qDebug() << Q_FUNC_INFO;
     QString name = ui->profileComboBox->currentText();
     if (name.isEmpty()) return;
 
@@ -344,8 +360,9 @@ void CalibrationManager::on_deleteProfileButton_clicked()
     }
 }
 
-void CalibrationManager::on_profileComboBox_currentIndexChanged(const QString &name)
+void CalibrationManager::onprofileComboBox_currentIndexChanged(const QString &name)
 {
+    qDebug() << Q_FUNC_INFO;
     if (!name.isEmpty()) {
         emit currentProfileChanged(name);
     }
@@ -353,6 +370,7 @@ void CalibrationManager::on_profileComboBox_currentIndexChanged(const QString &n
 
 void CalibrationManager::saveProfile(const QString &name)
 {
+    qDebug() << Q_FUNC_INFO;
     QFile file(getProfilesPath() + "/" + name + ".json");
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning() << "Could not open file for writing:" << file.fileName();
