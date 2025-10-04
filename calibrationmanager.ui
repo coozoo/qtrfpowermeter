@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>955</width>
-    <height>602</height>
+    <width>957</width>
+    <height>604</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -146,9 +146,12 @@
        <widget class="QComboBox" name="stepUnitComboBox"/>
       </item>
       <item>
-       <widget class="QPushButton" name="generateButton">
+       <widget class="QToolButton" name="generateButton">
+        <property name="toolTip">
+         <string>Generate Table</string>
+        </property>
         <property name="text">
-         <string>Generate</string>
+         <string>-&gt;</string>
         </property>
        </widget>
       </item>
@@ -182,7 +185,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>150</height>
+          <height>160</height>
          </size>
         </property>
        </widget>

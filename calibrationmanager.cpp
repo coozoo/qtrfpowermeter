@@ -27,7 +27,7 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
 
 
     // Connect UI signals to slots
-    connect(ui->generateButton, &QPushButton::clicked, this, &CalibrationManager::ongenerateButton_clicked);
+    connect(ui->generateButton, &QToolButton::clicked, this, &CalibrationManager::ongenerateButton_clicked);
     connect(ui->pickAverageButton, &QPushButton::clicked, this, &CalibrationManager::onpickAverageButton_clicked);
     connect(ui->saveProfileButton, &QPushButton::clicked, this, &CalibrationManager::onsaveProfileButton_clicked);
     connect(ui->loadProfileButton, &QPushButton::clicked, this, &CalibrationManager::onloadProfileButton_clicked);
@@ -53,6 +53,8 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
     connect(ui->endUnitComboBox, &QComboBox::currentTextChanged, this, &CalibrationManager::onEndUnitChanged);
     connect(ui->stepUnitComboBox, &QComboBox::currentTextChanged, this, &CalibrationManager::onStepUnitChanged);
 
+    connect(ui->plotWidget, &QCustomPlot::mousePress, this, &CalibrationManager::onPlotMousePress);
+
     loadProfiles();
     setupPlot();
     onStartFreqChanged(ui->startFreqSpinBox->value());
@@ -67,16 +69,28 @@ CalibrationManager::~CalibrationManager()
 void CalibrationManager::setupPlot()
 {
     qDebug()<<Q_FUNC_INFO;
-    ui->plotWidget->addGraph();
+
+    // 1. Reduce minimum width by changing size policy
+    QSizePolicy sp = ui->plotWidget->sizePolicy();
+    sp.setHorizontalPolicy(QSizePolicy::Ignored);
+    ui->plotWidget->setSizePolicy(sp);
+
+    ui->plotWidget->addGraph(); // Interpolated line
     ui->plotWidget->graph(0)->setPen(QPen(Qt::blue));
     ui->plotWidget->addGraph();
     ui->plotWidget->graph(1)->setPen(QPen(Qt::red));
     ui->plotWidget->graph(1)->setLineStyle(QCPGraph::lsNone);
     ui->plotWidget->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
 
-    ui->plotWidget->xAxis->setLabel("Frequency (MHz)");
-    ui->plotWidget->yAxis->setLabel("Correction (dB)");
-    ui->plotWidget->setInteractions({});
+    m_highlightGraph = ui->plotWidget->addGraph();
+    m_highlightGraph->setPen(QPen(QColor(0, 255, 0, 150), 3));
+    m_highlightGraph->setLineStyle(QCPGraph::lsNone);
+    m_highlightGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 12));
+    m_highlightGraph->setVisible(false);
+
+    ui->plotWidget->xAxis->setLabel(m_model->headerData(0, Qt::Horizontal, Qt::DisplayRole).toString());
+    ui->plotWidget->yAxis->setLabel(m_model->headerData(1, Qt::Horizontal, Qt::DisplayRole).toString());
+    //ui->plotWidget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 }
 
 void CalibrationManager::updatePlot()
@@ -90,6 +104,7 @@ void CalibrationManager::updatePlot()
         {
             ui->plotWidget->graph(0)->setData({}, {});
             ui->plotWidget->graph(1)->setData({}, {});
+            m_highlightGraph->setVisible(false);
             ui->plotWidget->replot();
             return;
         }
@@ -125,9 +140,80 @@ void CalibrationManager::updatePlot()
 
     ui->plotWidget->graph(0)->setData(lineFreqs, lineCorrections);
     ui->plotWidget->graph(1)->setData(measuredFreqs, measuredCorrections);
+
+    // Ensure highlight is updated if selection exists
+    if (m_selectedIndex.isValid()) {
+        highlightPoint(m_selectedIndex);
+    } else {
+        m_highlightGraph->setVisible(false);
+    }
+
     ui->plotWidget->rescaleAxes();
+    QCPRange yRange = ui->plotWidget->yAxis->range();
+
+    double padding = yRange.size() * 0.1;
+    ui->plotWidget->yAxis->setRange(yRange.lower - padding, yRange.upper + padding);
     ui->plotWidget->replot();
 }
+
+void CalibrationManager::highlightPoint(const QModelIndex &index)
+{
+    if (!index.isValid()) {
+        m_highlightGraph->setVisible(false);
+        ui->plotWidget->replot();
+        return;
+    }
+    bool freqOk, corrOk;
+    double freq = m_model->data(m_model->index(index.row(), CalibrationModel::Frequency), Qt::EditRole).toDouble(&freqOk);
+    double corr = m_model->data(m_model->index(index.row(), CalibrationModel::Correction), Qt::EditRole).toDouble(&corrOk);
+
+    if (freqOk && corrOk) {
+        m_highlightGraph->setData({freq}, {corr});
+        m_highlightGraph->setVisible(true);
+    } else {
+        m_highlightGraph->setVisible(false);
+    }
+    ui->plotWidget->replot();
+}
+
+void CalibrationManager::onPlotMousePress(QMouseEvent *event)
+{
+    QCPGraph *graph = ui->plotWidget->graph(1);
+    if (!graph || graph->dataCount() == 0) return;
+
+    double minDist = std::numeric_limits<double>::max();
+    int closestDataIndex = -1;
+
+    for (int i = 0; i < graph->dataCount(); ++i)
+    {
+        QPointF dataPointPixel = graph->coordsToPixels(graph->dataMainKey(i), graph->dataMainValue(i));
+        double dist = qSqrt(qPow(dataPointPixel.x() - event->pos().x(), 2) + qPow(dataPointPixel.y() - event->pos().y(), 2));
+
+        if (dist < minDist)
+        {
+            minDist = dist;
+            closestDataIndex = i;
+        }
+    }
+
+    double threshold = 20; // Click within 20 pixels
+    if (closestDataIndex != -1 && minDist < threshold)
+    {
+        double targetFreq = graph->dataMainKey(closestDataIndex);
+        for(int row = 0; row < m_model->rowCount(); ++row)
+        {
+            QModelIndex index = m_model->index(row, CalibrationModel::Frequency);
+            double modelFreq = m_model->data(index, Qt::EditRole).toDouble();
+            if (qFuzzyCompare(modelFreq, targetFreq))
+            {
+                ui->tableView->selectRow(row);
+                ontable_clicked(index);
+                break;
+            }
+        }
+    }
+}
+
 
 void CalibrationManager::onStartFreqChanged(double value)
 {
@@ -257,6 +343,7 @@ void CalibrationManager::ontable_clicked(const QModelIndex &index)
     m_selectedIndex = index;
     double freq = m_model->data(m_model->index(index.row(), CalibrationModel::Frequency)).toDouble();
     ui->pickAverageButton->setEnabled(true);
+    highlightPoint(index);
     emit frequencySelected(freq);
 }
 
@@ -285,8 +372,6 @@ void CalibrationManager::setActiveProfile(const QString &name)
             ui->profileComboBox->setCurrentText(name);
         }
 }
-
-// --- Profile Management ---
 
 QString CalibrationManager::getProfilesPath() const
 {

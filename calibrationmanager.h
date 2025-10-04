@@ -6,6 +6,9 @@
 #include "calibrationmodel.h"
 #include "qcustomplot.h"
 
+class QCPPlottable;
+class QMouseEvent;
+
 namespace Ui {
 class CalibrationManager;
 }
@@ -44,18 +47,21 @@ private slots:
     void onStepUnitChanged(const QString &newUnit);
 
     void updatePlot();
+    void onPlotMousePress(QMouseEvent *event);
 
 private:
     void loadProfiles();
     void saveProfile(const QString &name);
     QString getProfilesPath() const;
     void setupPlot();
+    void highlightPoint(const QModelIndex &index);
 
     Ui::CalibrationManager *ui;
     CalibrationModel *m_model;
     QVector<double> m_measurements;
     QModelIndex m_selectedIndex;
     int m_samplesToTake = 0;
+    QCPGraph *m_highlightGraph;
 };
 
 #endif // CALIBRATIONMANAGER_H

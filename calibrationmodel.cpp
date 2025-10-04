@@ -93,7 +93,14 @@ Qt::ItemFlags CalibrationModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return Qt::NoItemFlags;
 
-    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    Qt::ItemFlags defaultFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+
+    if (index.column() == Correction)
+        {
+            return defaultFlags | Qt::ItemIsEditable;
+        }
+
+    return defaultFlags;
 }
 
 void CalibrationModel::generateFrequencies(double startMHz, double endMHz, double stepMHz)
