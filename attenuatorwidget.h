@@ -52,13 +52,12 @@ private:
     double m_attenuationValue;
     QString m_description = "";
     bool m_markedForRemoval;
-    bool m_editorHasBeenShown; // Flag for initial positioning
+    bool m_editorHasBeenShown;
 
     QLabel *m_typeLabel;
     QLabel *m_descrLabel;
     QLCDNumber *m_valueLcd;
 
-    // Pointers to the control/editor windows
     QtDigitalAttenuator *m_digitalControl;
     FixedAttenuatorControl *m_fixedControl;
 };

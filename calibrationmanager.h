@@ -22,11 +22,11 @@ public:
 
 signals:
     void frequencySelected(double frequencyMHz);
-    void currentProfileChanged(const QString& profileName);
+    void currentProfileChanged(const QString &profileName);
 
 public slots:
     void onNewMeasurement(double dbmValue);
-    void setActiveProfile(const QString& name);
+    void setActiveProfile(const QString &name);
 
 private slots:
     void ongenerateButton_clicked();
@@ -43,12 +43,11 @@ private slots:
     void onEndUnitChanged(const QString &newUnit);
     void onStepUnitChanged(const QString &newUnit);
 
-    // --- Automatic Plotting ---
     void updatePlot();
 
 private:
     void loadProfiles();
-    void saveProfile(const QString& name);
+    void saveProfile(const QString &name);
     QString getProfilesPath() const;
     void setupPlot();
 

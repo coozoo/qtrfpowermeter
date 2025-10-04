@@ -50,7 +50,7 @@ QtDigitalAttenuator::~QtDigitalAttenuator()
 
 void QtDigitalAttenuator::onPortOpened()
 {
-    qDebug() << Q_FUNC_INFO;
+    qDebug()<<Q_FUNC_INFO;
     setDeviceError("");
     setIsConnected(true);
     updateDeviceList();
@@ -58,7 +58,7 @@ void QtDigitalAttenuator::onPortOpened()
 
 void QtDigitalAttenuator::onPortClosed()
 {
-    qDebug() << Q_FUNC_INFO;
+    qDebug()<<Q_FUNC_INFO;
     ui->model_lineEdit->setText("");
     emit modelChanged(tr("Disconnected"));
     setIsConnected(false);
@@ -86,7 +86,7 @@ void QtDigitalAttenuator::on_connect_pushButton_clicked()
 
     if (ui->device_comboBox->currentIndex() == -1)
     {
-        qDebug() << "Connect clicked with no device selected.";
+        qDebug()<<"Connect clicked with no device selected.";
         return;
     }
     // This is the commit point. Set the current device from the UI selection.
@@ -94,7 +94,7 @@ void QtDigitalAttenuator::on_connect_pushButton_clicked()
     QString selectedSerial = ui->device_comboBox->currentData(SerialNumberRole).toString();
 
     setCurrentDevice(selectedSerial);
-    qDebug() << "Attempting to connect to" << selectedPort << "with S/N" << currentDevice();
+    qDebug()<<"Attempting to connect to"<<selectedPort<<"with S/N"<<currentDevice();
 
     if(!selectedPort.isEmpty())
     {
@@ -143,8 +143,8 @@ void QtDigitalAttenuator::updateDeviceList()
                         " (" + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
                         ":" + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+
                         busyText;
-            qInfo() << info.portName();
-            qInfo() << s;
+            qInfo()<<info.portName();
+            qInfo()<<s;
 
             int newIndex = ui->device_comboBox->count();
             ui->device_comboBox->addItem(s, info.portName()); // Default data is port name for logging in updateData
@@ -259,7 +259,7 @@ void QtDigitalAttenuator::ondeviceSetStatus(bool status)
 
 void QtDigitalAttenuator::onIsConnectedChanged(bool connected)
 {
-    qDebug() << Q_FUNC_INFO << "Connected:" << connected;
+    qDebug()<<Q_FUNC_INFO<<"Connected:"<<connected;
     ui->device_comboBox->setEnabled(!connected);
     ui->disconnect_pushButton->setEnabled(connected);
 
