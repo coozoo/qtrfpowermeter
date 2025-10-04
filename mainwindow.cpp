@@ -185,9 +185,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->calibration_pushButton, &QPushButton::toggled, this, &MainWindow::on_calibration_pushButton_toggled);
     connect(m_calibrationManager, &CalibrationManager::frequencySelected, this, &MainWindow::onCalibrationFrequencySelected);
     ui->calibration_dockWidget->installEventFilter(this);
-
-    // This is the key connection for your improved design
     connect(this, &MainWindow::newMeasurement, m_calibrationManager, &CalibrationManager::onNewMeasurement);
+
+    QMainWindow::tabifyDockWidget(ui->attenuation_dockWidget, ui->calibration_dockWidget);
 
 
     Q_EMIT(on_set_pushButton_clicked());
