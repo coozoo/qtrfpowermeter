@@ -12,7 +12,8 @@ class CalibrationModel : public QAbstractTableModel
 public:
     explicit CalibrationModel(QObject *parent = nullptr);
 
-    enum Column {
+    enum Column
+    {
         Frequency = 0,
         Correction,
         ColumnCount
@@ -29,8 +30,8 @@ public:
     // Public API to manage data
     void generateFrequencies(double startMHz, double endMHz, double stepMHz);
     void clear();
-    const QVector<CalibrationPoint>& getPoints() const;
-    void setPoints(const QVector<CalibrationPoint>& points);
+    const QVector<CalibrationPoint> &getPoints() const;
+    void setPoints(const QVector<CalibrationPoint> &points);
     double getCorrection(double frequencyMHz) const;
 
 private:

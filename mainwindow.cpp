@@ -185,9 +185,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->calibration_pushButton, &QPushButton::toggled, this, &MainWindow::on_calibration_pushButton_toggled);
     connect(m_calibrationManager, &CalibrationManager::frequencySelected, this, &MainWindow::onCalibrationFrequencySelected);
     ui->calibration_dockWidget->installEventFilter(this);
-
-    // This is the key connection for your improved design
     connect(this, &MainWindow::newMeasurement, m_calibrationManager, &CalibrationManager::onNewMeasurement);
+
+    QMainWindow::tabifyDockWidget(ui->attenuation_dockWidget, ui->calibration_dockWidget);
 
 
     Q_EMIT(on_set_pushButton_clicked());
@@ -435,13 +435,13 @@ void MainWindow::on_connect_pushButton_clicked()
     qDebug()<<"on_connect_pushButton_clicked";
     if (ui->device_comboBox->currentIndex() == -1)
     {
-        qDebug() << "Connect clicked with no device selected.";
+        qDebug()<<"Connect clicked with no device selected.";
         return;
     }
     // This is the commit point. Set the current device from the UI selection.
     QString selectedPort = ui->device_comboBox->currentData(PortNameRole).toString();
     setCurrentDevice(selectedPort);
-    qDebug() << "Attempting to connect to" << currentDevice();
+    qDebug()<<"Attempting to connect to"<<currentDevice();
 
     if(!currentDevice().isEmpty())
     {
@@ -474,7 +474,7 @@ void MainWindow::updateDeviceList()
     //{
     //    previouslySelectedPort = ui->device_comboBox->currentData(PortNameRole).toString();
     //}
-    //qDebug() << "Previously selected port:" << previouslySelectedPort;
+    //qDebug()<<"Previously selected port:"<<previouslySelectedPort;
 
     ui->device_comboBox->clear();
     const auto infos = QSerialPortInfo::availablePorts();
@@ -541,7 +541,7 @@ void MainWindow::updateDeviceList()
 
 void MainWindow::onPortOpened()
 {
-    qDebug() << Q_FUNC_INFO;
+    qDebug()<<Q_FUNC_INFO;
     setDeviceError("");
     setIsConnected(true);
     Q_EMIT updateDeviceList();
@@ -550,7 +550,7 @@ void MainWindow::onPortOpened()
 
 void MainWindow::onPortClosed()
 {
-    qDebug() << Q_FUNC_INFO;
+    qDebug()<<Q_FUNC_INFO;
     setIsConnected(false);
     Q_EMIT updateDeviceList();
 }
@@ -565,7 +565,7 @@ void MainWindow::on_serialPortError(const QString &error)
 
 void MainWindow::onIsConnectedChanged(bool connected)
 {
-    qDebug() << Q_FUNC_INFO << "Connected:" << connected;
+    qDebug()<<Q_FUNC_INFO<<"Connected:"<<connected;
     ui->device_comboBox->setEnabled(!connected);
     ui->disconnect_pushButton->setEnabled(connected);
 
@@ -801,7 +801,7 @@ void MainWindow::on_calibration_pushButton_toggled(bool checked)
 
 void MainWindow::onCalibrationFrequencySelected(double frequencyMHz)
 {
-    qDebug() << "Calibration: A frequency was selected:" << frequencyMHz << "MHz. Please set your signal generator accordingly.";
+    qDebug()<<"Calibration: A frequency was selected:"<<frequencyMHz<<"MHz. Please set your signal generator accordingly.";
     ui->frequency_spinBox->setValue(static_cast<int>(frequencyMHz));
     on_set_pushButton_clicked();
 }

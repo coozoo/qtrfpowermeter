@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>967</width>
-    <height>630</height>
+    <width>971</width>
+    <height>634</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -177,6 +177,9 @@
                             <width>0</width>
                             <height>0</height>
                            </size>
+                          </property>
+                          <property name="toolTip">
+                           <string>Indevice correction</string>
                           </property>
                           <property name="decimals">
                            <number>1</number>
@@ -395,8 +398,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>789</width>
-                    <height>173</height>
+                    <width>793</width>
+                    <height>177</height>
                    </rect>
                   </property>
                  </widget>
@@ -536,7 +539,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>967</width>
+     <width>971</width>
      <height>24</height>
     </rect>
    </property>
@@ -576,6 +579,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="calibration_dockWidget">
+   <property name="windowTitle">
+    <string>Calibration</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
