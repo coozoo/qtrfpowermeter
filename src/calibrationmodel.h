@@ -6,6 +6,8 @@
 #include <QColor>
 #include <QtMath>
 #include "calibrationpoint.h"
+#include "spline.h"
+#include <vector>
 
 class CalibrationModel : public QAbstractTableModel
 {

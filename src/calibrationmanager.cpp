@@ -70,12 +70,11 @@ void CalibrationManager::setupPlot()
 {
     qDebug()<<Q_FUNC_INFO;
 
-    // 1. Reduce minimum width by changing size policy
     QSizePolicy sp = ui->plotWidget->sizePolicy();
     sp.setHorizontalPolicy(QSizePolicy::Ignored);
     ui->plotWidget->setSizePolicy(sp);
 
-    ui->plotWidget->addGraph(); // Interpolated line
+    ui->plotWidget->addGraph();
     ui->plotWidget->graph(0)->setPen(QPen(Qt::blue));
     ui->plotWidget->addGraph();
     ui->plotWidget->graph(1)->setPen(QPen(Qt::red));
@@ -108,71 +107,80 @@ void CalibrationManager::updatePlot()
             ui->plotWidget->replot();
             return;
         }
-
-    for (const auto &point : points)
+    else
         {
-            if (point.isSet)
+            for (const auto &point : points)
                 {
-                    measuredFreqs.append(point.frequencyMHz);
-                    measuredCorrections.append(point.correctionDb);
+                    if (point.isSet)
+                        {
+                            measuredFreqs.append(point.frequencyMHz);
+                            measuredCorrections.append(point.correctionDb);
+                        }
                 }
-        }
 
-    const int lineSteps = 200;
-    double minFreq = points.first().frequencyMHz;
-    double maxFreq = points.last().frequencyMHz;
-    double step = (maxFreq - minFreq) / lineSteps;
+            const int lineSteps = 200;
+            double minFreq = points.first().frequencyMHz;
+            double maxFreq = points.last().frequencyMHz;
+            double step = (maxFreq - minFreq) / lineSteps;
 
-    if (step > 0)
-        {
-            for (int i = 0; i <= lineSteps; ++i)
+            if (step > 0)
                 {
-                    double freq = minFreq + i * step;
-                    lineFreqs.append(freq);
-                    lineCorrections.append(m_model->getCorrection(freq));
+                    for (int i = 0; i <= lineSteps; ++i)
+                        {
+                            double freq = minFreq + i * step;
+                            lineFreqs.append(freq);
+                            lineCorrections.append(m_model->getCorrection(freq));
+                        }
                 }
+            else
+                {
+                    lineFreqs.append(minFreq);
+                    lineCorrections.append(m_model->getCorrection(minFreq));
+                }
+
+            ui->plotWidget->graph(0)->setData(lineFreqs, lineCorrections);
+            ui->plotWidget->graph(1)->setData(measuredFreqs, measuredCorrections);
+
+            // Ensure highlight is updated if selection exists
+            if (m_selectedIndex.isValid())
+                {
+                    highlightPoint(m_selectedIndex);
+                }
+            else
+                {
+                    m_highlightGraph->setVisible(false);
+                }
+
+            ui->plotWidget->rescaleAxes();
+            QCPRange yRange = ui->plotWidget->yAxis->range();
+
+            double padding = yRange.size() * 0.1;
+            ui->plotWidget->yAxis->setRange(yRange.lower - padding, yRange.upper + padding);
+            ui->plotWidget->replot();
         }
-    else if (!points.isEmpty())
-        {
-            lineFreqs.append(minFreq);
-            lineCorrections.append(m_model->getCorrection(minFreq));
-        }
-
-    ui->plotWidget->graph(0)->setData(lineFreqs, lineCorrections);
-    ui->plotWidget->graph(1)->setData(measuredFreqs, measuredCorrections);
-
-    // Ensure highlight is updated if selection exists
-    if (m_selectedIndex.isValid()) {
-        highlightPoint(m_selectedIndex);
-    } else {
-        m_highlightGraph->setVisible(false);
-    }
-
-    ui->plotWidget->rescaleAxes();
-    QCPRange yRange = ui->plotWidget->yAxis->range();
-
-    double padding = yRange.size() * 0.1;
-    ui->plotWidget->yAxis->setRange(yRange.lower - padding, yRange.upper + padding);
-    ui->plotWidget->replot();
 }
 
 void CalibrationManager::highlightPoint(const QModelIndex &index)
 {
-    if (!index.isValid()) {
-        m_highlightGraph->setVisible(false);
-        ui->plotWidget->replot();
-        return;
-    }
+    if (!index.isValid())
+        {
+            m_highlightGraph->setVisible(false);
+            ui->plotWidget->replot();
+            return;
+        }
     bool freqOk, corrOk;
     double freq = m_model->data(m_model->index(index.row(), CalibrationModel::Frequency), Qt::EditRole).toDouble(&freqOk);
     double corr = m_model->data(m_model->index(index.row(), CalibrationModel::Correction), Qt::EditRole).toDouble(&corrOk);
 
-    if (freqOk && corrOk) {
-        m_highlightGraph->setData({freq}, {corr});
-        m_highlightGraph->setVisible(true);
-    } else {
-        m_highlightGraph->setVisible(false);
-    }
+    if (freqOk && corrOk)
+        {
+            m_highlightGraph->setData({freq}, {corr});
+            m_highlightGraph->setVisible(true);
+        }
+    else
+        {
+            m_highlightGraph->setVisible(false);
+        }
     ui->plotWidget->replot();
 }
 
@@ -185,33 +193,33 @@ void CalibrationManager::onPlotMousePress(QMouseEvent *event)
     int closestDataIndex = -1;
 
     for (int i = 0; i < graph->dataCount(); ++i)
-    {
-        QPointF dataPointPixel = graph->coordsToPixels(graph->dataMainKey(i), graph->dataMainValue(i));
-        double dist = qSqrt(qPow(dataPointPixel.x() - event->pos().x(), 2) + qPow(dataPointPixel.y() - event->pos().y(), 2));
-
-        if (dist < minDist)
         {
-            minDist = dist;
-            closestDataIndex = i;
+            QPointF dataPointPixel = graph->coordsToPixels(graph->dataMainKey(i), graph->dataMainValue(i));
+            double dist = qSqrt(qPow(dataPointPixel.x() - event->pos().x(), 2) + qPow(dataPointPixel.y() - event->pos().y(), 2));
+
+            if (dist < minDist)
+                {
+                    minDist = dist;
+                    closestDataIndex = i;
+                }
         }
-    }
 
     double threshold = 20; // Click within 20 pixels
     if (closestDataIndex != -1 && minDist < threshold)
-    {
-        double targetFreq = graph->dataMainKey(closestDataIndex);
-        for(int row = 0; row < m_model->rowCount(); ++row)
         {
-            QModelIndex index = m_model->index(row, CalibrationModel::Frequency);
-            double modelFreq = m_model->data(index, Qt::EditRole).toDouble();
-            if (qFuzzyCompare(modelFreq, targetFreq))
-            {
-                ui->tableView->selectRow(row);
-                ontable_clicked(index);
-                break;
-            }
+            double targetFreq = graph->dataMainKey(closestDataIndex);
+            for (int row = 0; row < m_model->rowCount(); ++row)
+                {
+                    QModelIndex index = m_model->index(row, CalibrationModel::Frequency);
+                    double modelFreq = m_model->data(index, Qt::EditRole).toDouble();
+                    if (qFuzzyCompare(modelFreq, targetFreq))
+                        {
+                            ui->tableView->selectRow(row);
+                            ontable_clicked(index);
+                            break;
+                        }
+                }
         }
-    }
 }
 
 

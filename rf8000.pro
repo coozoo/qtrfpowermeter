@@ -16,6 +16,7 @@ CONFIG += lrelease
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 INCLUDEPATH += $$PWD/3rdparty/qcustomplot
+INCLUDEPATH += $$PWD/3rdparty/spline/src
 INCLUDEPATH += $$PWD/src
 
 SOURCES += \
@@ -38,6 +39,7 @@ SOURCES += \
 
 HEADERS += \
     3rdparty/qcustomplot/qcustomplot.h \
+    3rdparty/spline/src/spline.h \
     src/attdevice.h \
     src/attenuationmanager.h \
     src/attenuatorwidget.h \
