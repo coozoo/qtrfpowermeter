@@ -3,6 +3,8 @@
 
 #include <QAbstractTableModel>
 #include <QVector>
+#include <QColor>
+#include <QtMath>
 #include "calibrationpoint.h"
 
 class CalibrationModel : public QAbstractTableModel

@@ -1,6 +1,4 @@
 #include "calibrationmodel.h"
-#include <QColor>
-#include <QtMath>
 
 CalibrationModel::CalibrationModel(QObject *parent)
     : QAbstractTableModel(parent)

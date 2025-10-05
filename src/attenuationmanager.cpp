@@ -2,7 +2,6 @@
 #include "attenuatorwidget.h"
 
 
-
 AttenuationManager::AttenuationManager(QWidget *parent)
     : QWidget(parent)
 {
