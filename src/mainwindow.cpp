@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -294,7 +293,7 @@ void MainWindow::updateData(const QString &data)
     QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
     ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+" "+data);
 
-    QRegularExpression reg("[$]([-+][0-9.]+)dBm([0-9.]+)(.)Vpp[$]");
+    QRegularExpression reg("[$]([-+]?[0-9.]+)dBm([0-9.]+)(.)Vpp[$]");
 
     QRegularExpressionMatchIterator i = reg.globalMatch(data.simplified().replace(" ",""));
     if (i.isValid())

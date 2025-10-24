@@ -11,7 +11,7 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include "qtdigitalattenuator.h"
-#include "fixedattenuatorcontrol.h" // Correctly included
+#include "fixedattenuatorcontrol.h"
 
 class AttenuatorWidget : public QGroupBox
 {

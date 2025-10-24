@@ -16,46 +16,49 @@ CONFIG += lrelease
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 INCLUDEPATH += $$PWD/3rdparty/qcustomplot
+INCLUDEPATH += $$PWD/3rdparty/spline/src
+INCLUDEPATH += $$PWD/src
 
 SOURCES += \
     3rdparty/qcustomplot/qcustomplot.cpp \
-    attdevice.cpp \
-    attenuationmanager.cpp \
-    attenuatorwidget.cpp \
-    calibrationmanager.cpp \
-    calibrationmodel.cpp \
-    calibrationpoint.cpp \
-    chartmanager.cpp \
-    chartrealtime.cpp \
-    fixedattenuatorcontrol.cpp \
     main.cpp \
-    mainwindow.cpp \
-    qtdigitalattenuator.cpp \
-    serialportinterface.cpp \
-    targetpowercalculator.cpp \
-    unitconverter.cpp
+    src/attdevice.cpp \
+    src/attenuationmanager.cpp \
+    src/attenuatorwidget.cpp \
+    src/calibrationmanager.cpp \
+    src/calibrationmodel.cpp \
+    src/calibrationpoint.cpp \
+    src/chartmanager.cpp \
+    src/chartrealtime.cpp \
+    src/fixedattenuatorcontrol.cpp \
+    src/mainwindow.cpp \
+    src/qtdigitalattenuator.cpp \
+    src/serialportinterface.cpp \
+    src/targetpowercalculator.cpp \
+    src/unitconverter.cpp
 
 HEADERS += \
     3rdparty/qcustomplot/qcustomplot.h \
-    attdevice.h \
-    attenuationmanager.h \
-    attenuatorwidget.h \
-    calibrationmanager.h \
-    calibrationmodel.h \
-    calibrationpoint.h \
-    chartmanager.h \
-    chartrealtime.h \
-    fixedattenuatorcontrol.h \
-    mainwindow.h \
-    qtdigitalattenuator.h \
-    serialportinterface.h \
-    targetpowercalculator.h \
-    unitconverter.h
+    3rdparty/spline/src/spline.h \
+    src/attdevice.h \
+    src/attenuationmanager.h \
+    src/attenuatorwidget.h \
+    src/calibrationmanager.h \
+    src/calibrationmodel.h \
+    src/calibrationpoint.h \
+    src/chartmanager.h \
+    src/chartrealtime.h \
+    src/fixedattenuatorcontrol.h \
+    src/mainwindow.h \
+    src/qtdigitalattenuator.h \
+    src/serialportinterface.h \
+    src/targetpowercalculator.h \
+    src/unitconverter.h
 
 FORMS += \
-    calibrationmanager.ui \
-    mainwindow.ui \
-    qtdigitalattenuator.ui
+    src/calibrationmanager.ui \
+    src/mainwindow.ui \
+    src/qtdigitalattenuator.ui
 
 win32:RC_FILE = icon.rc
 macx:RC_FILE = icon.icns

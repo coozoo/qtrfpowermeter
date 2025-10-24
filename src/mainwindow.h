@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QRandomGenerator>
 #include <QtMath>
+#include <QDebug>
 #include "serialportinterface.h"
 #include "qcustomplot.h"
 #include "chartmanager.h"

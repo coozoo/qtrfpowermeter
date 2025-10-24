@@ -1,6 +1,4 @@
 #include "calibrationmodel.h"
-#include <QColor>
-#include <QtMath>
 
 CalibrationModel::CalibrationModel(QObject *parent)
     : QAbstractTableModel(parent)
@@ -157,6 +155,7 @@ void CalibrationModel::setPoints(const QVector<CalibrationPoint> &points)
     endResetModel();
 }
 
+/* linear
 double CalibrationModel::getCorrection(double frequencyMHz) const
 {
     if (m_points.isEmpty())
@@ -207,4 +206,36 @@ double CalibrationModel::getCorrection(double frequencyMHz) const
     double y2 = p2->correctionDb;
 
     return y1 + (y2 - y1) * (frequencyMHz - x1) / (x2 - x1);
+}
+*/
+
+double CalibrationModel::getCorrection(double frequencyMHz) const
+{
+    std::vector<double> x_points;
+    std::vector<double> y_points;
+    for (const auto &point : m_points)
+        {
+            if (point.isSet)
+                {
+                    x_points.push_back(point.frequencyMHz);
+                    y_points.push_back(point.correctionDb);
+                }
+        }
+
+    if (x_points.size() < 2)
+        {
+            if (x_points.empty())
+                {
+                    return 0.0;
+                }
+            else
+                {
+                    return y_points[0];
+                }
+        }
+
+    tk::spline s;
+    s.set_points(x_points, y_points, tk::spline::cspline);
+
+    return s(frequencyMHz);
 }
