@@ -125,3 +125,42 @@ void AttenuationManager::updateTotalAttenuation()
     m_totalLcd->display(total);
     emit totalAttenuationChanged(total);
 }
+
+void AttenuationManager::addInternalAttenuator(double min, double max, double step)
+{
+    if (m_internalAttenuatorWidget) return;
+
+    m_internalAttenuatorWidget = new AttenuatorWidget(AttenuatorWidget::InternalDigital);
+    m_internalAttenuatorWidget->setInternalProperties(min, max, step); // Pass properties down
+
+    // This signal tells MainWindow when the value is changed *from within this widget's editor*
+    connect(m_internalAttenuatorWidget, &AttenuatorWidget::valueChanged, this, &AttenuationManager::internalAttenuationChanged);
+
+    // This updates the total when the value changes
+    connect(m_internalAttenuatorWidget, &AttenuatorWidget::valueChanged, this, &AttenuationManager::updateTotalAttenuation);
+
+    m_attenuatorWidgets.append(m_internalAttenuatorWidget);
+    m_listLayout->insertWidget(0, m_internalAttenuatorWidget);
+    updateTotalAttenuation();
+}
+
+void AttenuationManager::removeInternalAttenuator()
+{
+    if (!m_internalAttenuatorWidget) {
+        return;
+    }
+
+    m_attenuatorWidgets.removeAll(m_internalAttenuatorWidget);
+    m_listLayout->removeWidget(m_internalAttenuatorWidget);
+    m_internalAttenuatorWidget->deleteLater();
+    m_internalAttenuatorWidget = nullptr;
+
+    updateTotalAttenuation();
+}
+
+void AttenuationManager::setInternalAttenuation(double value)
+{
+    if (m_internalAttenuatorWidget) {
+        m_internalAttenuatorWidget->setValue(value);
+    }
+}

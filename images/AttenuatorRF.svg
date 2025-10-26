@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    version="1.1"
-   width="121.63396"
-   height="110.12483"
+   width="120"
+   height="120"
    id="svg13"
    sodipodi:docname="AttenuatorRF.svg"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
@@ -21,7 +21,7 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="4.5464756"
-     inkscape:cx="58.066956"
+     inkscape:cx="57.847006"
      inkscape:cy="51.578414"
      inkscape:window-width="1920"
      inkscape:window-height="1026"
@@ -1919,17 +1919,17 @@
     </linearGradient>
   </defs>
   <rect
-     style="opacity:0.888628;fill:#071315;fill-opacity:1;stroke:#2b7188;stroke-width:7.19;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+     style="opacity:0.888628;fill:#071315;fill-opacity:1;stroke:#2b7188;stroke-width:7.46844;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
      id="rect13"
-     width="114.24348"
-     height="102.73435"
-     x="3.69524"
-     y="3.69524"
-     ry="9.2379246" />
+     width="112.53156"
+     height="112.53156"
+     x="3.73422"
+     y="3.73422"
+     ry="10.118895" />
   <g
-     transform="matrix(1.4601268,0,0,1.4405217,-977.99116,-1169.289)"
+     transform="matrix(1.4601268,0,0,1.4405217,-975.67194,-1164.9902)"
      id="g13"
-     style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round">
+     style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1">
     <path
        d="m 710,832 7,3 -7,3"
        fill="none"
@@ -1940,7 +1940,7 @@
        stroke-miterlimit="10"
        pointer-events="none"
        id="path5"
-       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round" />
+       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1" />
     <path
        d="m 710,838 -7,3 7,3"
        fill="none"
@@ -1951,7 +1951,7 @@
        stroke-miterlimit="10"
        pointer-events="none"
        id="path6"
-       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round" />
+       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1" />
     <path
        d="m 710,844 7,3 -7,3"
        fill="none"
@@ -1962,7 +1962,7 @@
        stroke-miterlimit="10"
        pointer-events="none"
        id="path7"
-       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round" />
+       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1" />
     <path
        d="m 710,850 -7,3 7,3"
        fill="none"
@@ -1973,7 +1973,7 @@
        stroke-miterlimit="10"
        pointer-events="none"
        id="path8"
-       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round" />
+       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1" />
     <path
        d="m 710,856 7,3 -7,3"
        fill="none"
@@ -1984,7 +1984,7 @@
        stroke-miterlimit="10"
        pointer-events="none"
        id="path9"
-       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round" />
+       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1" />
     <path
        d="m 710,862 -7,3 7,3"
        fill="none"
@@ -1995,7 +1995,7 @@
        stroke-miterlimit="10"
        pointer-events="none"
        id="path10"
-       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round" />
+       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1" />
     <path
        d="m 710,821 v 10"
        fill="#000000"
@@ -2005,7 +2005,7 @@
        stroke-miterlimit="10"
        pointer-events="none"
        id="path11"
-       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round" />
+       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1" />
     <path
        d="m 710,869 v 10"
        fill="#000000"
@@ -2015,6 +2015,6 @@
        stroke-miterlimit="10"
        pointer-events="none"
        id="path12"
-       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97092656;stroke-dasharray:none;stroke-opacity:1;stroke-linecap:round" />
+       style="fill:none;fill-opacity:1;stroke:#8acee4;stroke-width:3.97093;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>
