@@ -57,16 +57,19 @@ jobs:
         id: set_flags
         run: |
           get_clean_text() {
-          echo "$1" | sed -E '/```/,/```/d' | sed -E 's/`[^`]*`//g'
+          printf "%s" "$1" | awk '
+          BEGIN {in_code=0}
+          /^```/ {in_code = !in_code; next}
+          !in_code {gsub(/`[^`]+`/, ""); print}
+          '
           }
 
           if [[ "${{ github.event_name }}" = "pull_request" ]]; then
-          # Remove backtick code blocks from both title and body
-          PR_TITLE_CLEAN=$(get_clean_text "${{ github.event.pull_request.title }}")
-          PR_BODY_CLEAN=$(get_clean_text "${{ github.event.pull_request.body }}")
+            PR_TITLE_CLEAN=$(get_clean_text "${{ github.event.pull_request.title }}")
+            PR_BODY_CLEAN=$(get_clean_text "${{ github.event.pull_request.body }}")
             SRC="$PR_TITLE_CLEAN $PR_BODY_CLEAN"
           else
-             SRC=$(get_clean_text "${{ github.event.head_commit.message }}")
+            SRC=$(get_clean_text "${{ github.event.head_commit.message }}")
           fi
           #if [[ "${{ github.event_name }}" = "pull_request" ]]; then
           #  SRC="${{ github.event.pull_request.title }} ${{ github.event.pull_request.body }}"
