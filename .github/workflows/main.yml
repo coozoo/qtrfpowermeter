@@ -57,7 +57,7 @@ jobs:
         id: set_flags
         run: |
           get_clean_text() {
-          echo "$1" | sed -e 's/`[^`]*`//g'
+          echo "$1" | sed -E '/```/,/```/d' | sed -E 's/`[^`]*`//g'
           }
 
           if [[ "${{ github.event_name }}" = "pull_request" ]]; then
