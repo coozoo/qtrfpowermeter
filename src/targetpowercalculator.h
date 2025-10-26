@@ -32,7 +32,7 @@ private slots:
 
 private:
     void performHighlighting();
-    void updateSpinBoxRange(); // New helper function
+    void updateSpinBoxRange();
 
     QDoubleSpinBox *m_powerInputSpinBox;
     QComboBox *m_unitComboBox;

@@ -6,7 +6,11 @@
         <file>images/sine-graphdBm.svg</file>
         <file>images/digiattcontrol.svg</file>
         <file>images/AttenuatorRF.svg</file>
+        <file>images/coaxcable.svg</file>
         <file>images/document-open.svg</file>
+        <file>images/devices/rf8000.png</file>
+        <file>images/devices/rf_pm_v7_10.png</file>
         <file>chart_rules.json</file>
+        <file>cables.json</file>
     </qresource>
 </RCC>

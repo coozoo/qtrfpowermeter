@@ -6,3 +6,4 @@ Exec=qtrfpowermeter %F
 Icon=qtrfpowermeter
 Comment=QT RF Power Meter
 Name[en_US]=qtrfpowermeter
+Name[uk_UA]=qtrfpowermeter

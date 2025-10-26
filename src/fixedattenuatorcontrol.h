@@ -31,6 +31,7 @@ private slots:
 private:
     void setupUi();
 
+protected:
     QDoubleSpinBox *m_spinBox;
     QLineEdit *m_descriptionEdit;
 };

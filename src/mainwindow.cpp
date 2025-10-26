@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -8,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    m_max_dbm = -std::numeric_limits<double>::infinity();
     datetimefile = QDateTime::fromMSecsSinceEpoch(QDateTime::currentMSecsSinceEpoch()).toString("dd.MM.yyyy_hh.mm.ss.zzz");
 
 #ifdef Q_OS_WIN
@@ -21,16 +21,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     filepath = rootstatsdir + statsdirlocation + datetimefile + "/";
 
-    updateDeviceList();
-    serialPortPowerMeter= new SerialPortInterface();
-    Q_EMIT(ondevice_comboBox_currentIndexChanged());
-    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
-    connect(serialPortPowerMeter,&SerialPortInterface::serialPortNewRFData,this,&MainWindow::updateData);
-    connect(serialPortPowerMeter,&SerialPortInterface::serialPortErrorSignal,this,&MainWindow::on_serialPortError);
-    connect(serialPortPowerMeter, &SerialPortInterface::portOpened, this, &MainWindow::onPortOpened);
-    connect(serialPortPowerMeter, &SerialPortInterface::portClosed, this, &MainWindow::onPortClosed);
-    connect(this, &MainWindow::isConnectedChanged, this, &MainWindow::onIsConnectedChanged);
+    // --- New Device Abstraction Setup ---
+    m_deviceFactory = new PMDeviceFactory(this);
+    setupDeviceSelector();
+    // Remove old direct serial port handling
+    // serialPortPowerMeter= new SerialPortInterface();
 
+    updateDeviceList();
+    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
+    connect(this, &MainWindow::isConnectedChanged, this, &MainWindow::onIsConnectedChanged);
 
     ui->resetMax_toolButton->setToolTip(tr("Reset max values"));
     ui->resetMax_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
@@ -86,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
 #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
     configpath = QStandardPaths::standardLocations(QStandardPaths::ConfigLocation)[0] + "/" + qAppName();
 #endif
- /*   QFile file(configpath + "/chart_rules.json");
+    /*   QFile file(configpath + "/chart_rules.json");
     QDir().mkpath(configpath) ;
     if (!QFileInfo::exists(configpath + "/chart_rules.json"))
     {
@@ -154,6 +153,8 @@ MainWindow::MainWindow(QWidget *parent)
     attenuationMgr = new AttenuationManager(this);
     ui->att_gridLayout->addWidget(attenuationMgr, 1, 0, 1, 1);
     connect(attenuationMgr, &AttenuationManager::totalAttenuationChanged, this, &MainWindow::onTotalAttenuationChanged);
+    connect(attenuationMgr, &AttenuationManager::cableManagerAdded, this, &MainWindow::onCableManagerAdded);
+    connect(attenuationMgr, &AttenuationManager::cableManagerRemoved, this, &MainWindow::onCableManagerRemoved);
     ui->att_pushButton->setText(tr("Attenuation:") + " " + QString::number(m_current_atteuation,'f',2) + " dB");
 
     m_attenuatorCalculator = new TargetPowerCalculator(this);
@@ -189,7 +190,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QMainWindow::tabifyDockWidget(ui->attenuation_dockWidget, ui->calibration_dockWidget);
 
-
+    onDeviceSelector_currentIndexChanged(ui->deviceType_comboBox->currentIndex());
     Q_EMIT(on_set_pushButton_clicked());
 
 
@@ -234,6 +235,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->flow_checkBox,&QCheckBox::stateChanged,charts,&chartManager::setisflow);
     ui->flow_checkBox->setChecked(true);
 
+    connect(ui->frequency_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_set_pushButton_clicked);
+
+    // --- Tools Menu ---
+    QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
+    toolsMenu->addAction(cableLossCalcAction);
+    connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
+
+
     //autoconnector works fine
     //connect(ui->range_spinBox, SIGNAL(valueChanged(int)), this, SLOT(on_range_spinBox_valueChanged(int)));
     //connect(ui->saveCharts_toolButton, SIGNAL(clicked()), this, SLOT(on_saveCharts_toolButton_clicked()));
@@ -243,6 +253,150 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::setupDeviceSelector()
+{
+    QList<PMDeviceProperties> devices = m_deviceFactory->availableDevices();
+    for (const auto &props : devices) {
+        ui->deviceType_comboBox->addItem(props.icon(), props.name, props.id);
+    }
+
+    auto* delegate = new DeviceComboBoxDelegate(this);
+    ui->deviceType_comboBox->setItemDelegate(delegate);
+
+    int maxWidth = 0;
+    for (int i = 0; i < ui->deviceType_comboBox->count(); ++i) {
+        QStyleOptionViewItem option;
+        option.font = ui->deviceType_comboBox->font();
+        int itemWidth = delegate->sizeHint(option, ui->deviceType_comboBox->model()->index(i, 0)).width();
+        if (itemWidth > maxWidth) {
+            maxWidth = itemWidth;
+        }
+    }
+
+    maxWidth += 10;
+    ui->deviceType_comboBox->view()->setMinimumWidth(maxWidth);
+
+    connect(ui->deviceType_comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onDeviceSelector_currentIndexChanged);
+}
+
+void MainWindow::onDeviceSelector_currentIndexChanged(int index)
+{
+    if (index < 0) return;
+
+    QString deviceId = ui->deviceType_comboBox->itemData(index).toString();
+    createDevice(deviceId);
+}
+
+void MainWindow::createDevice(const QString &deviceId)
+{
+    if (m_activeDeviceObject) {
+        // Disconnect signals for the old device to prevent dangling connections
+        disconnect(ui->internalAtt_spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                   attenuationMgr, &AttenuationManager::setInternalAttenuation);
+        disconnect(attenuationMgr, &AttenuationManager::internalAttenuationChanged,
+                   this, &MainWindow::onDeviceInternalAttChanged);
+
+        // Clean up the UI and the old device object
+        attenuationMgr->removeInternalAttenuator();
+        m_activeDeviceObject->disconnectDevice();
+        m_activeDeviceObject->deleteLater();
+        m_activeDeviceObject = nullptr;
+    }
+
+    m_activeDeviceObject = m_deviceFactory->createDevice(deviceId, this);
+
+    if (m_activeDeviceObject) {
+        connect(m_activeDeviceObject, &AbstractPMDevice::deviceConnected, this, &MainWindow::onDeviceConnected);
+        connect(m_activeDeviceObject, &AbstractPMDevice::deviceDisconnected, this, &MainWindow::onDeviceDisconnected);
+        connect(m_activeDeviceObject, &AbstractPMDevice::deviceError, this, &MainWindow::onDeviceError);
+        connect(m_activeDeviceObject, &AbstractPMDevice::measurementReady, this, &MainWindow::onNewDeviceMeasurement);
+        connect(m_activeDeviceObject, &AbstractPMDevice::newLogMessage, this, &MainWindow::onNewDeviceLogMessage);
+
+        if (m_activeDeviceObject->properties().hasInternalAttenuator) {
+            const auto& props = m_activeDeviceObject->properties();
+            attenuationMgr->addInternalAttenuator(props.internalAttMinDb, props.internalAttMaxDb, props.internalAttStepDb);
+
+            // Create connections only when the device supports it
+            connect(ui->internalAtt_spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                    attenuationMgr, &AttenuationManager::setInternalAttenuation);
+            connect(attenuationMgr, &AttenuationManager::internalAttenuationChanged,
+                    this, &MainWindow::onDeviceInternalAttChanged);
+        }
+
+        updateUiForDevice(m_activeDeviceObject->properties());
+    } else {
+        qWarning() << "Failed to create device object for" << deviceId;
+        updateUiForDevice(PMDeviceProperties()); // Reset UI to a default state
+    }
+}
+
+void MainWindow::updateUiForDevice(const PMDeviceProperties &props)
+{
+    ui->frequency_spinBox->setMinimum(props.minFreqHz / 1000000);
+    ui->frequency_spinBox->setMaximum(props.maxFreqHz / 1000000);
+    ui->set_pushButton->setEnabled(true);
+
+    ui->correction_groupBox->setVisible(props.hasOffset);
+    ui->internalAtt_groupBox->setVisible(props.hasInternalAttenuator);
+
+    if (props.hasInternalAttenuator) {
+        ui->internalAtt_spinBox->blockSignals(true);
+        ui->internalAtt_spinBox->setRange(props.internalAttMinDb, props.internalAttMaxDb);
+        ui->internalAtt_spinBox->setSingleStep(props.internalAttStepDb);
+        ui->internalAtt_spinBox->setSingleStep(props.internalAttStepDb);
+        // Set decimals based on step. (e.g., 0.25 -> 2 decimals, 0.5 -> 1 decimal)
+        if (props.internalAttStepDb < 0.1)
+            ui->internalAtt_spinBox->setDecimals(3);
+        else if (props.internalAttStepDb < 1.0)
+            ui->internalAtt_spinBox->setDecimals(2);
+        else
+            ui->internalAtt_spinBox->setDecimals(1);
+
+        ui->internalAtt_spinBox->setValue(0.0);
+        ui->internalAtt_spinBox->blockSignals(false);
+    }
+
+    double middlePower = (props.minPowerDbm + props.maxPowerDbm) / 2.0;
+    double targetDbm = round(middlePower / 5.0) * 5.0;
+    m_attenuatorCalculator->setMinDbm(props.minPowerDbm);
+    m_attenuatorCalculator->setMaxDbm(props.maxPowerDbm);
+    m_attenuatorCalculator->setTargetDbm(targetDbm);
+
+    // Emit the current frequency to update cable managers etc.
+    onCurrentFrequencyChanged(ui->frequency_spinBox->value());
+}
+
+void MainWindow::on_set_pushButton_clicked()
+{
+    qDebug()<<"on_set_pushButton_clicked";
+    if (!m_activeDeviceObject || !isConnected()) {
+        qDebug() << "Set button clicked, but device not connected or doesn't exist.";
+        return;
+    }
+
+    // Set all the properties on the abstract device object.
+    // Each device class now handles sending the command immediately within the setter.
+    quint64 freqHz = static_cast<quint64>(ui->frequency_spinBox->value()) * 1000000;
+    m_activeDeviceObject->setFrequency(freqHz);
+
+    if (m_activeDeviceObject->properties().hasOffset) {
+        double offsetDb = ui->offset_doubleSpinBox->value();
+        if (ui->correctionminus_radioButton->isChecked()) {
+            offsetDb = -offsetDb;
+        }
+        m_activeDeviceObject->setOffset(offsetDb);
+    }
+
+    if (m_activeDeviceObject->properties().hasInternalAttenuator) {
+        m_activeDeviceObject->setInternalAttenuation(ui->internalAtt_spinBox->value());
+    }
+
+    // Manually trigger frequency update for other components
+    onCurrentFrequencyChanged(ui->frequency_spinBox->value());
+}
+
 
 /* slot to call range changing */
 void MainWindow::on_range_spinBox_valueChanged(int range)
@@ -288,146 +442,107 @@ void MainWindow::ondevice_comboBox_currentIndexChanged()
     onIsConnectedChanged(isConnected());
 }
 
-void MainWindow::updateData(const QString &data)
+void MainWindow::onNewDeviceLogMessage(const QString &message)
 {
-    qDebug()<<"updateData"<<data;
+    ui->data_plainTextEdit->appendPlainText(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz") + " [DEVICE] " + message);
+}
+
+void MainWindow::onNewDeviceMeasurement(double dbm, double vpp_raw)
+{
     QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
-    ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+" "+data);
+    ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+ QString(" $%1dBm%2mVpp$").arg(dbm).arg(vpp_raw));
 
-    QRegularExpression reg("[$]([-+][0-9.]+)dBm([0-9.]+)(.)Vpp[$]");
+    double milliwatts = 0;
 
-    QRegularExpressionMatchIterator i = reg.globalMatch(data.simplified().replace(" ",""));
-    if (i.isValid())
+    // --- Apply Corrections for Display ---
+    double current_freq_mhz = getFrequency().toDouble();
+    double calibration_correction = m_calibrationManager->getCorrection(current_freq_mhz);
+
+    double actual_dbm = dbm + m_current_atteuation + calibration_correction;
+    double actual_milliwatts = UnitConverter::dBmToMilliwatts(actual_dbm);
+
+    // Update main displays with actual values
+    ui->dbm_lcdNumber->display(actual_dbm);
+    emit newMeasurement(dbm); // Still emit raw value for calibration
+    QPair<double, QString> formattedPower = UnitConverter::formatPower(actual_milliwatts);
+    ui->mW_lcdNumber->display(formattedPower.first);
+    ui->wattage_groupBox->setTitle(formattedPower.second);
+
+    // Use UnitConverter to get Vpp from actual power
+    double vpp = UnitConverter::milliwattsToVpp(actual_milliwatts);
+    QPair<double, QString> formattedVoltage = UnitConverter::formatVoltage(vpp);
+    ui->mVpp_lcdNumber->display(formattedVoltage.first);
+    // Correctly append "Vpp" to the prefix (k, "", m, µ, n)
+    ui->mvpp_groupBox->setTitle(formattedVoltage.second + "Vpp");
+
+    // Update MAX displays with actual values
+    if(actual_dbm > m_max_dbm)
     {
-        while (i.hasNext())
+        m_max_dbm = actual_dbm;
+        ui->maxdbm_lineEdit->setText(QString::number(actual_dbm, 'f', 2));
+        QPair<double, QString> formattedMaxPower = UnitConverter::formatPower(actual_milliwatts);
+        ui->maxmw_lineEdit->setText(QString::number(formattedMaxPower.first, 'f', 4));
+        ui->maxmw_label->setText(formattedMaxPower.second + ":");
+    }
+
+    // --- Table Population Logic ---
+    int row = data_model->rowCount();
+    data_model->setItem(row,dataTimeColumnID,new QStandardItem(curdate));
+    data_model->setItem(row,dataValuedBmColumnID,new QStandardItem(QString::number(dbm, 'f', 2)));
+    data_model->setData(data_model->index(row,dataValuedBmColumnID),dbm,Qt::UserRole);
+
+    milliwatts = UnitConverter::dBmToMilliwatts(dbm);
+    data_model->setItem(row,dataValuemWColumnID,new QStandardItem(QString::number(milliwatts,'f',7)));
+    data_model->setData(data_model->index(row,dataValuemWColumnID),QString::number(milliwatts,'f',7),Qt::UserRole);
+
+    data_model->setItem(row,dataValuemVppColumnID,new QStandardItem(QString::number(vpp_raw,'f',4)));
+    data_model->setData(data_model->index(row,dataValuemVppColumnID),vpp_raw,Qt::UserRole);
+
+    data_model->setItem(row,dataValueFreqColumnID,new QStandardItem(getFrequency()));
+    data_model->setData(data_model->index(row,dataValueFreqColumnID),getFrequency(),Qt::UserRole);
+    data_model->setItem(row,dataValueCorrectColumnID,new QStandardItem(getOffset()));
+    data_model->setData(data_model->index(row,dataValueCorrectColumnID),getOffset(),Qt::UserRole);
+
+    data_model->setItem(row, dataValueAttenuationColumnID, new QStandardItem(QString::number(m_current_atteuation, 'f', 2)));
+
+    double calibration_correction_for_table = m_calibrationManager->getCorrection(getFrequency().toDouble());
+    double total_dbm = dbm + m_current_atteuation + calibration_correction_for_table;
+    double total_mw = UnitConverter::dBmToMilliwatts(total_dbm);
+
+    data_model->setItem(row, dataValueTotalDbmColumnID, new QStandardItem(QString::number(total_dbm, 'f', 2)));
+    data_model->setItem(row, dataValueTotalMwColumnID, new QStandardItem(QString::number(total_mw, 'f', 7)));
+
+    QString logLine="";
+    QString headersList="";
+    for (int i = 0; i < data_model->columnCount(); i++)
+    {
+        headersList = headersList + data_model->headerData(i, Qt::Horizontal).toString() + ",";
+        if (data_model->hasIndex(row, i))
         {
-            QRegularExpressionMatch match = i.next();
-
-            bool ok;
-            double dbm = match.captured(1).toDouble(&ok);
-            double milliwatts = 0;
-
-            if (ok)
-            {
-                // --- Apply Corrections for Display ---
-                double current_freq_mhz = getFrequency().toDouble();
-                double calibration_correction = m_calibrationManager->getCorrection(current_freq_mhz);
-
-                double actual_dbm = dbm + m_current_atteuation + calibration_correction;
-                double actual_milliwatts = UnitConverter::dBmToMilliwatts(actual_dbm);
-
-                // Update main displays with actual values
-                ui->dbm_lcdNumber->display(actual_dbm);
-                emit newMeasurement(dbm);
-                QPair<double, QString> formattedPower = UnitConverter::formatPower(actual_milliwatts);
-                ui->mW_lcdNumber->display(formattedPower.first);
-                ui->wattage_groupBox->setTitle(formattedPower.second);
-
-                // Use UnitConverter to get Vpp from actual power
-                double vpp = UnitConverter::milliwattsToVpp(actual_milliwatts);
-                QPair<double, QString> formattedVoltage = UnitConverter::formatVoltage(vpp);
-                ui->mVpp_lcdNumber->display(formattedVoltage.first);
-                // Correctly append "Vpp" to the prefix (k, "", m, µ, n)
-                ui->mvpp_groupBox->setTitle(formattedVoltage.second + "Vpp");
-
-                // Update MAX displays with actual values
-                if(ui->maxdbm_lineEdit->text().toDouble() < actual_dbm || ui->maxdbm_lineEdit->text().isEmpty())
-                {
-                    ui->maxdbm_lineEdit->setText(QString::number(actual_dbm, 'f', 2));
-                    QPair<double, QString> formattedMaxPower = UnitConverter::formatPower(actual_milliwatts);
-                    ui->maxmw_lineEdit->setText(QString::number(formattedMaxPower.first, 'f', 4));
-                    ui->maxmw_label->setText(formattedMaxPower.second + ":");
-                }
-            }
-            else
-            {
-                // Display error on LCDs if parsing failed
-                ui->dbm_lcdNumber->display(tr("Error"));
-                ui->mW_lcdNumber->display(tr("Error"));
-                ui->mVpp_lcdNumber->display(tr("Error"));
-                ui->wattage_groupBox->setTitle("mW");
-                ui->mvpp_groupBox->setTitle("mVpp");
-            }
-
-            // --- Table Population Logic ---
-            int row = data_model->rowCount();
-            data_model->setItem(row,dataTimeColumnID,new QStandardItem(curdate));
-            data_model->setItem(row,dataValuedBmColumnID,new QStandardItem(match.captured(1)));
-            data_model->setData(data_model->index(row,dataValuedBmColumnID),match.captured(1),Qt::UserRole);
-
-
-            if(ok)
-            {
-                milliwatts = UnitConverter::dBmToMilliwatts(dbm);
-                data_model->setItem(row,dataValuemWColumnID,new QStandardItem(QString::number(milliwatts,'f',7)));
-                data_model->setData(data_model->index(row,dataValuemWColumnID),QString::number(milliwatts,'f',7),Qt::UserRole);
-            }
-            else
-            {
-                data_model->setItem(row,dataValuemWColumnID,new QStandardItem(tr("Error")));
-            }
-
-            double mvpp_raw=match.captured(2).toDouble();
-            if(match.captured(3)=='u') mvpp_raw /= 1000.0;
-            data_model->setItem(row,dataValuemVppColumnID,new QStandardItem(QString::number(mvpp_raw,'f',4)));
-            data_model->setData(data_model->index(row,dataValuemVppColumnID),mvpp_raw,Qt::UserRole);
-
-            data_model->setItem(row,dataValueFreqColumnID,new QStandardItem(getFrequency()));
-            data_model->setData(data_model->index(row,dataValueFreqColumnID),getFrequency(),Qt::UserRole);
-            data_model->setItem(row,dataValueCorrectColumnID,new QStandardItem(getOffset()));
-            data_model->setData(data_model->index(row,dataValueCorrectColumnID),getOffset(),Qt::UserRole);
-
-            data_model->setItem(row, dataValueAttenuationColumnID, new QStandardItem(QString::number(m_current_atteuation, 'f', 2)));
-
-            if (ok) {
-                double calibration_correction_for_table = m_calibrationManager->getCorrection(getFrequency().toDouble());
-                double total_dbm = dbm + m_current_atteuation + calibration_correction_for_table;
-                double total_mw = UnitConverter::dBmToMilliwatts(total_dbm);
-
-                data_model->setItem(row, dataValueTotalDbmColumnID, new QStandardItem(QString::number(total_dbm, 'f', 2)));
-                data_model->setItem(row, dataValueTotalMwColumnID, new QStandardItem(QString::number(total_mw, 'f', 7)));
-            } else {
-                data_model->setItem(row, dataValueTotalDbmColumnID, new QStandardItem(tr("Error")));
-                data_model->setItem(row, dataValueTotalMwColumnID, new QStandardItem(tr("Error")));
-            }
-
-                QString logLine="";
-                QString headersList="";
-                for (int i = 0; i < data_model->columnCount(); i++)
-                {
-                    headersList = headersList + data_model->headerData(i, Qt::Horizontal).toString() + ",";
-                    if (data_model->hasIndex(row, i))
-                    {
-                        logLine = logLine + data_model->data(data_model->index(row, i)).toString() + ",";
-                    }
-                    else
-                    {
-                        qDebug()<<"no such index";
-                    }
-                }
-                if (headersList != "")
-                {
-                    headersList = headersList.left(headersList.length() - 1);
-                }
-                if (logLine != "")
-                {
-                    logLine = logLine.left(logLine.length() - 1);
-                }
-                qDebug()<<headersList;
-                qDebug()<<logLine;
-
-
-            if(ui->writeCSV_checkBox->isChecked())
-            {
-                writeStatCSV("power", logLine, headersList);
-            }
-            emit newData(headersList, logLine);
+            logLine = logLine + data_model->data(data_model->index(row, i)).toString() + ",";
+        }
+        else
+        {
+            qDebug()<<"no such index";
         }
     }
-    else
+    if (headersList != "")
     {
-        ui->statusbar->showMessage(tr("Error incoming data, check device"),1000);
+        headersList = headersList.left(headersList.length() - 1);
     }
+    if (logLine != "")
+    {
+        logLine = logLine.left(logLine.length() - 1);
+    }
+    qDebug()<<headersList;
+    qDebug()<<logLine;
+
+
+    if(ui->writeCSV_checkBox->isChecked())
+    {
+        writeStatCSV("power", logLine, headersList);
+    }
+    emit newData(headersList, logLine);
 }
 
 void MainWindow::on_connect_pushButton_clicked()
@@ -438,25 +553,27 @@ void MainWindow::on_connect_pushButton_clicked()
         qDebug()<<"Connect clicked with no device selected.";
         return;
     }
-    // This is the commit point. Set the current device from the UI selection.
+    if (!m_activeDeviceObject) {
+        qWarning() << "Connect clicked, but no active device object exists!";
+        return;
+    }
+
     QString selectedPort = ui->device_comboBox->currentData(PortNameRole).toString();
     setCurrentDevice(selectedPort);
     qDebug()<<"Attempting to connect to"<<currentDevice();
 
     if(!currentDevice().isEmpty())
     {
-        serialPortPowerMeter->setportName(currentDevice());
-        serialPortPowerMeter->setbaudRate(9600);
-        serialPortPowerMeter->startPort();
+        m_activeDeviceObject->connectDevice(currentDevice());
     }
-
 }
 
 void MainWindow::on_disconnect_pushButton_clicked()
 {
     qDebug()<<"on_disconnect_pushButton_clicked";
-    serialPortPowerMeter->stopPort();
-
+    if (m_activeDeviceObject) {
+        m_activeDeviceObject->disconnectDevice();
+    }
 }
 
 void MainWindow::on_refreshDevices_toolbutton_clicked()
@@ -468,19 +585,12 @@ void MainWindow::on_refreshDevices_toolbutton_clicked()
 void MainWindow::updateDeviceList()
 {
     qDebug()<<"updateDeviceList";
-    //QString previouslySelectedPort = "";
-    // If a device is already selected, remember its port name.
-    //if (ui->device_comboBox->currentIndex() != -1)
-    //{
-    //    previouslySelectedPort = ui->device_comboBox->currentData(PortNameRole).toString();
-    //}
-    //qDebug()<<"Previously selected port:"<<previouslySelectedPort;
-
     ui->device_comboBox->clear();
     const auto infos = QSerialPortInfo::availablePorts();
     int newIndexToSelect = -1;
     for (const QSerialPortInfo &info : infos)
     {
+        // Keep filtering for the specific USB-Serial chip if desired
         if (info.isNull() || !info.hasVendorIdentifier() || QString::number(info.vendorIdentifier(),16) != "1a86")
             continue;
 
@@ -521,10 +631,6 @@ void MainWindow::updateDeviceList()
         if (info.portName() == currentDevice())
         {
             newIndexToSelect = newIndex;
-            if (newIndexToSelect != -1)
-            {
-                ui->device_comboBox->setCurrentIndex(newIndexToSelect);
-            }
         }
     }
 
@@ -532,41 +638,42 @@ void MainWindow::updateDeviceList()
     {
         ui->device_comboBox->setCurrentIndex(newIndexToSelect);
     }
-    else
+    else if (isConnected())
     {
-        if(isConnected())onPortClosed();
+        onDeviceDisconnected();
     }
     ondevice_comboBox_currentIndexChanged();
 }
 
-void MainWindow::onPortOpened()
+void MainWindow::onDeviceConnected()
 {
     qDebug()<<Q_FUNC_INFO;
     setDeviceError("");
     setIsConnected(true);
-    Q_EMIT updateDeviceList();
-    Q_EMIT on_set_pushButton_clicked();
+    updateDeviceList();
+    on_set_pushButton_clicked();
 }
 
-void MainWindow::onPortClosed()
+void MainWindow::onDeviceDisconnected()
 {
     qDebug()<<Q_FUNC_INFO;
     setIsConnected(false);
-    Q_EMIT updateDeviceList();
+    updateDeviceList();
 }
 
-void MainWindow::on_serialPortError(const QString &error)
+void MainWindow::onDeviceError(const QString &error)
 {
-    qDebug()<<"on_serialPortError";
+    qDebug()<< "onDeviceError:" << error;
     setDeviceError(error);
     setIsConnected(false);
-    Q_EMIT updateDeviceList();
+    updateDeviceList();
 }
 
 void MainWindow::onIsConnectedChanged(bool connected)
 {
     qDebug()<<Q_FUNC_INFO<<"Connected:"<<connected;
     ui->device_comboBox->setEnabled(!connected);
+    ui->deviceType_comboBox->setEnabled(!connected);
     ui->disconnect_pushButton->setEnabled(connected);
 
     if (ui->device_comboBox->currentIndex() == -1)
@@ -580,7 +687,7 @@ void MainWindow::onIsConnectedChanged(bool connected)
 
     if (connected)
     {
-        ui->statusbar->showMessage(tr("Connected to %1").arg(currentDevice()));
+        ui->statusbar->showMessage(tr("Connected to %1 on %2").arg(ui->deviceType_comboBox->currentText()).arg(currentDevice()));
     }
     else
     {
@@ -634,33 +741,35 @@ void MainWindow::on_simulatorTimer()
 
     double simdbmvalue =  QRandomGenerator::global()->generateDouble() * (5 + 60) - 60;
     qDebug()<<"on_simulatorTimer simulator is in progress";
-    QString formattedValue = (simdbmvalue >= 0) ? QString("+%1").arg(simdbmvalue, 0, 'f', 1) : QString::number(simdbmvalue, 'f', 1);
-    //2×(((2×impedance)÷1000)^(1÷2))×(10^(simdbmvalue÷20))
-    //2×(((2×50)÷1000)^(1÷2))=0.6324555322
-    double simmvppValue = qPow(10, (simdbmvalue / 20.0)) * 0.6324555322*1000000;
-    char simmvppSign='u';
-    if(simmvppValue>1000)
-    {
-        simmvppValue=simmvppValue/1000;
-        simmvppSign='m';
-    }
-    QString formattedvppValue =  QString::number(simmvppValue, 'f', 1);
-    QString formattedString = QString("$%1 dBm%2 %3Vpp$").arg(formattedValue).arg(formattedvppValue).arg(simmvppSign);
 
-    Q_EMIT(updateData(formattedString));
+    double simmvppValue = UnitConverter::milliwattsToVpp(UnitConverter::dBmToMilliwatts(simdbmvalue));
+
+    onNewDeviceMeasurement(simdbmvalue, simmvppValue);
 
 }
 
 
-void MainWindow::on_set_pushButton_clicked()
-{
-    qDebug()<<"on_set_pushButton_clicked";
-    setFrequency(QString::number(ui->frequency_spinBox->value(),'d',0).rightJustified(4, '0'));
-    setOffset(QString(ui->correctionplus_radioButton->isChecked()?"+":"-")+QString::number(ui->offset_doubleSpinBox->value(),'f',1).rightJustified(4, '0'));
-    qDebug()<<getFrequency();
-    qDebug()<<getOffset();
-    serialPortPowerMeter->writeData(("$"+getFrequency()+getOffset()+"#").toLatin1());
-}
+// void MainWindow::on_set_pushButton_clicked()
+// {
+//     qDebug()<<"on_set_pushButton_clicked";
+//     if (!m_activeDeviceObject || !isConnected()) {
+//         qDebug() << "Set button clicked, but device not connected or doesn't exist.";
+//         return;
+//     }
+
+//     quint64 freqHz = static_cast<quint64>(ui->frequency_spinBox->value()) * 1000000;
+//     setFrequency(QString::number(ui->frequency_spinBox->value()));
+
+//     double offsetDb = ui->offset_doubleSpinBox->value();
+//     if (ui->correctionminus_radioButton->isChecked()) {
+//         offsetDb = -offsetDb;
+//     }
+//     setOffset(QString::number(offsetDb, 'f', 1));
+
+//     qDebug() << "Setting frequency to" << freqHz << "Hz and offset to" << offsetDb << "dB";
+//     m_activeDeviceObject->setFrequency(freqHz);
+//     m_activeDeviceObject->setOffset(offsetDb);
+// }
 
 void MainWindow::writeStatCSV(const QString &appendFileName, const QString &logLine, const QString &headersList)
 {
@@ -774,6 +883,7 @@ void MainWindow::onTotalAttenuationChanged(double totalAttenuation)
 void MainWindow::on_resetMax_toolButton_clicked()
 {
     qDebug()<<Q_FUNC_INFO;
+    m_max_dbm = -std::numeric_limits<double>::infinity();
     ui->maxdbm_lineEdit->setText("");
     ui->maxmw_lineEdit->setText("");
 }
@@ -804,4 +914,48 @@ void MainWindow::onCalibrationFrequencySelected(double frequencyMHz)
     qDebug()<<"Calibration: A frequency was selected:"<<frequencyMHz<<"MHz. Please set your signal generator accordingly.";
     ui->frequency_spinBox->setValue(static_cast<int>(frequencyMHz));
     on_set_pushButton_clicked();
+}
+
+
+void MainWindow::onDeviceInternalAttChanged(double attDb)
+{
+    ui->internalAtt_spinBox->blockSignals(true);
+    ui->internalAtt_spinBox->setValue(attDb);
+    ui->internalAtt_spinBox->blockSignals(false);
+}
+
+void MainWindow::onCableManagerAdded(QtCoaxCableLossCalcManager *manager)
+{
+    if (!manager) return;
+
+    // Connect the frequency signal from MainWindow to the manager's slot
+    connect(this, &MainWindow::currentFrequencyChanged, manager, &QtCoaxCableLossCalcManager::setFrequency);
+
+    // Set the initial frequency and range
+    if (m_activeDeviceObject) {
+        const auto& props = m_activeDeviceObject->properties();
+        manager->setPlotRange(props.minFreqHz / 1000000.0, props.maxFreqHz / 1000000.0);
+    }
+    manager->setFrequency(ui->frequency_spinBox->value());
+}
+
+void MainWindow::onCableManagerRemoved(QtCoaxCableLossCalcManager *manager)
+{
+    if (!manager) return;
+
+    // Disconnect the frequency signal
+    disconnect(this, &MainWindow::currentFrequencyChanged, manager, &QtCoaxCableLossCalcManager::setFrequency);
+}
+
+void MainWindow::onCurrentFrequencyChanged(int freqMHz)
+{
+    setFrequency(QString::number(freqMHz));
+    emit currentFrequencyChanged(static_cast<double>(freqMHz));
+}
+
+void MainWindow::on_actionCableLossCalculator_triggered()
+{
+    CableLossCalculatorWindow *cableWindow = new CableLossCalculatorWindow(this);
+    cableWindow->setAttribute(Qt::WA_DeleteOnClose);
+    cableWindow->show();
 }

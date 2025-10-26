@@ -12,11 +12,11 @@
 #include <QLabel>
 #include <QDebug>
 
-// Forward declarations to keep the header clean
 class QVBoxLayout;
 class QComboBox;
 class QLCDNumber;
 class AttenuatorWidget;
+class QtCoaxCableLossCalcManager;
 
 class AttenuationManager : public QWidget
 {
@@ -25,20 +25,28 @@ class AttenuationManager : public QWidget
 public:
     explicit AttenuationManager(QWidget *parent = nullptr);
     ~AttenuationManager();
+    void addInternalAttenuator(double min, double max, double step);
+    void removeInternalAttenuator();
 
 signals:
     void totalAttenuationChanged(double totalAttenuation);
+    void internalAttenuationChanged(double value);
+    void cableManagerAdded(QtCoaxCableLossCalcManager *manager);
+    void cableManagerRemoved(QtCoaxCableLossCalcManager *manager);
 
 private slots:
     void addAttenuator();
     void removeSelectedAttenuators();
     void updateTotalAttenuation();
 
+public slots:
+    void setInternalAttenuation(double value);
+
 private:
     void setupUi();
 
-    // The list of pointers you correctly suggested
     QList<AttenuatorWidget*> m_attenuatorWidgets;
+    AttenuatorWidget* m_internalAttenuatorWidget = nullptr;
 
     // UI elements
     QVBoxLayout *m_listLayout;

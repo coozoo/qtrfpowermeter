@@ -11,7 +11,9 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include "qtdigitalattenuator.h"
-#include "fixedattenuatorcontrol.h" // Correctly included
+#include "fixedattenuatorcontrol.h"
+#include "internalattenuatorcontrol.h"
+#include "qtcoaxcablelosscalcmanager.h"
 
 class AttenuatorWidget : public QGroupBox
 {
@@ -21,7 +23,9 @@ public:
     enum AttenuatorType
     {
         Fixed,
-        Digital
+        Digital,
+        InternalDigital,
+        Cable
     };
 
     explicit AttenuatorWidget(AttenuatorType type, QWidget *parent = nullptr);
@@ -31,8 +35,15 @@ public:
 
     bool isMarkedForRemoval() const { return m_markedForRemoval; }
 
+    void setInternalProperties(double min, double max, double step);
+
+    QtCoaxCableLossCalcManager *cableManager() const { return m_cableManager; }
+
 signals:
     void valueChanged(double newValue);
+
+public slots:
+    void setValue(double value);
 
 private slots:
     void onValueChanged(double value);
@@ -40,7 +51,7 @@ private slots:
 
     void onCheckBoxToggled(bool checked);
     void onStatusChanged(bool status);
-    void onDescriptionChanged(const QString &description); // Renamed from onModelChanged
+    void onDescriptionChanged(const QString &description);
 
 private:
     void setupUi();
@@ -60,6 +71,8 @@ private:
 
     QtDigitalAttenuator *m_digitalControl;
     FixedAttenuatorControl *m_fixedControl;
+    InternalAttenuatorControl *m_internalControl;
+    QtCoaxCableLossCalcManager *m_cableManager;
 };
 
 #endif // ATTENUATORWIDGET_H

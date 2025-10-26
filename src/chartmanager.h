@@ -17,7 +17,7 @@
 class chartManager : public QWidget
 {
     Q_OBJECT
-    //string with datetime it used to be folder name
+    //string with datetime it will be used to be folder name
     Q_PROPERTY(QString strDateTimeFile
            READ getstrDateTimeFile
            WRITE setstrDateTimeFile
