@@ -56,11 +56,23 @@ jobs:
       - name: Set build flags from PR tags or commit message
         id: set_flags
         run: |
+          get_clean_text() {
+          echo "$1" | sed -e 's/`[^`]*`//g'
+          }
+
           if [[ "${{ github.event_name }}" = "pull_request" ]]; then
-            SRC="${{ github.event.pull_request.title }} ${{ github.event.pull_request.body }}"
+          # Remove backtick code blocks from both title and body
+          PR_TITLE_CLEAN=$(get_clean_text "${{ github.event.pull_request.title }}")
+          PR_BODY_CLEAN=$(get_clean_text "${{ github.event.pull_request.body }}")
+            SRC="$PR_TITLE_CLEAN $PR_BODY_CLEAN"
           else
-            SRC="${{ github.event.head_commit.message }}"
+             SRC=$(get_clean_text "${{ github.event.head_commit.message }}")
           fi
+          #if [[ "${{ github.event_name }}" = "pull_request" ]]; then
+          #  SRC="${{ github.event.pull_request.title }} ${{ github.event.pull_request.body }}"
+          #else
+          #  SRC="${{ github.event.head_commit.message }}"
+          #fi
 
           BUILD_MAC_DMG=0
           BUILD_MAC_ZIP=0
