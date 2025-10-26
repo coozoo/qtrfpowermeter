@@ -23,9 +23,11 @@ void AttenuationManager::setupUi()
     m_typeComboBox = new QComboBox();
     QIcon fixedIcon(":/images/AttenuatorRF.svg");
     QIcon digitalIcon(":/images/digiattcontrol.svg");
+    QIcon cableIcon(":/images/coaxcable.svg");
 
     m_typeComboBox->addItem(fixedIcon, tr("Fixed Attenuator"), AttenuatorWidget::Fixed);
     m_typeComboBox->addItem(digitalIcon, tr("Digital Attenuator"), AttenuatorWidget::Digital);
+    m_typeComboBox->addItem(cableIcon, tr("Cable Loss"), AttenuatorWidget::Cable);
 
     QPushButton *addButton = new QPushButton(tr("Add"));
     addButton->setToolTip(tr("Add Attenuator"));
@@ -78,6 +80,11 @@ void AttenuationManager::addAttenuator()
     connect(newWidget, &AttenuatorWidget::valueChanged, this, &AttenuationManager::updateTotalAttenuation);
     connect(newWidget, &QGroupBox::toggled, this, &AttenuationManager::updateTotalAttenuation); // Also update if enabled/disabled
 
+    // If it's a cable widget, emit it so MainWindow can connect frequency signals
+    if (type == AttenuatorWidget::Cable) {
+        emit cableManagerAdded(newWidget->cableManager());
+    }
+
     // Add to our list of pointers
     m_attenuatorWidgets.append(newWidget);
 
@@ -94,20 +101,25 @@ void AttenuationManager::removeSelectedAttenuators()
     qDebug()<<Q_FUNC_INFO;
     // Use a reverse iterator to safely remove items while looping
     for (int i = m_attenuatorWidgets.count() - 1; i >= 0; --i)
+    {
+        AttenuatorWidget *widget = m_attenuatorWidgets[i];
+        if (widget->isMarkedForRemoval())
         {
-            AttenuatorWidget *widget = m_attenuatorWidgets[i];
-            if (widget->isMarkedForRemoval())
-                {
-                    // Remove from our list of pointers
-                    m_attenuatorWidgets.removeAt(i);
+            // If it's a cable widget, emit a signal so MainWindow can disconnect
+            if (widget->cableManager()) {
+                emit cableManagerRemoved(widget->cableManager());
+            }
 
-                    // Remove from the visual layout
-                    m_listLayout->removeWidget(widget);
+            // Remove from our list of pointers
+            m_attenuatorWidgets.removeAt(i);
 
-                    // Schedule the widget for deletion
-                    widget->deleteLater();
-                }
+            // Remove from the visual layout
+            m_listLayout->removeWidget(widget);
+
+            // Schedule the widget for deletion
+            widget->deleteLater();
         }
+    }
     qDebug()<<"Removed selected. Total count:"<<m_attenuatorWidgets.count();
     updateTotalAttenuation();
 }
@@ -118,9 +130,9 @@ void AttenuationManager::updateTotalAttenuation()
     double total = 0.0;
     // Loop over the list of pointers
     for (AttenuatorWidget *widget : m_attenuatorWidgets)
-        {
-            total += widget->getAttenuation();
-        }
+    {
+        total += widget->getAttenuation();
+    }
 
     m_totalLcd->display(total);
     emit totalAttenuationChanged(total);

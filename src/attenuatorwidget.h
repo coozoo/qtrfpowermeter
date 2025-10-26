@@ -13,6 +13,7 @@
 #include "qtdigitalattenuator.h"
 #include "fixedattenuatorcontrol.h"
 #include "internalattenuatorcontrol.h"
+#include "qtcoaxcablelosscalcmanager.h"
 
 class AttenuatorWidget : public QGroupBox
 {
@@ -23,7 +24,8 @@ public:
     {
         Fixed,
         Digital,
-        InternalDigital
+        InternalDigital,
+        Cable
     };
 
     explicit AttenuatorWidget(AttenuatorType type, QWidget *parent = nullptr);
@@ -34,6 +36,8 @@ public:
     bool isMarkedForRemoval() const { return m_markedForRemoval; }
 
     void setInternalProperties(double min, double max, double step);
+
+    QtCoaxCableLossCalcManager *cableManager() const { return m_cableManager; }
 
 signals:
     void valueChanged(double newValue);
@@ -68,6 +72,7 @@ private:
     QtDigitalAttenuator *m_digitalControl;
     FixedAttenuatorControl *m_fixedControl;
     InternalAttenuatorControl *m_internalControl;
+    QtCoaxCableLossCalcManager *m_cableManager;
 };
 
 #endif // ATTENUATORWIDGET_H

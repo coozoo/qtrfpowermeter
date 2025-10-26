@@ -16,6 +16,7 @@ class QVBoxLayout;
 class QComboBox;
 class QLCDNumber;
 class AttenuatorWidget;
+class QtCoaxCableLossCalcManager;
 
 class AttenuationManager : public QWidget
 {
@@ -30,6 +31,8 @@ public:
 signals:
     void totalAttenuationChanged(double totalAttenuation);
     void internalAttenuationChanged(double value);
+    void cableManagerAdded(QtCoaxCableLossCalcManager *manager);
+    void cableManagerRemoved(QtCoaxCableLossCalcManager *manager);
 
 private slots:
     void addAttenuator();

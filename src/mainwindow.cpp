@@ -153,6 +153,8 @@ MainWindow::MainWindow(QWidget *parent)
     attenuationMgr = new AttenuationManager(this);
     ui->att_gridLayout->addWidget(attenuationMgr, 1, 0, 1, 1);
     connect(attenuationMgr, &AttenuationManager::totalAttenuationChanged, this, &MainWindow::onTotalAttenuationChanged);
+    connect(attenuationMgr, &AttenuationManager::cableManagerAdded, this, &MainWindow::onCableManagerAdded);
+    connect(attenuationMgr, &AttenuationManager::cableManagerRemoved, this, &MainWindow::onCableManagerRemoved);
     ui->att_pushButton->setText(tr("Attenuation:") + " " + QString::number(m_current_atteuation,'f',2) + " dB");
 
     m_attenuatorCalculator = new TargetPowerCalculator(this);
@@ -232,6 +234,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->resetCharts_toolButton,&QToolButton::clicked,charts,&chartManager::resetAllCharts);
     connect(ui->flow_checkBox,&QCheckBox::stateChanged,charts,&chartManager::setisflow);
     ui->flow_checkBox->setChecked(true);
+
+    connect(ui->frequency_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_set_pushButton_clicked);
+
+    // --- Tools Menu ---
+    QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
+    toolsMenu->addAction(cableLossCalcAction);
+    connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
+
 
     //autoconnector works fine
     //connect(ui->range_spinBox, SIGNAL(valueChanged(int)), this, SLOT(on_range_spinBox_valueChanged(int)));
@@ -352,6 +363,9 @@ void MainWindow::updateUiForDevice(const PMDeviceProperties &props)
     m_attenuatorCalculator->setMinDbm(props.minPowerDbm);
     m_attenuatorCalculator->setMaxDbm(props.maxPowerDbm);
     m_attenuatorCalculator->setTargetDbm(targetDbm);
+
+    // Emit the current frequency to update cable managers etc.
+    onCurrentFrequencyChanged(ui->frequency_spinBox->value());
 }
 
 void MainWindow::on_set_pushButton_clicked()
@@ -378,6 +392,9 @@ void MainWindow::on_set_pushButton_clicked()
     if (m_activeDeviceObject->properties().hasInternalAttenuator) {
         m_activeDeviceObject->setInternalAttenuation(ui->internalAtt_spinBox->value());
     }
+
+    // Manually trigger frequency update for other components
+    onCurrentFrequencyChanged(ui->frequency_spinBox->value());
 }
 
 
@@ -907,4 +924,38 @@ void MainWindow::onDeviceInternalAttChanged(double attDb)
     ui->internalAtt_spinBox->blockSignals(false);
 }
 
+void MainWindow::onCableManagerAdded(QtCoaxCableLossCalcManager *manager)
+{
+    if (!manager) return;
 
+    // Connect the frequency signal from MainWindow to the manager's slot
+    connect(this, &MainWindow::currentFrequencyChanged, manager, &QtCoaxCableLossCalcManager::setFrequency);
+
+    // Set the initial frequency and range
+    if (m_activeDeviceObject) {
+        const auto& props = m_activeDeviceObject->properties();
+        manager->setPlotRange(props.minFreqHz / 1000000.0, props.maxFreqHz / 1000000.0);
+    }
+    manager->setFrequency(ui->frequency_spinBox->value());
+}
+
+void MainWindow::onCableManagerRemoved(QtCoaxCableLossCalcManager *manager)
+{
+    if (!manager) return;
+
+    // Disconnect the frequency signal
+    disconnect(this, &MainWindow::currentFrequencyChanged, manager, &QtCoaxCableLossCalcManager::setFrequency);
+}
+
+void MainWindow::onCurrentFrequencyChanged(int freqMHz)
+{
+    setFrequency(QString::number(freqMHz));
+    emit currentFrequencyChanged(static_cast<double>(freqMHz));
+}
+
+void MainWindow::on_actionCableLossCalculator_triggered()
+{
+    CableLossCalculatorWindow *cableWindow = new CableLossCalculatorWindow(this);
+    cableWindow->setAttribute(Qt::WA_DeleteOnClose);
+    cableWindow->show();
+}
