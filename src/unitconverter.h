@@ -11,7 +11,7 @@ public:
     // --- Power Conversions ---
     static double dBmToMilliwatts(double dBm);
     static double milliwattsToDBm(double milliwatts);
-    static double milliwattsToVpp(double milliwatts, double impedance = 50.0); // <-- ADDED
+    static double milliwattsToVpp(double milliwatts, double impedance = 50.0);
 
     // --- Formatting ---
     static QPair<double, QString> formatPower(double milliwatts);

@@ -12,6 +12,7 @@
 #include <QCheckBox>
 #include "qtdigitalattenuator.h"
 #include "fixedattenuatorcontrol.h"
+#include "internalattenuatorcontrol.h"
 
 class AttenuatorWidget : public QGroupBox
 {
@@ -21,7 +22,8 @@ public:
     enum AttenuatorType
     {
         Fixed,
-        Digital
+        Digital,
+        InternalDigital
     };
 
     explicit AttenuatorWidget(AttenuatorType type, QWidget *parent = nullptr);
@@ -31,8 +33,13 @@ public:
 
     bool isMarkedForRemoval() const { return m_markedForRemoval; }
 
+    void setInternalProperties(double min, double max, double step);
+
 signals:
     void valueChanged(double newValue);
+
+public slots:
+    void setValue(double value);
 
 private slots:
     void onValueChanged(double value);
@@ -40,7 +47,7 @@ private slots:
 
     void onCheckBoxToggled(bool checked);
     void onStatusChanged(bool status);
-    void onDescriptionChanged(const QString &description); // Renamed from onModelChanged
+    void onDescriptionChanged(const QString &description);
 
 private:
     void setupUi();
@@ -60,6 +67,7 @@ private:
 
     QtDigitalAttenuator *m_digitalControl;
     FixedAttenuatorControl *m_fixedControl;
+    InternalAttenuatorControl *m_internalControl;
 };
 
 #endif // ATTENUATORWIDGET_H

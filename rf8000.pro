@@ -30,9 +30,14 @@ SOURCES += \
     src/calibrationpoint.cpp \
     src/chartmanager.cpp \
     src/chartrealtime.cpp \
+    src/devicecomboboxdelegate.cpp \
     src/fixedattenuatorcontrol.cpp \
+    src/internalattenuatorcontrol.cpp \
     src/mainwindow.cpp \
+    src/pmdevicefactory.cpp \
     src/qtdigitalattenuator.cpp \
+    src/rf8000device.cpp \
+    src/rfpmv7device.cpp \
     src/serialportinterface.cpp \
     src/targetpowercalculator.cpp \
     src/unitconverter.cpp
@@ -40,6 +45,7 @@ SOURCES += \
 HEADERS += \
     3rdparty/qcustomplot/qcustomplot.h \
     3rdparty/spline/src/spline.h \
+    src/abstractpmdevice.h \
     src/attdevice.h \
     src/attenuationmanager.h \
     src/attenuatorwidget.h \
@@ -48,9 +54,15 @@ HEADERS += \
     src/calibrationpoint.h \
     src/chartmanager.h \
     src/chartrealtime.h \
+    src/devicecomboboxdelegate.h \
     src/fixedattenuatorcontrol.h \
+    src/internalattenuatorcontrol.h \
     src/mainwindow.h \
+    src/pmdevicefactory.h \
+    src/pmdeviceproperties.h \
     src/qtdigitalattenuator.h \
+    src/rf8000device.h \
+    src/rfpmv7device.h \
     src/serialportinterface.h \
     src/targetpowercalculator.h \
     src/unitconverter.h

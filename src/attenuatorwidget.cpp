@@ -3,7 +3,8 @@
 AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidget *parent)
     : QGroupBox(parent), m_type(type), m_attenuationValue(0.0), m_markedForRemoval(false),
     m_editorHasBeenShown(false), // Initialize the flag to false
-    m_digitalControl(nullptr), m_fixedControl(nullptr)
+    m_digitalControl(nullptr), m_fixedControl(nullptr),
+    m_internalControl(nullptr)
 {
     setupUi();
     installEventFilter(this);
@@ -23,6 +24,13 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
         connect(m_fixedControl, &FixedAttenuatorControl::descriptionChanged, this, &AttenuatorWidget::onDescriptionChanged);
         onDescriptionChanged(tr("Fixed"));
     }
+    else if (m_type == InternalDigital)
+    {
+        m_internalControl = new InternalAttenuatorControl();
+        connect(m_internalControl, &InternalAttenuatorControl::valueChanged, this, &AttenuatorWidget::onValueChanged);
+        connect(m_internalControl, &InternalAttenuatorControl::descriptionChanged, this, &AttenuatorWidget::onDescriptionChanged);
+        onDescriptionChanged(tr("Device Built-in"));
+    }
 }
 
 AttenuatorWidget::~AttenuatorWidget()
@@ -30,6 +38,7 @@ AttenuatorWidget::~AttenuatorWidget()
     qDebug()<<"AttenuatorWidget destructor called.";
     if (m_digitalControl) delete m_digitalControl;
     if (m_fixedControl) delete m_fixedControl;
+    //if (m_internalControl) delete m_internalControl;
 }
 
 void AttenuatorWidget::setupUi()
@@ -44,9 +53,24 @@ void AttenuatorWidget::setupUi()
     connect(removeCheckBox, &QCheckBox::toggled, this, &AttenuatorWidget::onCheckBoxToggled);
 
     m_typeLabel = new QLabel(this);
-    QPixmap pixmapFromFile = (m_type == Fixed) ? QPixmap(":/images/AttenuatorRF.svg") : QPixmap(":/images/digiattcontrol.svg");
+    QPixmap pixmapFromFile;
+    QString tooltip;
+
+    if (m_type == Fixed) {
+        pixmapFromFile = QPixmap(":/images/AttenuatorRF.svg");
+        tooltip = tr("Fixed Attenuator");
+    } else if (m_type == Digital) {
+        pixmapFromFile = QPixmap(":/images/digiattcontrol.svg");
+        tooltip = tr("Digital Attenuator");
+    } else if (m_type == InternalDigital) {
+        pixmapFromFile = QPixmap(":/images/devices/rf8000.png");
+        tooltip = tr("Device Internal Attenuator");
+        removeCheckBox->setDisabled(true);
+        removeCheckBox->setToolTip(tr("The internal attenuator is part of the device and cannot be removed."));
+    }
+
     m_typeLabel->setPixmap(pixmapFromFile.scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    m_typeLabel->setToolTip((m_type == Fixed) ? tr("Fixed") : tr("Digital"));
+    m_typeLabel->setToolTip(tooltip);
 
     m_valueLcd = new QLCDNumber(this);
     m_valueLcd->setSegmentStyle(QLCDNumber::Flat);
@@ -88,6 +112,11 @@ void AttenuatorWidget::onCheckBoxToggled(bool checked)
     m_markedForRemoval = checked;
 }
 
+void AttenuatorWidget::setValue(double value)
+{
+    onValueChanged(value);
+}
+
 void AttenuatorWidget::onValueChanged(double value)
 {
     qDebug()<<Q_FUNC_INFO<<value;
@@ -109,6 +138,12 @@ void AttenuatorWidget::openEditor()
         m_fixedControl->setValue(m_attenuationValue);
         m_fixedControl->setDescription(m_description);
         editor = m_fixedControl;
+    }
+    else if (m_internalControl)
+    {
+        m_internalControl->setValue(m_attenuationValue);
+        m_internalControl->setDescription(m_description);
+        editor = m_internalControl;
     }
 
     if (editor)
@@ -144,6 +179,7 @@ void AttenuatorWidget::setPressedStyle(bool pressed)
 
 bool AttenuatorWidget::eventFilter(QObject *watched, QEvent *event)
 {
+
     if (watched == this) {
         if (event->type() == QEvent::MouseButtonPress) {
             QWidget *child = childAt(static_cast<QMouseEvent *>(event)->pos());
@@ -169,5 +205,12 @@ void AttenuatorWidget::onDescriptionChanged(const QString &description)
     m_descrLabel->setText(description);
     if (m_digitalControl) {
         m_digitalControl->setWindowTitle(tr("Digital Attenuator: ") + description);
+    }
+}
+
+void AttenuatorWidget::setInternalProperties(double min, double max, double step)
+{
+    if (m_internalControl) {
+        m_internalControl->setProperties(min, max, step);
     }
 }

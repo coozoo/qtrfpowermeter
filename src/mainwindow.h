@@ -20,6 +20,10 @@
 #include "unitconverter.h"
 #include "targetpowercalculator.h"
 #include "calibrationmanager.h"
+#include "pmdevicefactory.h"
+#include "abstractpmdevice.h"
+#include "devicecomboboxdelegate.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -58,32 +62,32 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     Q_PROPERTY(QString curFrequency
-                       READ getFrequency
+                   READ getFrequency
                        WRITE setFrequency
                )
     Q_PROPERTY(QString curOffset
-                       READ getOffset
+                   READ getOffset
                        WRITE setOffset
                )
 
     Q_PROPERTY(QString strDateTimeFile
-                       READ getstrDateTimeFile
+                   READ getstrDateTimeFile
                        WRITE setstrDateTimeFile
                )
     Q_PROPERTY(QString currentDevice
-                       READ currentDevice
+                   READ currentDevice
                        WRITE setCurrentDevice
-                       NOTIFY currentDeviceChanged
+                           NOTIFY currentDeviceChanged
                )
     Q_PROPERTY(bool isConnected
-                    READ isConnected
-                    WRITE setIsConnected
-                    NOTIFY isConnectedChanged
+                   READ isConnected
+                       WRITE setIsConnected
+                           NOTIFY isConnectedChanged
                )
     Q_PROPERTY(QString deviceError
-                       READ deviceError
+                   READ deviceError
                        WRITE setDeviceError
-                       NOTIFY deviceErrorChanged
+                           NOTIFY deviceErrorChanged
                )
 
 public:
@@ -151,7 +155,6 @@ public:
 private:
     Ui::MainWindow *ui;
     void updateDeviceList();
-    SerialPortInterface *serialPortPowerMeter;
     QTimer simulatorTimer;
     QString curFrequency="0";
     QString curOffset="0";
@@ -163,16 +166,23 @@ private:
     TargetPowerCalculator *m_attenuatorCalculator;
     CalibrationManager *m_calibrationManager;
 
+    double m_max_dbm;
+
     QString m_currentDevice;
     bool m_isConnected = false;
     QString m_deviceError;
+
+    PMDeviceFactory *m_deviceFactory;
+    AbstractPMDevice *m_activeDeviceObject = nullptr;
+    void setupDeviceSelector();
+    void updateUiForDevice(const PMDeviceProperties &props);
+    void createDevice(const QString &deviceId);
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:
     void ondevice_comboBox_currentIndexChanged();
-    void updateData(const QString &data);
     void on_connect_pushButton_clicked();
     void on_disconnect_pushButton_clicked();
     void on_resetMax_toolButton_clicked();
@@ -181,15 +191,22 @@ private slots:
     void on_simulate_checkBox_clicked();
     void on_set_pushButton_clicked();
     void on_simulatorTimer();
-    void on_serialPortError(const QString &error);
     void writeStatCSV(const QString &appendFileName, const QString &logLine, const QString &headersList);
     void onTotalAttenuationChanged(double totalAttenuation);
-    void onPortOpened();
-    void onPortClosed();
     void onIsConnectedChanged(bool connected);
     // --- Calibration Slots ---
     void on_calibration_pushButton_toggled(bool checked);
     void onCalibrationFrequencySelected(double frequencyMHz);
+
+    void onDeviceSelector_currentIndexChanged(int index);
+    void onDeviceConnected();
+    void onDeviceDisconnected();
+    void onDeviceError(const QString &error);
+    void onNewDeviceMeasurement(double dbm, double vpp_raw);
+    void onNewDeviceLogMessage(const QString &message);
+
+
+    void onDeviceInternalAttChanged(double attDb);
 
 public slots:
     void on_range_spinBox_valueChanged(int range);
