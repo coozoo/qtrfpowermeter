@@ -4,7 +4,7 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
     : QGroupBox(parent), m_type(type), m_attenuationValue(0.0), m_markedForRemoval(false),
     m_editorHasBeenShown(false), // Initialize the flag to false
     m_digitalControl(nullptr), m_fixedControl(nullptr),
-    m_internalControl(nullptr)
+    m_internalControl(nullptr), m_cableManager(nullptr)
 {
     setupUi();
     installEventFilter(this);
@@ -31,6 +31,18 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
         connect(m_internalControl, &InternalAttenuatorControl::descriptionChanged, this, &AttenuatorWidget::onDescriptionChanged);
         onDescriptionChanged(tr("Device Built-in"));
     }
+    else if (m_type == Cable)
+    {
+        m_cableManager = new QtCoaxCableLossCalcManager();
+        m_cableManager->setWindowTitle(tr("Coaxial Cable Loss Calculator"));
+        m_cableManager->loadCablesFromJson(":/cables.json");
+        m_cableManager->resize(800, 600);
+        m_cableManager->setMinimumHeight(500);
+        m_cableManager->setIndividualLengthAllowed(true);
+        m_cableManager->setAllowCableDupes(true);
+        connect(m_cableManager, &QtCoaxCableLossCalcManager::totalAttenuationChanged, this, &AttenuatorWidget::onValueChanged);
+        onDescriptionChanged(tr("Cable Loss"));
+    }
 }
 
 AttenuatorWidget::~AttenuatorWidget()
@@ -38,7 +50,8 @@ AttenuatorWidget::~AttenuatorWidget()
     qDebug()<<"AttenuatorWidget destructor called.";
     if (m_digitalControl) delete m_digitalControl;
     if (m_fixedControl) delete m_fixedControl;
-    //if (m_internalControl) delete m_internalControl;
+    if (m_internalControl) delete m_internalControl;
+    if (m_cableManager) delete m_cableManager;
 }
 
 void AttenuatorWidget::setupUi()
@@ -67,6 +80,9 @@ void AttenuatorWidget::setupUi()
         tooltip = tr("Device Internal Attenuator");
         removeCheckBox->setDisabled(true);
         removeCheckBox->setToolTip(tr("The internal attenuator is part of the device and cannot be removed."));
+    } else if (m_type == Cable) {
+        pixmapFromFile = QPixmap(":/images/coaxcable.svg");
+        tooltip = tr("Coaxial Cable Loss");
     }
 
     m_typeLabel->setPixmap(pixmapFromFile.scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -144,6 +160,10 @@ void AttenuatorWidget::openEditor()
         m_internalControl->setValue(m_attenuationValue);
         m_internalControl->setDescription(m_description);
         editor = m_internalControl;
+    }
+    else if (m_cableManager)
+    {
+        editor = m_cableManager;
     }
 
     if (editor)

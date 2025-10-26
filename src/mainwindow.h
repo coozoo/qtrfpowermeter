@@ -23,6 +23,8 @@
 #include "pmdevicefactory.h"
 #include "abstractpmdevice.h"
 #include "devicecomboboxdelegate.h"
+#include "qtcoaxcablelosscalcmanager.h"
+#include "cablelosscalculatorwindow.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -55,7 +57,6 @@ enum dataColumns {
     dataValueTotalDbmColumnID,
     dataValueTotalMwColumnID
 };
-
 
 class MainWindow : public QMainWindow
 {
@@ -208,6 +209,13 @@ private slots:
 
     void onDeviceInternalAttChanged(double attDb);
 
+    // Cable Manager Integration Slots
+    void onCableManagerAdded(QtCoaxCableLossCalcManager *manager);
+    void onCableManagerRemoved(QtCoaxCableLossCalcManager *manager);
+    void onCurrentFrequencyChanged(int freqMHz);
+
+    void on_actionCableLossCalculator_triggered();
+
 public slots:
     void on_range_spinBox_valueChanged(int range);
     int on_saveCharts_toolButton_clicked();
@@ -218,5 +226,6 @@ signals:
     void currentDeviceChanged();
     void isConnectedChanged(bool connected);
     void deviceErrorChanged();
+    void currentFrequencyChanged(double freqMHz);
 };
 #endif // MAINWINDOW_H

@@ -25,6 +25,9 @@ SOURCES += \
     src/attdevice.cpp \
     src/attenuationmanager.cpp \
     src/attenuatorwidget.cpp \
+    src/cablelosscalculatorwindow.cpp \
+    src/cablemodel.cpp \
+    src/cablewidget.cpp \
     src/calibrationmanager.cpp \
     src/calibrationmodel.cpp \
     src/calibrationpoint.cpp \
@@ -35,6 +38,7 @@ SOURCES += \
     src/internalattenuatorcontrol.cpp \
     src/mainwindow.cpp \
     src/pmdevicefactory.cpp \
+    src/qtcoaxcablelosscalcmanager.cpp \
     src/qtdigitalattenuator.cpp \
     src/rf8000device.cpp \
     src/rfpmv7device.cpp \
@@ -49,6 +53,9 @@ HEADERS += \
     src/attdevice.h \
     src/attenuationmanager.h \
     src/attenuatorwidget.h \
+    src/cablelosscalculatorwindow.h \
+    src/cablemodel.h \
+    src/cablewidget.h \
     src/calibrationmanager.h \
     src/calibrationmodel.h \
     src/calibrationpoint.h \
@@ -60,6 +67,7 @@ HEADERS += \
     src/mainwindow.h \
     src/pmdevicefactory.h \
     src/pmdeviceproperties.h \
+    src/qtcoaxcablelosscalcmanager.h \
     src/qtdigitalattenuator.h \
     src/rf8000device.h \
     src/rfpmv7device.h \
@@ -68,6 +76,7 @@ HEADERS += \
     src/unitconverter.h
 
 FORMS += \
+    src/cablelosscalculatorwindow.ui \
     src/calibrationmanager.ui \
     src/mainwindow.ui \
     src/qtdigitalattenuator.ui
