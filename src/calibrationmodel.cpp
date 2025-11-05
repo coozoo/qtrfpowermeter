@@ -222,16 +222,26 @@ double CalibrationModel::getCorrection(double frequencyMHz) const
                 }
         }
 
-    if (x_points.size() < 2)
+    if (x_points.size() < 3)
         {
             if (x_points.empty())
-                {
-                    return 0.0;
-                }
+            {
+                return 0.0;
+            }
+            else if (x_points.size() == 1)
+            {
+                return y_points[0];
+            }
             else
-                {
-                    return y_points[0];
-                }
+            {
+                double x1 = x_points[0], y1 = y_points[0];
+                double x2 = x_points[1], y2 = y_points[1];
+                if (frequencyMHz <= x1)
+                    return y1;
+                if (frequencyMHz >= x2)
+                    return y2;
+                return y1 + (y2 - y1) * (frequencyMHz - x1) / (x2 - x1);
+            }
         }
 
     tk::spline s;
