@@ -2,6 +2,7 @@
 #define RF8000DEVICE_H
 
 #include "abstractpmdevice.h"
+#include <QTimer>
 
 class Rf8000Device : public AbstractPMDevice
 {
@@ -20,12 +21,14 @@ public:
 private slots:
     void onSerialPortNewData(const QString &data);
     void onSerialPortError(const QString &error);
+    void sendBufferedCommand();
 
 private:
     SerialPortInterface *m_serialPort;
     quint64 m_currentFrequencyHz = 1000000;
     double m_currentOffsetDb = 0.0;
     bool m_isPositiveOffset = true;
+    QTimer *m_commandTimer;
 
     void sendCommand();
 };
