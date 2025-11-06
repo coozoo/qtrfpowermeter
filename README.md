@@ -1,5 +1,8 @@
+[<img src="https://github.com/coozoo/qtrfpowermeter/workflows/Release_Version/badge.svg"></img>](https://github.com/coozoo/qtrfpowermeter/releases/latest)
+[<img src="https://copr.fedorainfracloud.org/coprs/yura/qtrfpowermeter/package/qtrfpowermeter/status_image/last_build.png"></img>](https://copr.fedorainfracloud.org/coprs/yura/qtrfpowermeter/)
+
 # QT RF Power Meter
-This application few hours project (not anymore now add week to that) intended to improve usage of chinese RF power meter RF8000. Chinese default application is terrible unreliable with no functionality and lot of crashes.
+This application few hours project (not anymore now add week to that) intended to improve usage of Chinese RF power meter RF8000. Chinese default application is terrible unreliable with no functionality and lot of crashes.
 
 Device shown on image below.
 
@@ -8,7 +11,7 @@ Device shown on image below.
 
 There are versions of device with lower frequency range I'm not aware if they're compatible, but I suspect the only limitation will be the ability to set higher frequencies.
 
-Simple serial protocol that reports dbm and Vpp values, with some bugs of broken charachters can be fixed with setting frequency and offset (basically most of the times program will do that for you, but if you see no captures and broken symbols on device screen simply try to set frequency using program).
+Simple serial protocol that reports dbm and Vpp values, with some bugs of broken characters can be fixed with setting frequency and offset (basically most of the times program will do that for you, but if you see no captures and broken symbols on device screen simply try to set frequency using program).
 
 There is no way to identify device for sure so you should do that by your own if you have more than one serial devices connected.
 
@@ -16,14 +19,18 @@ To initiate connection press connect. After that raw data captured from device w
 
 On data tab there is parsed and calculated data exactly in the same way it's written to csv if such option selected on status tab.
 
-Status tab contains diplays with on-fly data and box with possibility to set device offset and frequency, there is chart with posibility to save images.
+Status tab contains displays with on-fly data and box with possibility to set device offset and frequency, there is chart with possibility to save images.
 
-Supports adding fixed and digital attenuators of one kind https://github.com/coozoo/digiattcontrol. So in such way the range of mesurement is now defined only by attenuators that you have available.
+Supports adding fixed and digital attenuators of one kind https://github.com/coozoo/digiattcontrol. So in such way the range of measurement is now defined only by attenuators that you have available. Also you can set cables type and length in order to count them in total attenuation.
 
 For convenient measurement there is attenuation calculator to prevent mixing and damaging your equipment but still you need to be cautious.
 
+There is calibration possibility that can be done manually, by selecting level frequency and pressing button, sure you need to set your generator exactly such parameters
 
-<img width="1919" height="1044" alt="image" src="https://github.com/user-attachments/assets/8f672b0a-70af-47a0-99fd-940c8c621d2a" />
+<img width="1913" height="1050" alt="image" src="https://github.com/user-attachments/assets/dcfbd7bc-3c20-424d-aad2-d680f0d8e613" />
+
+<img width="1910" height="1047" alt="image" src="https://github.com/user-attachments/assets/e18f8692-6edf-4691-92e1-07a8dd4675c4" />
+
 
 
 ## Installation
@@ -51,9 +58,19 @@ sudo apt update
 sudo apt-get install qtrfpowermeter
 ```
 
-If you still need to buil it by your own.
+Mac users
 
-It is required qt6 so adjust qmake accorddingly to your system.
+Should dance and turn few times in order to launch it. Once app unpacked you need to allow it  for damn mac security and it's getting harder from day to day
+
+```
+# adjust application location accordingly to yours
+xattr -dr com.apple.quarantine /Applications/qtjsondiff.app
+codesign --force --deep --sign - /Applications/qtjsondiff.app
+```
+
+If you still need to build it by your own.
+
+It is required qt6 so adjust qmake accordingly to your system.
 
 ```
 qmake6
