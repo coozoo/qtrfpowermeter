@@ -9,6 +9,11 @@ Rf8000Device::Rf8000Device(const PMDeviceProperties &props, QObject *parent)
     connect(m_serialPort, &SerialPortInterface::serialPortErrorSignal, this, &Rf8000Device::onSerialPortError);
     connect(m_serialPort, &SerialPortInterface::portOpened, this, &AbstractPMDevice::deviceConnected);
     connect(m_serialPort, &SerialPortInterface::portClosed, this, &AbstractPMDevice::deviceDisconnected);
+
+    m_commandTimer = new QTimer(this);
+    m_commandTimer->setSingleShot(true);
+    m_commandTimer->setInterval(300);
+    connect(m_commandTimer, &QTimer::timeout, this, &Rf8000Device::sendBufferedCommand);
 }
 
 Rf8000Device::~Rf8000Device()
@@ -24,6 +29,7 @@ void Rf8000Device::connectDevice(const QString &portName)
 
 void Rf8000Device::disconnectDevice()
 {
+    m_commandTimer->stop();
     m_serialPort->stopPort();
 }
 
@@ -41,6 +47,12 @@ void Rf8000Device::setOffset(double offsetDb)
 }
 
 void Rf8000Device::sendCommand()
+{
+    if (!m_serialPort->isPortOpen()) return;
+    m_commandTimer->start();
+}
+
+void Rf8000Device::sendBufferedCommand()
 {
     if (!m_serialPort->isPortOpen()) return;
 
