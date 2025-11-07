@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1108</width>
-    <height>640</height>
+    <width>1110</width>
+    <height>642</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -445,8 +445,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>928</width>
-                    <height>184</height>
+                    <width>932</width>
+                    <height>185</height>
                    </rect>
                   </property>
                  </widget>
@@ -487,9 +487,21 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="range_spinBox">
+                <widget class="QDoubleSpinBox" name="range_doubleSpinBox">
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="minimum">
+                  <double>0.200000000000000</double>
+                 </property>
                  <property name="maximum">
-                  <number>100000</number>
+                  <double>9999999.000000000000000</double>
+                 </property>
+                 <property name="stepType">
+                  <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
+                 </property>
+                 <property name="value">
+                  <double>5.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -586,7 +598,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1108</width>
+     <width>1110</width>
      <height>24</height>
     </rect>
    </property>

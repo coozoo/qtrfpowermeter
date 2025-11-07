@@ -220,7 +220,7 @@ private slots:
     void on_actionCableLossCalculator_triggered();
 
 public slots:
-    void on_range_spinBox_valueChanged(int range);
+    void onrange_doubleSpinBox_valueChanged(double range);
     int on_saveCharts_toolButton_clicked();
 
 signals:

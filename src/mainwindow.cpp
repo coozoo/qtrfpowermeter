@@ -198,11 +198,14 @@ MainWindow::MainWindow(QWidget *parent)
     onDeviceSelector_currentIndexChanged(ui->deviceType_comboBox->currentIndex());
     Q_EMIT(on_set_pushButton_clicked());
 
-
-    ui->range_spinBox->setMinimum(1);
-    ui->range_spinBox->setMaximum(100000);
-    ui->range_spinBox->setAlignment(Qt::AlignRight);
-    ui->range_spinBox->setValue(10);
+    connect(ui->range_doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onrange_doubleSpinBox_valueChanged);
+    ui->range_doubleSpinBox->setMinimum(0.2);
+    ui->range_doubleSpinBox->setMaximum(999999999);
+    ui->range_doubleSpinBox->setAlignment(Qt::AlignRight);
+    ui->range_doubleSpinBox->setValue(5);
+    ui->range_doubleSpinBox->setDecimals(1);
+    ui->range_doubleSpinBox->setSingleStep(10);
+    onrange_doubleSpinBox_valueChanged(ui->range_doubleSpinBox->value());
 
     ui->flow_checkBox->setText(tr("Flow"));
     ui->flow_checkBox->setToolTip(tr("After this time data on chart will move out so it will look like a flow"));
@@ -242,16 +245,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->frequency_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_set_pushButton_clicked);
 
+//    connect(ui->saveCharts_toolButton, &QToolButton::clicked, this, &MainWindow::on_saveCharts_toolButton_clicked);
+
     // --- Tools Menu ---
     QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
     QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
     toolsMenu->addAction(cableLossCalcAction);
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
 
-
-    //autoconnector works fine
-    //connect(ui->range_spinBox, SIGNAL(valueChanged(int)), this, SLOT(on_range_spinBox_valueChanged(int)));
-    //connect(ui->saveCharts_toolButton, SIGNAL(clicked()), this, SLOT(on_saveCharts_toolButton_clicked()));
 }
 
 MainWindow::~MainWindow()
@@ -448,11 +449,10 @@ void MainWindow::on_set_pushButton_clicked()
 
 
 /* slot to call range changing */
-void MainWindow::on_range_spinBox_valueChanged(int range)
+void MainWindow::onrange_doubleSpinBox_valueChanged(double range)
 {
-    qDebug()<<"on_range_spinBox_valueChanged";
-    //convert to minutes
-    charts->setAllRanges(range * 60);
+    qDebug()<<"on_range_doubleSpinBox_valueChanged";
+    charts->setAllRanges(range*60);
 }
 
 int MainWindow::on_saveCharts_toolButton_clicked()
