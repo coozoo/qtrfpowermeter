@@ -266,11 +266,14 @@ void chartRealTime::on_datacoming(QDateTime dateTime, const QList<double> &data)
     if(timeReset==true)
     {
         timer.restart();
+        m_startTime = dateTime;
         timeReset=false;
     }
+    qDebug()<<"timereset:"<<timeReset<<"m_startTime:"<<m_startTime<<dateTime;
 
-    double key = static_cast<double>(timer.elapsed())/1000.0;
-    qDebug()<<getisflow()<<key;
+    //double key = static_cast<double>(timer.elapsed())/1000.0;
+    double key = static_cast<double>(m_startTime.msecsTo(dateTime)) / 1000.0;
+    qDebug()<<"isflow:"<<getisflow()<<"key:"<<key;
     //add each value to graph
     double i=0;
     foreach (double value, data)

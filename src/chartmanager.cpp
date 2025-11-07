@@ -226,7 +226,8 @@ void chartManager::dataIncome(const QString &headersString, const QString &dataS
                   chartRealTime *chart=listCharts.at(i);
                   if(chart->getWindowTitle()==chartItem.toObject()["chart"].toString())
                   {
-                    chart->dataSlot(QDateTime::fromString(dataString.split(",")[0]),dataset);
+                      //qDebug()<<"dataString"<<dataString;
+                    chart->dataSlot(QDateTime::fromString(dataString.split(",")[0], Qt::ISODateWithMs), dataset);
                   }
         }
 

@@ -4,6 +4,7 @@
 #include <QObject>
 #include "serialportinterface.h"
 #include "pmdeviceproperties.h"
+#include <QDateTime>
 
 class AbstractPMDevice : public QObject
 {
@@ -30,7 +31,7 @@ signals:
     void deviceError(const QString &error);
 
     void rawDataReceived(const QString &data);
-    void measurementReady(double dbm, double vpp_raw);
+    void measurementReady(QDateTime timestamp, double dbm, double vpp_raw);
     void newLogMessage(const QString &message);
     void internalAttenuationChanged(double attDb);
 

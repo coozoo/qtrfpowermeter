@@ -206,7 +206,7 @@ private slots:
     void onDeviceConnected();
     void onDeviceDisconnected();
     void onDeviceError(const QString &error);
-    void onNewDeviceMeasurement(double dbm, double vpp_raw);
+    void onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw);
     void onNewDeviceLogMessage(const QString &message);
 
 

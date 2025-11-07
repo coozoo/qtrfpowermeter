@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     // --- New Device Abstraction Setup ---
     m_deviceFactory = new PMDeviceFactory(this);
     setupDeviceSelector();
-    // Remove old direct serial port handling
+    // old direct serial port handling
     // serialPortPowerMeter= new SerialPortInterface();
 
     updateDeviceList();
@@ -487,12 +487,13 @@ void MainWindow::ondevice_comboBox_currentIndexChanged()
 
 void MainWindow::onNewDeviceLogMessage(const QString &message)
 {
-    ui->data_plainTextEdit->appendPlainText(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz") + " [DEVICE] " + message);
+    ui->data_plainTextEdit->appendPlainText(message);
 }
 
-void MainWindow::onNewDeviceMeasurement(double dbm, double vpp_raw)
+void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw)
 {
-    QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
+    //QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
+    QString curdate = timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz");
     ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+ QString(" $%1dBm%2mVpp$").arg(dbm).arg(vpp_raw));
 
     double milliwatts = 0;
@@ -797,8 +798,7 @@ void MainWindow::on_simulatorTimer()
 
     double simmvppValue = UnitConverter::milliwattsToVpp(UnitConverter::dBmToMilliwatts(simdbmvalue));
 
-    onNewDeviceMeasurement(simdbmvalue, simmvppValue);
-
+    onNewDeviceMeasurement(QDateTime::currentDateTime(), simdbmvalue, simmvppValue);
 }
 
 

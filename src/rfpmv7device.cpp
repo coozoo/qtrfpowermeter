@@ -1,6 +1,7 @@
 #include "rfpmv7device.h"
 #include <QRegularExpression>
 #include <QTimer>
+#include <QDateTime>
 
 RfpmV7Device::RfpmV7Device(const PMDeviceProperties &props, QObject *parent)
     : AbstractPMDevice(props, parent)
@@ -13,7 +14,8 @@ RfpmV7Device::RfpmV7Device(const PMDeviceProperties &props, QObject *parent)
     connect(m_serialPort, &SerialPortInterface::portOpened, this, [=](){
         emit deviceConnected();
         m_serialPort->writeData("IC000+L\r\n");
-        emit newLogMessage("Started continuous data stream (L command).");
+        emit newLogMessage(QString("%1 [DEVICE] Started continuous data stream (L command).")
+                               .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz")));
     });
 
     connect(m_serialPort, &SerialPortInterface::portClosed, this, &AbstractPMDevice::deviceDisconnected);
@@ -34,7 +36,8 @@ void RfpmV7Device::disconnectDevice()
 {
     if (m_serialPort->isPortOpen()) {
         m_serialPort->writeData("IC000+T\r\n");
-        emit newLogMessage("Stopped continuous data stream (T command).");
+        emit newLogMessage(QString("%1 [DEVICE] Stopped continuous data stream (T command).")
+                               .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz")));
     }
     m_serialPort->stopPort();
 }
@@ -70,7 +73,9 @@ void RfpmV7Device::sendWriteCommand()
     QString command = QString("IC000+W%1%2+%3+%4\r\n").arg(sign).arg(offsetStr).arg(attStr).arg(freqStr);
 
     m_serialPort->writeData(command.toLatin1());
-    emit newLogMessage(QString("Sent V7 Write Command: %1").arg(command.trimmed()));
+    emit newLogMessage(QString("%1 [DEVICE] Sent V7 Write Command: %2")
+                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                           .arg(command.trimmed()));
 }
 
 void RfpmV7Device::onSerialPortNewData(const QString &data)
@@ -104,6 +109,7 @@ void RfpmV7Device::processData(const QString &data)
             QRegularExpression re("Power:\\s*([0-9.]+)(\\wW)");
             QRegularExpressionMatch match = re.match(trimmedLine);
             if (match.hasMatch()) {
+                const QDateTime timestamp = QDateTime::currentDateTime();
                 double powerValue = match.captured(1).toDouble();
                 QString unit = match.captured(2);
                 double powerMilliwatts = 0.0;
@@ -122,11 +128,13 @@ void RfpmV7Device::processData(const QString &data)
 
                 double vpp = UnitConverter::milliwattsToVpp(powerMilliwatts);
 
-                emit measurementReady(m_lastDbm, vpp);
+                emit measurementReady(timestamp, m_lastDbm, vpp);
                 m_waitingForPower = false;
             }
         } else {
-            emit newLogMessage(QString("Non-measurement data: %1").arg(trimmedLine));
+            emit newLogMessage(QString("%1 [DEVICE] Non-measurement data: %2")
+                                   .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                                   .arg(trimmedLine));
         }
     }
 }
