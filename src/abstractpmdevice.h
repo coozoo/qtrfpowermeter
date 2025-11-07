@@ -20,7 +20,7 @@ public:
     virtual void setOffset(double offsetDb) = 0;
     virtual void setInternalAttenuation(double attDb) { Q_UNUSED(attDb); }
     virtual void connectDevice(const QString &portName) = 0;
-    virtual void disconnectDevice() = 0;
+    Q_INVOKABLE virtual void disconnectDevice() = 0;
 
     virtual void processData(const QString &data) = 0;
 

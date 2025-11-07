@@ -25,6 +25,7 @@
 #include "devicecomboboxdelegate.h"
 #include "qtcoaxcablelosscalcmanager.h"
 #include "cablelosscalculatorwindow.h"
+#include <QThread>
 
 
 QT_BEGIN_NAMESPACE
@@ -175,6 +176,8 @@ private:
 
     PMDeviceFactory *m_deviceFactory;
     AbstractPMDevice *m_activeDeviceObject = nullptr;
+    bool m_useThreading;
+    QThread *m_deviceThread = nullptr;
     void setupDeviceSelector();
     void updateUiForDevice(const PMDeviceProperties &props);
     void createDevice(const QString &deviceId);
@@ -227,5 +230,6 @@ signals:
     void isConnectedChanged(bool connected);
     void deviceErrorChanged();
     void currentFrequencyChanged(double freqMHz);
+    void shutdownDevice();
 };
 #endif // MAINWINDOW_H
