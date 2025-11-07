@@ -6,6 +6,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    // --- Threading Flag ---
+    // Set to true to use a background thread for device communication (responsive UI).
+    // Set to false for single-threaded operation (easier debugging).
+    m_useThreading = true;
+
     ui->setupUi(this);
     m_max_dbm = -std::numeric_limits<double>::infinity();
     datetimefile = QDateTime::fromMSecsSinceEpoch(QDateTime::currentMSecsSinceEpoch()).toString("dd.MM.yyyy_hh.mm.ss.zzz");
@@ -24,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     // --- New Device Abstraction Setup ---
     m_deviceFactory = new PMDeviceFactory(this);
     setupDeviceSelector();
-    // Remove old direct serial port handling
+    // old direct serial port handling
     // serialPortPowerMeter= new SerialPortInterface();
 
     updateDeviceList();
@@ -251,6 +256,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    if (m_useThreading && m_deviceThread) {
+        QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+        m_deviceThread->quit();
+        m_deviceThread->wait();
+    }
     delete ui;
 }
 
@@ -292,27 +302,44 @@ void MainWindow::onDeviceSelector_currentIndexChanged(int index)
 void MainWindow::createDevice(const QString &deviceId)
 {
     if (m_activeDeviceObject) {
-        // Disconnect signals for the old device to prevent dangling connections
+        if (m_useThreading && m_deviceThread) {
+            // Tell the device in the other thread to disconnect
+            QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+            m_deviceThread->quit();
+            m_deviceThread->wait();
+        } else {
+            m_activeDeviceObject->disconnectDevice();
+        }
+        // Disconnect UI signals
         disconnect(ui->internalAtt_spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
                    attenuationMgr, &AttenuationManager::setInternalAttenuation);
         disconnect(attenuationMgr, &AttenuationManager::internalAttenuationChanged,
                    this, &MainWindow::onDeviceInternalAttChanged);
-
-        // Clean up the UI and the old device object
         attenuationMgr->removeInternalAttenuator();
-        m_activeDeviceObject->disconnectDevice();
+        // The device will be deleted either by the thread finishing or directly
         m_activeDeviceObject->deleteLater();
         m_activeDeviceObject = nullptr;
     }
 
-    m_activeDeviceObject = m_deviceFactory->createDevice(deviceId, this);
+    // Create device with no parent so it can be moved to a thread
+    m_activeDeviceObject = m_deviceFactory->createDevice(deviceId, nullptr);
 
     if (m_activeDeviceObject) {
-        connect(m_activeDeviceObject, &AbstractPMDevice::deviceConnected, this, &MainWindow::onDeviceConnected);
-        connect(m_activeDeviceObject, &AbstractPMDevice::deviceDisconnected, this, &MainWindow::onDeviceDisconnected);
-        connect(m_activeDeviceObject, &AbstractPMDevice::deviceError, this, &MainWindow::onDeviceError);
-        connect(m_activeDeviceObject, &AbstractPMDevice::measurementReady, this, &MainWindow::onNewDeviceMeasurement);
-        connect(m_activeDeviceObject, &AbstractPMDevice::newLogMessage, this, &MainWindow::onNewDeviceLogMessage);
+        if (m_useThreading) {
+            m_deviceThread = new QThread(this);
+            m_activeDeviceObject->moveToThread(m_deviceThread);
+            // When thread finishes, delete the device
+            connect(m_deviceThread, &QThread::finished, m_activeDeviceObject, &QObject::deleteLater);
+            // Forward signals from device thread to main thread
+            connect(m_activeDeviceObject, &AbstractPMDevice::deviceConnected, this, &MainWindow::onDeviceConnected, Qt::QueuedConnection);
+            m_deviceThread->start();
+        } else {
+            connect(m_activeDeviceObject, &AbstractPMDevice::deviceConnected, this, &MainWindow::onDeviceConnected);
+        }
+        connect(m_activeDeviceObject, &AbstractPMDevice::deviceDisconnected, this, &MainWindow::onDeviceDisconnected, Qt::QueuedConnection);
+        connect(m_activeDeviceObject, &AbstractPMDevice::deviceError, this, &MainWindow::onDeviceError, Qt::QueuedConnection);
+        connect(m_activeDeviceObject, &AbstractPMDevice::measurementReady, this, &MainWindow::onNewDeviceMeasurement, Qt::QueuedConnection);
+        connect(m_activeDeviceObject, &AbstractPMDevice::newLogMessage, this, &MainWindow::onNewDeviceLogMessage, Qt::QueuedConnection);
 
         if (m_activeDeviceObject->properties().hasInternalAttenuator) {
             const auto& props = m_activeDeviceObject->properties();
@@ -379,21 +406,37 @@ void MainWindow::on_set_pushButton_clicked()
     // Set all the properties on the abstract device object.
     // Each device class now handles sending the command immediately within the setter.
     quint64 freqHz = static_cast<quint64>(ui->frequency_spinBox->value()) * 1000000;
-    m_activeDeviceObject->setFrequency(freqHz);
-
+    double offsetDb = 0;
     if (m_activeDeviceObject->properties().hasOffset) {
-        double offsetDb = ui->offset_doubleSpinBox->value();
+        offsetDb = ui->offset_doubleSpinBox->value();
         if (ui->correctionminus_radioButton->isChecked()) {
             offsetDb = -offsetDb;
         }
-        m_activeDeviceObject->setOffset(offsetDb);
     }
-
+    double att = 0;
     if (m_activeDeviceObject->properties().hasInternalAttenuator) {
-        m_activeDeviceObject->setInternalAttenuation(ui->internalAtt_spinBox->value());
+        att = ui->internalAtt_spinBox->value();
     }
 
-    // Manually trigger frequency update for other components
+    if (m_useThreading) {
+        QMetaObject::invokeMethod(m_activeDeviceObject, "setFrequency", Q_ARG(quint64, freqHz));
+        if (m_activeDeviceObject->properties().hasOffset) {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "setOffset", Q_ARG(double, offsetDb));
+        }
+        if (m_activeDeviceObject->properties().hasInternalAttenuator) {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "setInternalAttenuation", Q_ARG(double, att));
+        }
+    } else {
+        m_activeDeviceObject->setFrequency(freqHz);
+        if (m_activeDeviceObject->properties().hasOffset) {
+            m_activeDeviceObject->setOffset(offsetDb);
+        }
+        if (m_activeDeviceObject->properties().hasInternalAttenuator) {
+            m_activeDeviceObject->setInternalAttenuation(att);
+        }
+    }
+
+    // Manually trigger frequency update for other components on the UI thread
     onCurrentFrequencyChanged(ui->frequency_spinBox->value());
 }
 
@@ -444,12 +487,13 @@ void MainWindow::ondevice_comboBox_currentIndexChanged()
 
 void MainWindow::onNewDeviceLogMessage(const QString &message)
 {
-    ui->data_plainTextEdit->appendPlainText(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz") + " [DEVICE] " + message);
+    ui->data_plainTextEdit->appendPlainText(message);
 }
 
-void MainWindow::onNewDeviceMeasurement(double dbm, double vpp_raw)
+void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw)
 {
-    QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
+    //QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
+    QString curdate = timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz");
     ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+ QString(" $%1dBm%2mVpp$").arg(dbm).arg(vpp_raw));
 
     double milliwatts = 0;
@@ -564,7 +608,12 @@ void MainWindow::on_connect_pushButton_clicked()
 
     if(!currentDevice().isEmpty())
     {
-        m_activeDeviceObject->connectDevice(currentDevice());
+        if (m_useThreading)
+        {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "connectDevice", Q_ARG(QString, currentDevice()));
+        } else {
+            m_activeDeviceObject->connectDevice(currentDevice());
+        }
     }
 }
 
@@ -572,7 +621,12 @@ void MainWindow::on_disconnect_pushButton_clicked()
 {
     qDebug()<<"on_disconnect_pushButton_clicked";
     if (m_activeDeviceObject) {
-        m_activeDeviceObject->disconnectDevice();
+        if (m_useThreading) {
+            // Use invokeMethod to call the slot in the object's thread
+            QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+        } else {
+            m_activeDeviceObject->disconnectDevice();
+        }
     }
 }
 
@@ -744,8 +798,7 @@ void MainWindow::on_simulatorTimer()
 
     double simmvppValue = UnitConverter::milliwattsToVpp(UnitConverter::dBmToMilliwatts(simdbmvalue));
 
-    onNewDeviceMeasurement(simdbmvalue, simmvppValue);
-
+    onNewDeviceMeasurement(QDateTime::currentDateTime(), simdbmvalue, simmvppValue);
 }
 
 
