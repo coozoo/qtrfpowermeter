@@ -257,7 +257,9 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     if (m_useThreading && m_deviceThread) {
-        QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+        if(m_activeDeviceObject) {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+        }
         m_deviceThread->quit();
         m_deviceThread->wait();
     }
@@ -309,6 +311,7 @@ void MainWindow::createDevice(const QString &deviceId)
             m_deviceThread->wait();
         } else {
             m_activeDeviceObject->disconnectDevice();
+            m_activeDeviceObject->deleteLater();
         }
         // Disconnect UI signals
         disconnect(ui->internalAtt_spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
@@ -316,8 +319,7 @@ void MainWindow::createDevice(const QString &deviceId)
         disconnect(attenuationMgr, &AttenuationManager::internalAttenuationChanged,
                    this, &MainWindow::onDeviceInternalAttChanged);
         attenuationMgr->removeInternalAttenuator();
-        // The device will be deleted either by the thread finishing or directly
-        m_activeDeviceObject->deleteLater();
+        
         m_activeDeviceObject = nullptr;
     }
 
@@ -398,8 +400,12 @@ void MainWindow::updateUiForDevice(const PMDeviceProperties &props)
 void MainWindow::on_set_pushButton_clicked()
 {
     qDebug()<<"on_set_pushButton_clicked";
-    if (!m_activeDeviceObject || !isConnected()) {
-        qDebug() << "Set button clicked, but device not connected or doesn't exist.";
+    if (!m_activeDeviceObject) {
+        qDebug() << "Set button clicked, but device object does not exist.";
+        return;
+    }
+    if (!isConnected()) {
+        qDebug() << "Set button clicked, but device not connected.";
         return;
     }
 

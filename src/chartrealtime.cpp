@@ -276,15 +276,29 @@ void chartRealTime::on_datacoming(QDateTime dateTime, const QList<double> &data)
     qDebug()<<"isflow:"<<getisflow()<<"key:"<<key;
     //add each value to graph
     double i=0;
+    bool yAxisChanged = false;
+    QCPRange yRange = customPlot->yAxis->range();
+
     foreach (double value, data)
+    {
+        customPlot->graph(i)->addData(key, value);
+        if (value > yRange.upper)
         {
-            customPlot->graph(i)->addData(key, value);
-            if(customPlot->yAxis->range().upper<value)
-                {
-                    customPlot->yAxis->setRange(-60,value+((value*10)/100));
-                }
-            i++;
+            yRange.upper = value + std::abs(value * 0.1); // Add 10% margin
+            yAxisChanged = true;
         }
+        if (value < yRange.lower)
+        {
+            yRange.lower = value - std::abs(value * 0.1); // Add 10% margin
+            yAxisChanged = true;
+        }
+        i++;
+    }
+
+    if(yAxisChanged)
+    {
+        customPlot->yAxis->setRange(yRange);
+    }
     //range flow if less
     //if more then range than "compress" it
     //later I want to add scroll type (flow like when old data moves to left side and lost when our of range)
