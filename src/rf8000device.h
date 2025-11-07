@@ -28,7 +28,7 @@ private:
     quint64 m_currentFrequencyHz = 1000000;
     double m_currentOffsetDb = 0.0;
     bool m_isPositiveOffset = true;
-    QTimer *m_commandTimer;s
+    QTimer *m_commandTimer;
 
     void sendCommand();
 };
