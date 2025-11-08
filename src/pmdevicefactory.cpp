@@ -18,6 +18,7 @@ void PMDeviceFactory::registerDevices()
     PMDeviceProperties rf10000_v7;
     rf10000_v7.id = "rfpm_v7_10ghz";
     rf10000_v7.name = "RF-PM V7 10GHz";
+    rf10000_v7.alternativeNames = "";
     rf10000_v7.imagePath = ":/images/devices/rf_pm_v7_10.png";
     rf10000_v7.minFreqHz = 1000000;
     rf10000_v7.maxFreqHz = 10000000000;
@@ -36,6 +37,7 @@ void PMDeviceFactory::registerDevices()
     PMDeviceProperties rf8000;
     rf8000.id = "rf8000";
     rf8000.name = "RF8000 8GHZ";
+    rf8000.alternativeNames = "RF-Power 8000,RFPower8000";
     rf8000.imagePath = ":/images/devices/rf8000.png";
     rf8000.minFreqHz = 1000000;      // 1 MHz
     rf8000.maxFreqHz = 7999000000;   // 8000 MHz - 7999 is the highest value
@@ -51,6 +53,7 @@ void PMDeviceFactory::registerDevices()
     PMDeviceProperties rf3000;
     rf3000.id = "rf3000";
     rf3000.name = "RF3000 3GHz";
+    rf3000.alternativeNames = "RF-Power 3000,RFPower3000";
     rf3000.imagePath = ":/images/devices/rf8000.png";
     rf3000.minFreqHz = 50000000;    // 50 MHz maybe require fix I don't know what is real lowest freq
     rf3000.maxFreqHz = 2999000000;  // 3000 MHz - assume that 2999 highest value as it is with rf8000
@@ -66,6 +69,7 @@ void PMDeviceFactory::registerDevices()
     PMDeviceProperties rf500;
     rf500.id = "rf500";
     rf500.name = "RF500 500MHz";
+    rf500.alternativeNames = "RF-Power 500,RFPower500";
     rf500.imagePath = ":/images/devices/rf8000.png";
     rf500.minFreqHz = 1000000;      // 1 MHz
     rf500.maxFreqHz = 499000000;    // 500 MHz  - assume that 499 highest value as it is with rf8000

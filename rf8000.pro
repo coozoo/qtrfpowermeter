@@ -35,6 +35,7 @@ SOURCES += \
     src/chartrealtime.cpp \
     src/devicecomboboxdelegate.cpp \
     src/fixedattenuatorcontrol.cpp \
+    src/helpdialog.cpp \
     src/internalattenuatorcontrol.cpp \
     src/mainwindow.cpp \
     src/pmdevicefactory.cpp \
@@ -63,6 +64,7 @@ HEADERS += \
     src/chartrealtime.h \
     src/devicecomboboxdelegate.h \
     src/fixedattenuatorcontrol.h \
+    src/helpdialog.h \
     src/internalattenuatorcontrol.h \
     src/mainwindow.h \
     src/pmdevicefactory.h \

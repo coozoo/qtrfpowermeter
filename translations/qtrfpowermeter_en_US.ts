@@ -4,37 +4,42 @@
 <context>
     <name>AttenuationManager</name>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="27"/>
+        <location filename="../src/attenuationmanager.cpp" line="28"/>
         <source>Fixed Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="28"/>
+        <location filename="../src/attenuationmanager.cpp" line="29"/>
         <source>Digital Attenuator</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/attenuationmanager.cpp" line="30"/>
-        <source>Add</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/attenuationmanager.cpp" line="31"/>
-        <source>Add Attenuator</source>
+        <source>Cable Loss</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/attenuationmanager.cpp" line="32"/>
-        <source>Remove</source>
+        <source>Add</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/attenuationmanager.cpp" line="33"/>
+        <source>Add Attenuator</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuationmanager.cpp" line="34"/>
+        <source>Remove</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuationmanager.cpp" line="35"/>
         <source>Remove Selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="60"/>
+        <location filename="../src/attenuationmanager.cpp" line="62"/>
         <source>Total Attenuation:</source>
         <translation></translation>
     </message>
@@ -57,28 +62,133 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="61"/>
+        <location filename="../src/attenuatorwidget.cpp" line="37"/>
+        <source>Coaxial Cable Loss Calculator</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="44"/>
+        <source>Cable Loss</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="74"/>
         <source>Fixed Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="64"/>
+        <location filename="../src/attenuatorwidget.cpp" line="77"/>
         <source>Digital Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="67"/>
+        <location filename="../src/attenuatorwidget.cpp" line="80"/>
         <source>Device Internal Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="69"/>
+        <location filename="../src/attenuatorwidget.cpp" line="82"/>
         <source>The internal attenuator is part of the device and cannot be removed.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="207"/>
+        <location filename="../src/attenuatorwidget.cpp" line="85"/>
+        <source>Coaxial Cable Loss</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="227"/>
         <source>Digital Attenuator: </source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>CableLossCalculatorWindow</name>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="14"/>
+        <source>Coaxial Cable Loss Calculator</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="28"/>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="45"/>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="98"/>
+        <source>MHz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="54"/>
+        <source>Global Length (m):</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="88"/>
+        <source>Current Frequency:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="128"/>
+        <source>Cables</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>CableWidget</name>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="70"/>
+        <source>Calculated Loss:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="75"/>
+        <source>Length:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="81"/>
+        <source>m</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="92"/>
+        <source>ExtDiameter(mm)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="94"/>
+        <source>Impedance</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="96"/>
+        <source>Velocity</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="106"/>
+        <source>Datasheet:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="107"/>
+        <source>Link</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="158"/>
+        <source>dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="166"/>
+        <source>Warning: This value is extrapolated
+beyond the cable&apos;s max data frequency of %1 MHz.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="172"/>
+        <source>Warning: This value is extrapolated
+beyond the cable&apos;s min data frequency of %1 MHz.</source>
         <translation></translation>
     </message>
 </context>
@@ -312,6 +422,94 @@ Calculated correction: %2 dB</source>
     </message>
 </context>
 <context>
+    <name>HelpDialog</name>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="16"/>
+        <source>Help: %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="23"/>
+        <source>Close</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="72"/>
+        <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;The group devices that communicates using a text-based protocol over serial.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Command Format:&lt;/b&gt; &lt;code&gt;$FFFF+00.0#&lt;/code&gt; where FFFF is the frequency in MHz and 00.0 is the offset in dB.&lt;/p&gt;&lt;h3&gt;Problems&lt;/h3&gt;&lt;p&gt;Device has very fragile protocol, there is two main problems with it and sure they persist in original software because actual problem is in firmware:&lt;/p&gt;&lt;p&gt;&lt;b&gt;Broken character:&lt;/b&gt;&lt;br&gt;Device screen has updates, there is incoming data in log. &lt;br&gt;There is broken character on screen (see image below) and as well in protocol, so the data is incorrect and cannot be parsed.&lt;/p&gt;&lt;br&gt;&lt;img src=&quot;qrc:/help/img/rf8000brokenchar.png&quot; alt=&quot;rf8000 broken charachters&quot; width=&quot;300&quot;&gt;&lt;p&gt;&lt;b&gt;Hanging:&lt;/b&gt;&lt;br&gt;Device screen is frozen, no incoming data. &lt;br&gt;Device can hang if send commands to often or some unknown reason.&lt;/p&gt;&lt;h3&gt;Solutions&lt;/h3&gt;&lt;p&gt;&lt;b&gt;Broken character:&lt;/b&gt;&lt;br&gt;Simply press Set device parameters in app, like frequency, and it will be fixed.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Hanging:&lt;/b&gt;&lt;br&gt;&lt;p&gt;Connect device in safe proof order&lt;ul&gt;&lt;li&gt;Connect/restart device (device in wait mode. It shows logo on device screen)&lt;/li&gt;&lt;li&gt;Refresh devices list in app (select correct device type)&lt;/li&gt;&lt;li&gt;Press connect in app&lt;/li&gt;&lt;li&gt;On device press middle button to start capture&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Other sequences could work but sometimes glitches may appear.&lt;/p&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="90"/>
+        <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;The V7 device uses a complex command set, including commands to start and stop data streams.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Example Command:&lt;/b&gt; &lt;code&gt;IC000+W+00.0+00.00+1000&lt;/code&gt;&lt;/p&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="94"/>
+        <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;TBD.&lt;/p&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="102"/>
+        <source>&lt;h2&gt;Error&lt;/h2&gt;&lt;p&gt;Could not load help template.&lt;/p&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="109"/>
+        <source>Device Specifications</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="110"/>
+        <source>Parameter</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="111"/>
+        <source>Value</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="112"/>
+        <source>Frequency Range</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="113"/>
+        <source>Power Range</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="114"/>
+        <source>Baud Rate</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="115"/>
+        <source>Internal Attenuator</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="120"/>
+        <source>%1 MHz to %2 MHz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="121"/>
+        <source>%1 dBm to %2 dBm</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="123"/>
+        <source>Yes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="123"/>
+        <source>No</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>InternalAttenuatorControl</name>
     <message>
         <location filename="../src/internalattenuatorcontrol.cpp" line="6"/>
@@ -332,303 +530,399 @@ Calculated correction: %2 dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="57"/>
-        <location filename="../src/mainwindow.cpp" line="204"/>
+        <location filename="../src/mainwindow.ui" line="64"/>
+        <location filename="../src/mainwindow.cpp" line="221"/>
         <source>Refresh</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="60"/>
-        <location filename="../src/mainwindow.ui" line="413"/>
-        <location filename="../src/mainwindow.ui" line="465"/>
-        <location filename="../src/mainwindow.ui" line="513"/>
-        <location filename="../src/mainwindow.ui" line="554"/>
+        <location filename="../src/mainwindow.ui" line="47"/>
+        <location filename="../src/mainwindow.ui" line="67"/>
+        <location filename="../src/mainwindow.ui" line="420"/>
+        <location filename="../src/mainwindow.ui" line="472"/>
+        <location filename="../src/mainwindow.ui" line="532"/>
+        <location filename="../src/mainwindow.ui" line="573"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="67"/>
+        <location filename="../src/mainwindow.ui" line="74"/>
         <source>Connect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="74"/>
+        <location filename="../src/mainwindow.ui" line="81"/>
         <source>Disconnect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="81"/>
+        <location filename="../src/mainwindow.ui" line="88"/>
         <source>Simulate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="96"/>
+        <location filename="../src/mainwindow.ui" line="103"/>
         <source>Log</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="106"/>
+        <location filename="../src/mainwindow.ui" line="113"/>
         <source>Data</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="116"/>
+        <location filename="../src/mainwindow.ui" line="123"/>
         <source>Status</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="206"/>
+        <location filename="../src/mainwindow.ui" line="213"/>
         <source>Indevice correction</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="234"/>
+        <location filename="../src/mainwindow.ui" line="241"/>
         <source>Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="274"/>
-        <location filename="../src/mainwindow.ui" line="630"/>
+        <location filename="../src/mainwindow.ui" line="281"/>
+        <location filename="../src/mainwindow.ui" line="649"/>
         <source>Calibration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="290"/>
-        <location filename="../src/mainwindow.cpp" line="156"/>
-        <location filename="../src/mainwindow.cpp" line="861"/>
+        <location filename="../src/mainwindow.ui" line="297"/>
+        <location filename="../src/mainwindow.cpp" line="165"/>
+        <location filename="../src/mainwindow.cpp" line="947"/>
         <source>Attenuation:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="310"/>
+        <location filename="../src/mainwindow.ui" line="317"/>
         <source>Current</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="318"/>
-        <location filename="../src/mainwindow.cpp" line="48"/>
+        <location filename="../src/mainwindow.ui" line="325"/>
+        <location filename="../src/mainwindow.cpp" line="55"/>
         <source>dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="346"/>
-        <location filename="../src/mainwindow.cpp" line="50"/>
+        <location filename="../src/mainwindow.ui" line="353"/>
+        <location filename="../src/mainwindow.cpp" line="57"/>
         <source>mW</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="362"/>
-        <location filename="../src/mainwindow.cpp" line="49"/>
+        <location filename="../src/mainwindow.ui" line="369"/>
+        <location filename="../src/mainwindow.cpp" line="56"/>
         <source>mVpp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="600"/>
+        <location filename="../src/mainwindow.ui" line="619"/>
         <source>Attenuation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="130"/>
-        <location filename="../src/mainwindow.ui" line="263"/>
+        <location filename="../src/mainwindow.ui" line="137"/>
+        <location filename="../src/mainwindow.ui" line="270"/>
         <source>Set</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="169"/>
+        <location filename="../src/mainwindow.ui" line="176"/>
         <source>Correction</source>
         <translation>Offset</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="177"/>
+        <location filename="../src/mainwindow.ui" line="184"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="190"/>
+        <location filename="../src/mainwindow.ui" line="197"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="222"/>
-        <location filename="../src/mainwindow.ui" line="247"/>
+        <location filename="../src/mainwindow.ui" line="229"/>
+        <location filename="../src/mainwindow.ui" line="254"/>
         <source>dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="140"/>
+        <location filename="../src/mainwindow.ui" line="147"/>
         <source>Frequency</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="159"/>
+        <location filename="../src/mainwindow.ui" line="166"/>
         <source>MHz</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="382"/>
+        <location filename="../src/mainwindow.ui" line="389"/>
         <source>MAX</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="389"/>
+        <location filename="../src/mainwindow.ui" line="396"/>
         <source>dBm:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="403"/>
+        <location filename="../src/mainwindow.ui" line="410"/>
         <source>mW:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="433"/>
+        <location filename="../src/mainwindow.ui" line="440"/>
         <source>Chart</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="462"/>
+        <location filename="../src/mainwindow.ui" line="469"/>
         <source>Reset Charts</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="485"/>
+        <location filename="../src/mainwindow.ui" line="492"/>
         <source>Range(min):</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="499"/>
-        <location filename="../src/mainwindow.cpp" line="200"/>
+        <location filename="../src/mainwindow.ui" line="518"/>
+        <location filename="../src/mainwindow.cpp" line="212"/>
         <source>Flow</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="544"/>
+        <location filename="../src/mainwindow.ui" line="563"/>
         <source>Write on fly data to CSV</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="547"/>
-        <location filename="../src/mainwindow.cpp" line="229"/>
+        <location filename="../src/mainwindow.ui" line="566"/>
+        <location filename="../src/mainwindow.cpp" line="249"/>
         <source>csv</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="34"/>
+        <location filename="../src/mainwindow.cpp" line="39"/>
         <source>Reset max values</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="37"/>
+        <location filename="../src/mainwindow.cpp" line="43"/>
         <source>Browse saved data directory</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="43"/>
+        <location filename="../src/mainwindow.cpp" line="50"/>
         <source>Session data not saved yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="47"/>
+        <location filename="../src/mainwindow.cpp" line="54"/>
         <source>Time</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="51"/>
+        <location filename="../src/mainwindow.cpp" line="58"/>
         <source>Frequency MHz</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="52"/>
+        <location filename="../src/mainwindow.cpp" line="59"/>
         <source>Correction dB</source>
         <translation>Offset dB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="53"/>
+        <location filename="../src/mainwindow.cpp" line="60"/>
         <source>Attenuation dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="54"/>
+        <location filename="../src/mainwindow.cpp" line="61"/>
         <source>Total dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="55"/>
+        <location filename="../src/mainwindow.cpp" line="62"/>
         <source>Total mW</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="201"/>
+        <location filename="../src/mainwindow.cpp" line="213"/>
         <source>After this time data on chart will move out so it will look like a flow</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="203"/>
+        <location filename="../src/mainwindow.cpp" line="215"/>
+        <location filename="../src/mainwindow.cpp" line="216"/>
+        <source>Device Info</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="220"/>
         <source>Refresh Devices</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="210"/>
+        <location filename="../src/mainwindow.cpp" line="229"/>
         <source>Save charts</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="211"/>
+        <location filename="../src/mainwindow.cpp" line="230"/>
         <source>Save charts as images to the log folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="213"/>
+        <location filename="../src/mainwindow.cpp" line="233"/>
         <source>Choose output format</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="217"/>
+        <location filename="../src/mainwindow.cpp" line="237"/>
         <source>Set image width</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="223"/>
+        <location filename="../src/mainwindow.cpp" line="243"/>
         <source>Set image height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="230"/>
+        <location filename="../src/mainwindow.cpp" line="250"/>
         <source>Write on fly data to csv file into log folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="411"/>
+        <location filename="../src/mainwindow.cpp" line="261"/>
+        <source>&amp;Tools</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="262"/>
+        <source>Cable Loss Calculator</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="487"/>
         <source>Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="412"/>
+        <location filename="../src/mainwindow.cpp" line="488"/>
         <source>Saved</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="673"/>
+        <location filename="../src/mainwindow.cpp" line="760"/>
         <source>Connected to %1 on %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="592"/>
-        <source>Port</source>
+        <location filename="../src/mainwindow.cpp" line="1035"/>
+        <source>No Device Selected</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="1035"/>
+        <source>Please select a device type first.</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="679"/>
+        <source>Port</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="766"/>
         <source>Error: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="683"/>
+        <location filename="../src/mainwindow.cpp" line="770"/>
         <source>Disconnected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="591"/>
+        <location filename="../src/mainwindow.cpp" line="678"/>
         <source> [Busy]</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QtCoaxCableLossCalcManager</name>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="45"/>
+        <source>Search for cable...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="51"/>
+        <source>Add</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="52"/>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="468"/>
+        <source>Add Cable</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="55"/>
+        <source>Delete Marked</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="59"/>
+        <source>Clear All</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="101"/>
+        <source>Error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="101"/>
+        <source>Could not open %1 error: %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="127"/>
+        <source>Frequency (MHz)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="128"/>
+        <source>Attenuation (dB/100m)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="285"/>
+        <source>Warning</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="285"/>
+        <source>Already added!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="371"/>
+        <source>Total Attenuation: %1 dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="462"/>
+        <source>Current Cable Already Added</source>
         <translation></translation>
     </message>
 </context>
@@ -772,7 +1066,7 @@ Calculated correction: %2 dB</source>
 <context>
     <name>Rf8000Device</name>
     <message>
-        <location filename="../src/rf8000device.cpp" line="76"/>
+        <location filename="../src/rf8000device.cpp" line="92"/>
         <source>Could not parse dBm value from device.</source>
         <translation></translation>
     </message>

@@ -38,9 +38,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->resetMax_toolButton->setToolTip(tr("Reset max values"));
     ui->resetMax_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
+    ui->resetMax_toolButton->setIconSize(QSize(24, 24));
 
     ui->browse_toolButton->setToolTip(tr("Browse saved data directory"));
     ui->browse_toolButton->setIcon(QIcon::fromTheme("document-open",QIcon(":/images/document-open.svg")));
+    ui->browse_toolButton->setIconSize(QSize(24, 24));
 
     connect(ui->browse_toolButton, &QToolButton::clicked, this, [=]() {
         if (QDir(filepath).exists()) QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
@@ -198,24 +200,35 @@ MainWindow::MainWindow(QWidget *parent)
     onDeviceSelector_currentIndexChanged(ui->deviceType_comboBox->currentIndex());
     Q_EMIT(on_set_pushButton_clicked());
 
-
-    ui->range_spinBox->setMinimum(1);
-    ui->range_spinBox->setMaximum(100000);
-    ui->range_spinBox->setAlignment(Qt::AlignRight);
-    ui->range_spinBox->setValue(10);
+    connect(ui->range_doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onrange_doubleSpinBox_valueChanged);
+    ui->range_doubleSpinBox->setMinimum(0.2);
+    ui->range_doubleSpinBox->setMaximum(999999999);
+    ui->range_doubleSpinBox->setAlignment(Qt::AlignRight);
+    ui->range_doubleSpinBox->setValue(5);
+    ui->range_doubleSpinBox->setDecimals(1);
+    ui->range_doubleSpinBox->setSingleStep(10);
+    onrange_doubleSpinBox_valueChanged(ui->range_doubleSpinBox->value());
 
     ui->flow_checkBox->setText(tr("Flow"));
     ui->flow_checkBox->setToolTip(tr("After this time data on chart will move out so it will look like a flow"));
 
+    ui->deviceInfo_toolButton->setToolTip(tr("Device Info"));
+    ui->deviceInfo_toolButton->setText(tr("Device Info"));
+    ui->deviceInfo_toolButton->setIcon(QIcon::fromTheme("info",QIcon(":/images/info.svg")));
+    ui->deviceInfo_toolButton->setIconSize(QSize(24, 24));
+
     ui->refreshDevices_toolbutton->setToolTip(tr("Refresh Devices"));
     ui->refreshDevices_toolbutton->setText(tr("Refresh"));
     ui->refreshDevices_toolbutton->setIcon(QIcon::fromTheme("view-refresh",QIcon(":/images/view-refresh.svg")));
+    ui->refreshDevices_toolbutton->setIconSize(QSize(24, 24));
 
     ui->resetCharts_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
+    ui->resetCharts_toolButton->setIconSize(QSize(24, 24));
 
     ui->saveCharts_toolButton->setIcon(QIcon::fromTheme("document-save",QIcon(":/images/document-save.svg")));
     ui->saveCharts_toolButton->setText(tr("Save charts"));
     ui->saveCharts_toolButton->setToolTip(tr("Save charts as images to the log folder"));
+    ui->saveCharts_toolButton->setIconSize(QSize(24, 24));
 
     ui->imageFormat_comboBox->setToolTip(tr("Choose output format"));
     ui->imageFormat_comboBox->addItem("png");
@@ -242,22 +255,22 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->frequency_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_set_pushButton_clicked);
 
+//    connect(ui->saveCharts_toolButton, &QToolButton::clicked, this, &MainWindow::on_saveCharts_toolButton_clicked);
+
     // --- Tools Menu ---
     QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
     QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
     toolsMenu->addAction(cableLossCalcAction);
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
 
-
-    //autoconnector works fine
-    //connect(ui->range_spinBox, SIGNAL(valueChanged(int)), this, SLOT(on_range_spinBox_valueChanged(int)));
-    //connect(ui->saveCharts_toolButton, SIGNAL(clicked()), this, SLOT(on_saveCharts_toolButton_clicked()));
 }
 
 MainWindow::~MainWindow()
 {
     if (m_useThreading && m_deviceThread) {
-        QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+        if(m_activeDeviceObject) {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+        }
         m_deviceThread->quit();
         m_deviceThread->wait();
     }
@@ -309,6 +322,7 @@ void MainWindow::createDevice(const QString &deviceId)
             m_deviceThread->wait();
         } else {
             m_activeDeviceObject->disconnectDevice();
+            m_activeDeviceObject->deleteLater();
         }
         // Disconnect UI signals
         disconnect(ui->internalAtt_spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
@@ -316,8 +330,7 @@ void MainWindow::createDevice(const QString &deviceId)
         disconnect(attenuationMgr, &AttenuationManager::internalAttenuationChanged,
                    this, &MainWindow::onDeviceInternalAttChanged);
         attenuationMgr->removeInternalAttenuator();
-        // The device will be deleted either by the thread finishing or directly
-        m_activeDeviceObject->deleteLater();
+        
         m_activeDeviceObject = nullptr;
     }
 
@@ -398,8 +411,12 @@ void MainWindow::updateUiForDevice(const PMDeviceProperties &props)
 void MainWindow::on_set_pushButton_clicked()
 {
     qDebug()<<"on_set_pushButton_clicked";
-    if (!m_activeDeviceObject || !isConnected()) {
-        qDebug() << "Set button clicked, but device not connected or doesn't exist.";
+    if (!m_activeDeviceObject) {
+        qDebug() << "Set button clicked, but device object does not exist.";
+        return;
+    }
+    if (!isConnected()) {
+        qDebug() << "Set button clicked, but device not connected.";
         return;
     }
 
@@ -442,11 +459,10 @@ void MainWindow::on_set_pushButton_clicked()
 
 
 /* slot to call range changing */
-void MainWindow::on_range_spinBox_valueChanged(int range)
+void MainWindow::onrange_doubleSpinBox_valueChanged(double range)
 {
-    qDebug()<<"on_range_spinBox_valueChanged";
-    //convert to minutes
-    charts->setAllRanges(range * 60);
+    qDebug()<<"on_range_doubleSpinBox_valueChanged";
+    charts->setAllRanges(range*60);
 }
 
 int MainWindow::on_saveCharts_toolButton_clicked()
@@ -1011,4 +1027,17 @@ void MainWindow::on_actionCableLossCalculator_triggered()
     CableLossCalculatorWindow *cableWindow = new CableLossCalculatorWindow(this);
     cableWindow->setAttribute(Qt::WA_DeleteOnClose);
     cableWindow->show();
+}
+
+void MainWindow::on_deviceInfo_toolButton_clicked()
+{
+    if (!m_activeDeviceObject) {
+        QMessageBox::warning(this, tr("No Device Selected"), tr("Please select a device type first."));
+        return;
+    }
+
+    // MainWindow's only job is to get the properties and pass them to the dialog.
+    const PMDeviceProperties &props = m_activeDeviceObject->properties();
+    HelpDialog *dialog = new HelpDialog(props, this);
+    dialog->show();
 }

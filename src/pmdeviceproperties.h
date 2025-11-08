@@ -9,6 +9,7 @@ struct PMDeviceProperties
     QString id; // Unique identifier, e.g., "rf8000"
     QString name; // User-friendly name, e.g., "RF Power Meter 8GHz"
     QString imagePath; // Path in resources, e.g., ":/images/rf8000.svg"
+    QString alternativeNames;
 
     quint64 minFreqHz = 1000000;
     quint64 maxFreqHz = 8000000000;

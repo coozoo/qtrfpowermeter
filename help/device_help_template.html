@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body { font-family: sans-serif; background-color: #f4f4f4; line-height: 1.6; }
+    h1, h2 { color: #2c3e50; }
+    .container { padding: 15px; }
+    .device-image { float: right; margin: 0 0 15px 15px; border: 1px solid #ccc; padding: 5px; background-color: white; max-width: 150px; }
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
+    th { background-color: #3498db; color: white; }
+    .section { margin-top: 25px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Image placeholder for the main device image -->
+    <img src="qrc:%DEVICE_IMAGE_PATH%" class="device-image">
+
+    <h1>%DEVICE_NAME%</h1>
+    <i>%ALTERNATIVE_NAMES%</i>
+
+    <div class="section">
+        <h2>%SPECS_TITLE%</h2>
+        <table>
+          <tr><th>%PARAM_TITLE%</th><th>%VALUE_TITLE%</th></tr>
+          <tr><td>%FREQ_RANGE_TITLE%</td><td>%FREQ_RANGE_VALUE%</td></tr>
+          <tr><td>%POWER_RANGE_TITLE%</td><td>%POWER_RANGE_VALUE%</td></tr>
+          <tr><td>%BAUD_RATE_TITLE%</td><td>%BAUD_RATE_VALUE%</td></tr>
+          <tr><td>%INTERNAL_ATT_TITLE%</td><td>%INTERNAL_ATT_VALUE%</td></tr>
+        </table>
+    </div>
+
+    <!-- Placeholder for device-specific additional info -->
+    %ADDITIONAL_INFO_CONTENT%
+
+</div>
+</body>
+</html>
