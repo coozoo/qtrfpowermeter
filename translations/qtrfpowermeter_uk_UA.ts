@@ -4,37 +4,42 @@
 <context>
     <name>AttenuationManager</name>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="27"/>
+        <location filename="../src/attenuationmanager.cpp" line="28"/>
         <source>Fixed Attenuator</source>
         <translation>Фіксований атенюатор</translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="28"/>
+        <location filename="../src/attenuationmanager.cpp" line="29"/>
         <source>Digital Attenuator</source>
         <translation>Цифровий атенюатор</translation>
     </message>
     <message>
         <location filename="../src/attenuationmanager.cpp" line="30"/>
+        <source>Cable Loss</source>
+        <translation>Втрати кабелю</translation>
+    </message>
+    <message>
+        <location filename="../src/attenuationmanager.cpp" line="32"/>
         <source>Add</source>
         <translation>Додати</translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="31"/>
+        <location filename="../src/attenuationmanager.cpp" line="33"/>
         <source>Add Attenuator</source>
         <translation>Додати атенюатор</translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="32"/>
+        <location filename="../src/attenuationmanager.cpp" line="34"/>
         <source>Remove</source>
         <translation>Видалити</translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="33"/>
+        <location filename="../src/attenuationmanager.cpp" line="35"/>
         <source>Remove Selected</source>
         <translation>Видалити обране</translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="60"/>
+        <location filename="../src/attenuationmanager.cpp" line="62"/>
         <source>Total Attenuation:</source>
         <translation>Повне послаблення:</translation>
     </message>
@@ -57,29 +62,134 @@
         <translation>Вбудований</translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="61"/>
+        <location filename="../src/attenuatorwidget.cpp" line="37"/>
+        <source>Coaxial Cable Loss Calculator</source>
+        <translation>Калькулятор втрат коаксіального кабелю</translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="44"/>
+        <source>Cable Loss</source>
+        <translation>Втрати кабелю</translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="74"/>
         <source>Fixed Attenuator</source>
         <translation>Фіксований атенюатор</translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="64"/>
+        <location filename="../src/attenuatorwidget.cpp" line="77"/>
         <source>Digital Attenuator</source>
         <translation>Цифровий атенюатор</translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="67"/>
+        <location filename="../src/attenuatorwidget.cpp" line="80"/>
         <source>Device Internal Attenuator</source>
         <translation>Внутрішній аттенюатор пристрою</translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="69"/>
+        <location filename="../src/attenuatorwidget.cpp" line="82"/>
         <source>The internal attenuator is part of the device and cannot be removed.</source>
         <translation>Внутрішніій аттенютор є частиною пристрою і не може бути видалений.</translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="207"/>
+        <location filename="../src/attenuatorwidget.cpp" line="85"/>
+        <source>Coaxial Cable Loss</source>
+        <translation>Втрати коаксіального кабелю</translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="227"/>
         <source>Digital Attenuator: </source>
         <translation>Цифровий атенюатор: </translation>
+    </message>
+</context>
+<context>
+    <name>CableLossCalculatorWindow</name>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="14"/>
+        <source>Coaxial Cable Loss Calculator</source>
+        <translation>Калькулятор втрат коаксіального кабелю</translation>
+    </message>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="28"/>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="45"/>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="98"/>
+        <source>MHz</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="54"/>
+        <source>Global Length (m):</source>
+        <translation>Глобальна довжина (м):</translation>
+    </message>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="88"/>
+        <source>Current Frequency:</source>
+        <translation>Обрана частота:</translation>
+    </message>
+    <message>
+        <location filename="../src/cablelosscalculatorwindow.ui" line="128"/>
+        <source>Cables</source>
+        <translation>Кабелі</translation>
+    </message>
+</context>
+<context>
+    <name>CableWidget</name>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="70"/>
+        <source>Calculated Loss:</source>
+        <translation>Розраховані втрати:</translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="75"/>
+        <source>Length:</source>
+        <translation>Довжина:</translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="81"/>
+        <source>m</source>
+        <translation>м</translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="92"/>
+        <source>ExtDiameter(mm)</source>
+        <translation>Зовн.діаметр(мм)</translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="94"/>
+        <source>Impedance</source>
+        <translation>Імпеданс</translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="96"/>
+        <source>Velocity</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="106"/>
+        <source>Datasheet:</source>
+        <translation>Специфікація:</translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="107"/>
+        <source>Link</source>
+        <translation>Посилання</translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="158"/>
+        <source>dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="166"/>
+        <source>Warning: This value is extrapolated
+beyond the cable&apos;s max data frequency of %1 MHz.</source>
+        <translation>УВАГА: Це значення є екстрапольоване поза максимальними зазначеними характеристиками кабелю %1 MHz.</translation>
+    </message>
+    <message>
+        <location filename="../src/cablewidget.cpp" line="172"/>
+        <source>Warning: This value is extrapolated
+beyond the cable&apos;s min data frequency of %1 MHz.</source>
+        <translation>УВАГА: Це значення є екстрапольоване поза мінімальними зазначеними характеристиками кабелю %1 MHz.</translation>
     </message>
 </context>
 <context>
@@ -313,6 +423,94 @@ Calculated correction: %2 dB</source>
     </message>
 </context>
 <context>
+    <name>HelpDialog</name>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="16"/>
+        <source>Help: %1</source>
+        <translation>Допомога: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="23"/>
+        <source>Close</source>
+        <translation>Закрити</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="72"/>
+        <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;The group devices that communicates using a text-based protocol over serial.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Command Format:&lt;/b&gt; &lt;code&gt;$FFFF+00.0#&lt;/code&gt; where FFFF is the frequency in MHz and 00.0 is the offset in dB.&lt;/p&gt;&lt;h3&gt;Problems&lt;/h3&gt;&lt;p&gt;Device has very fragile protocol, there is two main problems with it and sure they persist in original software because actual problem is in firmware:&lt;/p&gt;&lt;p&gt;&lt;b&gt;Broken character:&lt;/b&gt;&lt;br&gt;Device screen has updates, there is incoming data in log. &lt;br&gt;There is broken character on screen (see image below) and as well in protocol, so the data is incorrect and cannot be parsed.&lt;/p&gt;&lt;br&gt;&lt;img src=&quot;qrc:/help/img/rf8000brokenchar.png&quot; alt=&quot;rf8000 broken charachters&quot; width=&quot;300&quot;&gt;&lt;p&gt;&lt;b&gt;Hanging:&lt;/b&gt;&lt;br&gt;Device screen is frozen, no incoming data. &lt;br&gt;Device can hang if send commands to often or some unknown reason.&lt;/p&gt;&lt;h3&gt;Solutions&lt;/h3&gt;&lt;p&gt;&lt;b&gt;Broken character:&lt;/b&gt;&lt;br&gt;Simply press Set device parameters in app, like frequency, and it will be fixed.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Hanging:&lt;/b&gt;&lt;br&gt;&lt;p&gt;Connect device in safe proof order&lt;ul&gt;&lt;li&gt;Connect/restart device (device in wait mode. It shows logo on device screen)&lt;/li&gt;&lt;li&gt;Refresh devices list in app (select correct device type)&lt;/li&gt;&lt;li&gt;Press connect in app&lt;/li&gt;&lt;li&gt;On device press middle button to start capture&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Other sequences could work but sometimes glitches may appear.&lt;/p&gt;</source>
+        <translation>&lt;h2&gt;Додаткова інформація&lt;/h2&gt;&lt;p&gt;Група пристроїв, які взаємодіють за допомогою текстового протоколу через послідовний порт.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Формат команди:&lt;/b&gt; &lt;code&gt;$FFFF+00.0#&lt;/code&gt;, де FFFF – частота в MHz, а 00.0 – зміщення в dB.&lt;/p&gt;&lt;h3&gt;Проблеми&lt;/h3&gt;&lt;p&gt;Пристрій має дуже крихкий протокол, з ним є дві основні проблеми, і вони, звісно, зберігаються в оригінальному програмному забезпеченні, оскільки фактична проблема полягає в прошивці:&lt;/p&gt;&lt;p&gt;&lt;b&gt;Пошкоджений символ:&lt;/b&gt;&lt;br&gt;На екрані пристрою є оновлення, в логах є вхідні дані. &lt;br&gt;На екрані (див. зображення нижче) та в протоколі є пошкоджені символи, тому дані неправильні та не можуть бути проаналізовані.&lt;/p&gt;&lt;br&gt;&lt;img src=&quot;qrc:/help/img/rf8000brokenchar.png&quot; alt=&quot;rf8000 биті символи&quot; width=&quot;300&quot;&gt;&lt;p&gt;&lt;b&gt;Зависання:&lt;/b&gt;&lt;br&gt;Екран пристрою завис, вхідних даних немає. &lt;br&gt;Пристрій може зависнути, якщо команди надсилаються часто або з іншої невідомої причини.&lt;/p&gt;&lt;h3&gt;Рішення&lt;/h3&gt;&lt;p&gt;&lt;b&gt;Пошкоджений символ:&lt;/b&gt;&lt;br&gt;Просто натисніть Встановити параметри пристрою в додатку, наприклад, частоту, і проблема буде виправлена.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Зависання:&lt;/b&gt;&lt;br&gt;&lt;p&gt;Підключіть пристрій у безпечному порядку&lt;ul&gt;&lt;li&gt;Підключіть/перезавантажте пристрій (пристрій у режимі очікування. На екрані пристрою відображається логотип)&lt;/li&gt;&lt;li&gt;Оновіть список пристроїв у додатку (виберіть правильний тип пристрою)&lt;/li&gt;&lt;li&gt;Натисніть З&apos;єднати в додатку&lt;/li&gt;&lt;li&gt;На пристрої натисніть середню кнопку, щоб розпочати запис&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Інші послідовності можуть працювати, але іноді можуть виникати збої.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="90"/>
+        <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;The V7 device uses a complex command set, including commands to start and stop data streams.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Example Command:&lt;/b&gt; &lt;code&gt;IC000+W+00.0+00.00+1000&lt;/code&gt;&lt;/p&gt;</source>
+        <translation>&lt;h2&gt;Додаткова інформація&lt;/h2&gt;&lt;p&gt;Пристрій V7 Використовує досить складну систему команд.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Приклад команди:&lt;/b&gt; &lt;code&gt;IC000+W+00.0+00.00+1000&lt;/code&gt;&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="94"/>
+        <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;TBD.&lt;/p&gt;</source>
+        <translation>&lt;h2&gt;Додаткова інформація&lt;/h2&gt;&lt;p&gt;TBD.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="102"/>
+        <source>&lt;h2&gt;Error&lt;/h2&gt;&lt;p&gt;Could not load help template.&lt;/p&gt;</source>
+        <translation>&lt;h2&gt;Помилка&lt;/h2&gt;&lt;p&gt;Неможливо завантажити зразок.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="109"/>
+        <source>Device Specifications</source>
+        <translation>Специфікація пристрою</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="110"/>
+        <source>Parameter</source>
+        <translation>Параметр</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="111"/>
+        <source>Value</source>
+        <translation>Значення</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="112"/>
+        <source>Frequency Range</source>
+        <translation>Частотний діапазон</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="113"/>
+        <source>Power Range</source>
+        <translation>Діапазон потужності</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="114"/>
+        <source>Baud Rate</source>
+        <translation>Швидкість передачі даних</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="115"/>
+        <source>Internal Attenuator</source>
+        <translation>Внутрішній аттенюатор</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="120"/>
+        <source>%1 MHz to %2 MHz</source>
+        <translation>%1 MHz до %2 MHz</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="121"/>
+        <source>%1 dBm to %2 dBm</source>
+        <translation>%1 dBm до %2 dBm</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="123"/>
+        <source>Yes</source>
+        <translation>Так</translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="123"/>
+        <source>No</source>
+        <translation>Ні</translation>
+    </message>
+</context>
+<context>
     <name>InternalAttenuatorControl</name>
     <message>
         <location filename="../src/internalattenuatorcontrol.cpp" line="6"/>
@@ -333,304 +531,400 @@ Calculated correction: %2 dB</source>
         <translation>Пристрій:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="57"/>
-        <location filename="../src/mainwindow.cpp" line="204"/>
+        <location filename="../src/mainwindow.ui" line="64"/>
+        <location filename="../src/mainwindow.cpp" line="221"/>
         <source>Refresh</source>
         <translation>Оновити</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="60"/>
-        <location filename="../src/mainwindow.ui" line="413"/>
-        <location filename="../src/mainwindow.ui" line="465"/>
-        <location filename="../src/mainwindow.ui" line="513"/>
-        <location filename="../src/mainwindow.ui" line="554"/>
+        <location filename="../src/mainwindow.ui" line="47"/>
+        <location filename="../src/mainwindow.ui" line="67"/>
+        <location filename="../src/mainwindow.ui" line="420"/>
+        <location filename="../src/mainwindow.ui" line="472"/>
+        <location filename="../src/mainwindow.ui" line="532"/>
+        <location filename="../src/mainwindow.ui" line="573"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="67"/>
+        <location filename="../src/mainwindow.ui" line="74"/>
         <source>Connect</source>
         <translation>З&apos;єднати</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="74"/>
+        <location filename="../src/mainwindow.ui" line="81"/>
         <source>Disconnect</source>
         <translation>Від&apos;єднати</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="81"/>
+        <location filename="../src/mainwindow.ui" line="88"/>
         <source>Simulate</source>
         <translation>Симуляція</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="96"/>
+        <location filename="../src/mainwindow.ui" line="103"/>
         <source>Log</source>
         <translation>Лог</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="106"/>
+        <location filename="../src/mainwindow.ui" line="113"/>
         <source>Data</source>
         <translation>Дані</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="116"/>
+        <location filename="../src/mainwindow.ui" line="123"/>
         <source>Status</source>
         <translation>Статус</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="206"/>
+        <location filename="../src/mainwindow.ui" line="213"/>
         <source>Indevice correction</source>
         <translation>Вбудована в пристрій корекція</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="234"/>
+        <location filename="../src/mainwindow.ui" line="241"/>
         <source>Attenuator</source>
         <translation>Аттенюатор</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="274"/>
-        <location filename="../src/mainwindow.ui" line="630"/>
+        <location filename="../src/mainwindow.ui" line="281"/>
+        <location filename="../src/mainwindow.ui" line="649"/>
         <source>Calibration</source>
         <translation>Калібрування</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="290"/>
-        <location filename="../src/mainwindow.cpp" line="156"/>
-        <location filename="../src/mainwindow.cpp" line="861"/>
+        <location filename="../src/mainwindow.ui" line="297"/>
+        <location filename="../src/mainwindow.cpp" line="165"/>
+        <location filename="../src/mainwindow.cpp" line="947"/>
         <source>Attenuation:</source>
         <translation>Послаблення:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="310"/>
+        <location filename="../src/mainwindow.ui" line="317"/>
         <source>Current</source>
         <translation>Поточні</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="318"/>
-        <location filename="../src/mainwindow.cpp" line="48"/>
+        <location filename="../src/mainwindow.ui" line="325"/>
+        <location filename="../src/mainwindow.cpp" line="55"/>
         <source>dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="346"/>
-        <location filename="../src/mainwindow.cpp" line="50"/>
+        <location filename="../src/mainwindow.ui" line="353"/>
+        <location filename="../src/mainwindow.cpp" line="57"/>
         <source>mW</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="362"/>
-        <location filename="../src/mainwindow.cpp" line="49"/>
+        <location filename="../src/mainwindow.ui" line="369"/>
+        <location filename="../src/mainwindow.cpp" line="56"/>
         <source>mVpp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="600"/>
+        <location filename="../src/mainwindow.ui" line="619"/>
         <source>Attenuation</source>
         <translation>Послаблення</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="130"/>
-        <location filename="../src/mainwindow.ui" line="263"/>
+        <location filename="../src/mainwindow.ui" line="137"/>
+        <location filename="../src/mainwindow.ui" line="270"/>
         <source>Set</source>
         <translation>Встановити</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="169"/>
+        <location filename="../src/mainwindow.ui" line="176"/>
         <source>Correction</source>
         <translation>Офсет</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="177"/>
+        <location filename="../src/mainwindow.ui" line="184"/>
         <source>+</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="190"/>
+        <location filename="../src/mainwindow.ui" line="197"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="222"/>
-        <location filename="../src/mainwindow.ui" line="247"/>
+        <location filename="../src/mainwindow.ui" line="229"/>
+        <location filename="../src/mainwindow.ui" line="254"/>
         <source>dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="140"/>
+        <location filename="../src/mainwindow.ui" line="147"/>
         <source>Frequency</source>
         <translation>Частота</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="159"/>
+        <location filename="../src/mainwindow.ui" line="166"/>
         <source>MHz</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="382"/>
+        <location filename="../src/mainwindow.ui" line="389"/>
         <source>MAX</source>
         <translation>Макс</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="389"/>
+        <location filename="../src/mainwindow.ui" line="396"/>
         <source>dBm:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="403"/>
+        <location filename="../src/mainwindow.ui" line="410"/>
         <source>mW:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="433"/>
+        <location filename="../src/mainwindow.ui" line="440"/>
         <source>Chart</source>
         <translation>Графік</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="462"/>
+        <location filename="../src/mainwindow.ui" line="469"/>
         <source>Reset Charts</source>
         <translation>Скинути графіки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="485"/>
+        <location filename="../src/mainwindow.ui" line="492"/>
         <source>Range(min):</source>
         <translation>Діапазон(хв):</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="499"/>
-        <location filename="../src/mainwindow.cpp" line="200"/>
+        <location filename="../src/mainwindow.ui" line="518"/>
+        <location filename="../src/mainwindow.cpp" line="212"/>
         <source>Flow</source>
         <translation>Проточний</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="544"/>
+        <location filename="../src/mainwindow.ui" line="563"/>
         <source>Write on fly data to CSV</source>
         <translation>Записувати отриманні дані в CSV</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="547"/>
-        <location filename="../src/mainwindow.cpp" line="229"/>
+        <location filename="../src/mainwindow.ui" line="566"/>
+        <location filename="../src/mainwindow.cpp" line="249"/>
         <source>csv</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="34"/>
+        <location filename="../src/mainwindow.cpp" line="39"/>
         <source>Reset max values</source>
         <translation>Скинути максимальні значення</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="37"/>
+        <location filename="../src/mainwindow.cpp" line="43"/>
         <source>Browse saved data directory</source>
         <translation>Відкрити теку збережених даних</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="43"/>
+        <location filename="../src/mainwindow.cpp" line="50"/>
         <source>Session data not saved yet</source>
         <translation>Ще немає збережених даних</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="47"/>
+        <location filename="../src/mainwindow.cpp" line="54"/>
         <source>Time</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="51"/>
+        <location filename="../src/mainwindow.cpp" line="58"/>
         <source>Frequency MHz</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="52"/>
+        <location filename="../src/mainwindow.cpp" line="59"/>
         <source>Correction dB</source>
         <translation>Offset dB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="53"/>
+        <location filename="../src/mainwindow.cpp" line="60"/>
         <source>Attenuation dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="54"/>
+        <location filename="../src/mainwindow.cpp" line="61"/>
         <source>Total dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="55"/>
+        <location filename="../src/mainwindow.cpp" line="62"/>
         <source>Total mW</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="201"/>
+        <location filename="../src/mainwindow.cpp" line="213"/>
         <source>After this time data on chart will move out so it will look like a flow</source>
         <translation>Після цього часу дані будуть рухатись далі поза графік, тому буде виглядати як проточний</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="203"/>
+        <location filename="../src/mainwindow.cpp" line="215"/>
+        <location filename="../src/mainwindow.cpp" line="216"/>
+        <source>Device Info</source>
+        <translation>Інформація про пристрій</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="220"/>
         <source>Refresh Devices</source>
         <translation>Оновити пристрої</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="210"/>
+        <location filename="../src/mainwindow.cpp" line="229"/>
         <source>Save charts</source>
         <translation>Зберегти графіки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="211"/>
+        <location filename="../src/mainwindow.cpp" line="230"/>
         <source>Save charts as images to the log folder</source>
         <translation>Зберегти графіки до теки логування</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="213"/>
+        <location filename="../src/mainwindow.cpp" line="233"/>
         <source>Choose output format</source>
         <translation>Обрати формат збереження</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="217"/>
+        <location filename="../src/mainwindow.cpp" line="237"/>
         <source>Set image width</source>
         <translation>Втановити ширину картинки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="223"/>
+        <location filename="../src/mainwindow.cpp" line="243"/>
         <source>Set image height</source>
         <translation>Втановити висоту картинки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="230"/>
+        <location filename="../src/mainwindow.cpp" line="250"/>
         <source>Write on fly data to csv file into log folder</source>
         <translation>Записувати отриманні дані в CSV в теку логування</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="411"/>
+        <location filename="../src/mainwindow.cpp" line="261"/>
+        <source>&amp;Tools</source>
+        <translation>&amp;Інструменти</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="262"/>
+        <source>Cable Loss Calculator</source>
+        <translation>Калькулятор втрат коаксіального кабелю</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="487"/>
         <source>Info</source>
         <translation>Інфо</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="412"/>
+        <location filename="../src/mainwindow.cpp" line="488"/>
         <source>Saved</source>
         <translation>Збережено</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="673"/>
+        <location filename="../src/mainwindow.cpp" line="760"/>
         <source>Connected to %1 on %2</source>
         <translation>З&apos;єднано з %1 по %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="592"/>
+        <location filename="../src/mainwindow.cpp" line="1035"/>
+        <source>No Device Selected</source>
+        <translation>Пристрій не обрано</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="1035"/>
+        <source>Please select a device type first.</source>
+        <translation>Будь ласка спочатку оберіть тип пристрою.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="679"/>
         <source>Port</source>
         <translation>Порт</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="679"/>
+        <location filename="../src/mainwindow.cpp" line="766"/>
         <source>Error: %1</source>
         <translation>Помилка: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="683"/>
+        <location filename="../src/mainwindow.cpp" line="770"/>
         <source>Disconnected</source>
         <translation>Від&apos;єднано</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="591"/>
+        <location filename="../src/mainwindow.cpp" line="678"/>
         <source> [Busy]</source>
         <translation> [використовується]</translation>
+    </message>
+</context>
+<context>
+    <name>QtCoaxCableLossCalcManager</name>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="45"/>
+        <source>Search for cable...</source>
+        <translation>Пошук кабелю...</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="51"/>
+        <source>Add</source>
+        <translation>Додати</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="52"/>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="468"/>
+        <source>Add Cable</source>
+        <translation>Додати кабель</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="55"/>
+        <source>Delete Marked</source>
+        <translation>Видалити обране</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="59"/>
+        <source>Clear All</source>
+        <translation>Видалити все</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="101"/>
+        <source>Error</source>
+        <translation>Помилка</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="101"/>
+        <source>Could not open %1 error: %2</source>
+        <translation>Неможливо відкрити %1 помилка: %2</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="127"/>
+        <source>Frequency (MHz)</source>
+        <translation>Частота (MHz)</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="128"/>
+        <source>Attenuation (dB/100m)</source>
+        <translation>Послаблення (dB/100m)</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="285"/>
+        <source>Warning</source>
+        <translation>Увага</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="285"/>
+        <source>Already added!</source>
+        <translation>Вже додано!</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="371"/>
+        <source>Total Attenuation: %1 dB</source>
+        <translation>Повне послаблення: %1 dB</translation>
+    </message>
+    <message>
+        <location filename="../src/qtcoaxcablelosscalcmanager.cpp" line="462"/>
+        <source>Current Cable Already Added</source>
+        <translation>Цей кабель вже додано</translation>
     </message>
 </context>
 <context>
@@ -773,7 +1067,7 @@ Calculated correction: %2 dB</source>
 <context>
     <name>Rf8000Device</name>
     <message>
-        <location filename="../src/rf8000device.cpp" line="76"/>
+        <location filename="../src/rf8000device.cpp" line="92"/>
         <source>Could not parse dBm value from device.</source>
         <translation>Неможливо отримати значення dBm з пристрою.</translation>
     </message>
