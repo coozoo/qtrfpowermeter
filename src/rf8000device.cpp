@@ -1,5 +1,6 @@
 #include "rf8000device.h"
 #include <QRegularExpression>
+#include <QDateTime>
 
 Rf8000Device::Rf8000Device(const PMDeviceProperties &props, QObject *parent)
     : AbstractPMDevice(props, parent)
@@ -61,7 +62,9 @@ void Rf8000Device::sendBufferedCommand()
     QString command = QString("$%1%2#").arg(freqStr).arg(offsetStr);
 
     m_serialPort->writeData(command.toLatin1());
-    emit newLogMessage(QString("Sent command: %1").arg(command));
+    emit newLogMessage(QString("%1 [DEVICE] Sent command: %2")
+                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                           .arg(command));
 }
 
 void Rf8000Device::onSerialPortNewData(const QString &data)
@@ -72,6 +75,7 @@ void Rf8000Device::onSerialPortNewData(const QString &data)
 
 void Rf8000Device::processData(const QString &data)
 {
+    const QDateTime timestamp = QDateTime::currentDateTime();
     QRegularExpression reg("[$]([-+]?[0-9.]+)dBm([0-9.]+)(.)Vpp[$]");
     QRegularExpressionMatchIterator i = reg.globalMatch(data.simplified().replace(" ",""));
 
@@ -83,13 +87,15 @@ void Rf8000Device::processData(const QString &data)
             if (ok) {
                 double vpp_raw = match.captured(2).toDouble();
                 if (match.captured(3) == 'u') vpp_raw /= 1000.0;
-                emit measurementReady(dbm, vpp_raw);
+                emit measurementReady(timestamp, dbm, vpp_raw);
             } else {
                 emit deviceError(tr("Could not parse dBm value from device."));
             }
         }
     } else {
-        emit newLogMessage(QString("Non-measurement data: %1").arg(data));
+        emit newLogMessage(QString("%1 [DEVICE] Non-measurement data: %2")
+                               .arg(timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                               .arg(data));
     }
 }
 

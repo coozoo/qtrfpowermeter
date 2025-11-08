@@ -12,11 +12,11 @@ public:
     explicit Rf8000Device(const PMDeviceProperties &props, QObject *parent = nullptr);
     ~Rf8000Device();
 
-    void setFrequency(quint64 freqHz) override;
-    void setOffset(double offsetDb) override;
-    void connectDevice(const QString &portName) override;
-    void disconnectDevice() override;
-    void processData(const QString &data) override;
+    Q_INVOKABLE void setFrequency(quint64 freqHz) override;
+    Q_INVOKABLE void setOffset(double offsetDb) override;
+    Q_INVOKABLE void connectDevice(const QString &portName) override;
+    Q_INVOKABLE void disconnectDevice() override;
+    Q_INVOKABLE void processData(const QString &data) override;
 
 private slots:
     void onSerialPortNewData(const QString &data);

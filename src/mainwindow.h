@@ -25,6 +25,8 @@
 #include "devicecomboboxdelegate.h"
 #include "qtcoaxcablelosscalcmanager.h"
 #include "cablelosscalculatorwindow.h"
+#include <QThread>
+#include "helpdialog.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -175,6 +177,8 @@ private:
 
     PMDeviceFactory *m_deviceFactory;
     AbstractPMDevice *m_activeDeviceObject = nullptr;
+    bool m_useThreading;
+    QThread *m_deviceThread = nullptr;
     void setupDeviceSelector();
     void updateUiForDevice(const PMDeviceProperties &props);
     void createDevice(const QString &deviceId);
@@ -184,6 +188,7 @@ protected:
 
 private slots:
     void ondevice_comboBox_currentIndexChanged();
+    void on_deviceInfo_toolButton_clicked();
     void on_connect_pushButton_clicked();
     void on_disconnect_pushButton_clicked();
     void on_resetMax_toolButton_clicked();
@@ -203,7 +208,7 @@ private slots:
     void onDeviceConnected();
     void onDeviceDisconnected();
     void onDeviceError(const QString &error);
-    void onNewDeviceMeasurement(double dbm, double vpp_raw);
+    void onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw);
     void onNewDeviceLogMessage(const QString &message);
 
 
@@ -217,7 +222,7 @@ private slots:
     void on_actionCableLossCalculator_triggered();
 
 public slots:
-    void on_range_spinBox_valueChanged(int range);
+    void onrange_doubleSpinBox_valueChanged(double range);
     int on_saveCharts_toolButton_clicked();
 
 signals:
@@ -227,5 +232,6 @@ signals:
     void isConnectedChanged(bool connected);
     void deviceErrorChanged();
     void currentFrequencyChanged(double freqMHz);
+    void shutdownDevice();
 };
 #endif // MAINWINDOW_H

@@ -266,22 +266,39 @@ void chartRealTime::on_datacoming(QDateTime dateTime, const QList<double> &data)
     if(timeReset==true)
     {
         timer.restart();
+        m_startTime = dateTime;
         timeReset=false;
     }
+    qDebug()<<"timereset:"<<timeReset<<"m_startTime:"<<m_startTime<<dateTime;
 
-    double key = static_cast<double>(timer.elapsed())/1000.0;
-    qDebug()<<getisflow()<<key;
+    //double key = static_cast<double>(timer.elapsed())/1000.0;
+    double key = static_cast<double>(m_startTime.msecsTo(dateTime)) / 1000.0;
+    qDebug()<<"isflow:"<<getisflow()<<"key:"<<key;
     //add each value to graph
     double i=0;
+    bool yAxisChanged = false;
+    QCPRange yRange = customPlot->yAxis->range();
+
     foreach (double value, data)
+    {
+        customPlot->graph(i)->addData(key, value);
+        if (value > yRange.upper)
         {
-            customPlot->graph(i)->addData(key, value);
-            if(customPlot->yAxis->range().upper<value)
-                {
-                    customPlot->yAxis->setRange(-60,value+((value*10)/100));
-                }
-            i++;
+            yRange.upper = value + std::abs(value * 0.1); // Add 10% margin
+            yAxisChanged = true;
         }
+        if (value < yRange.lower)
+        {
+            yRange.lower = value - std::abs(value * 0.1); // Add 10% margin
+            yAxisChanged = true;
+        }
+        i++;
+    }
+
+    if(yAxisChanged)
+    {
+        customPlot->yAxis->setRange(yRange);
+    }
     //range flow if less
     //if more then range than "compress" it
     //later I want to add scroll type (flow like when old data moves to left side and lost when our of range)

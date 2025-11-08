@@ -82,6 +82,7 @@ private:
   int range;
   bool isflow;
   bool timeReset;
+  QDateTime m_startTime;
 
   QCPItemStraightLine *cursorLine = nullptr;
   QCPItemText *cursorLabel = nullptr;

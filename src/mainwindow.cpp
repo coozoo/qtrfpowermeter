@@ -6,6 +6,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    // --- Threading Flag ---
+    // Set to true to use a background thread for device communication (responsive UI).
+    // Set to false for single-threaded operation (easier debugging).
+    m_useThreading = true;
+
     ui->setupUi(this);
     m_max_dbm = -std::numeric_limits<double>::infinity();
     datetimefile = QDateTime::fromMSecsSinceEpoch(QDateTime::currentMSecsSinceEpoch()).toString("dd.MM.yyyy_hh.mm.ss.zzz");
@@ -24,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     // --- New Device Abstraction Setup ---
     m_deviceFactory = new PMDeviceFactory(this);
     setupDeviceSelector();
-    // Remove old direct serial port handling
+    // old direct serial port handling
     // serialPortPowerMeter= new SerialPortInterface();
 
     updateDeviceList();
@@ -33,9 +38,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->resetMax_toolButton->setToolTip(tr("Reset max values"));
     ui->resetMax_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
+    ui->resetMax_toolButton->setIconSize(QSize(24, 24));
 
     ui->browse_toolButton->setToolTip(tr("Browse saved data directory"));
     ui->browse_toolButton->setIcon(QIcon::fromTheme("document-open",QIcon(":/images/document-open.svg")));
+    ui->browse_toolButton->setIconSize(QSize(24, 24));
 
     connect(ui->browse_toolButton, &QToolButton::clicked, this, [=]() {
         if (QDir(filepath).exists()) QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
@@ -193,24 +200,35 @@ MainWindow::MainWindow(QWidget *parent)
     onDeviceSelector_currentIndexChanged(ui->deviceType_comboBox->currentIndex());
     Q_EMIT(on_set_pushButton_clicked());
 
-
-    ui->range_spinBox->setMinimum(1);
-    ui->range_spinBox->setMaximum(100000);
-    ui->range_spinBox->setAlignment(Qt::AlignRight);
-    ui->range_spinBox->setValue(10);
+    connect(ui->range_doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onrange_doubleSpinBox_valueChanged);
+    ui->range_doubleSpinBox->setMinimum(0.2);
+    ui->range_doubleSpinBox->setMaximum(999999999);
+    ui->range_doubleSpinBox->setAlignment(Qt::AlignRight);
+    ui->range_doubleSpinBox->setValue(5);
+    ui->range_doubleSpinBox->setDecimals(1);
+    ui->range_doubleSpinBox->setSingleStep(10);
+    onrange_doubleSpinBox_valueChanged(ui->range_doubleSpinBox->value());
 
     ui->flow_checkBox->setText(tr("Flow"));
     ui->flow_checkBox->setToolTip(tr("After this time data on chart will move out so it will look like a flow"));
 
+    ui->deviceInfo_toolButton->setToolTip(tr("Device Info"));
+    ui->deviceInfo_toolButton->setText(tr("Device Info"));
+    ui->deviceInfo_toolButton->setIcon(QIcon::fromTheme("info",QIcon(":/images/info.svg")));
+    ui->deviceInfo_toolButton->setIconSize(QSize(24, 24));
+
     ui->refreshDevices_toolbutton->setToolTip(tr("Refresh Devices"));
     ui->refreshDevices_toolbutton->setText(tr("Refresh"));
     ui->refreshDevices_toolbutton->setIcon(QIcon::fromTheme("view-refresh",QIcon(":/images/view-refresh.svg")));
+    ui->refreshDevices_toolbutton->setIconSize(QSize(24, 24));
 
     ui->resetCharts_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
+    ui->resetCharts_toolButton->setIconSize(QSize(24, 24));
 
     ui->saveCharts_toolButton->setIcon(QIcon::fromTheme("document-save",QIcon(":/images/document-save.svg")));
     ui->saveCharts_toolButton->setText(tr("Save charts"));
     ui->saveCharts_toolButton->setToolTip(tr("Save charts as images to the log folder"));
+    ui->saveCharts_toolButton->setIconSize(QSize(24, 24));
 
     ui->imageFormat_comboBox->setToolTip(tr("Choose output format"));
     ui->imageFormat_comboBox->addItem("png");
@@ -237,20 +255,25 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->frequency_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_set_pushButton_clicked);
 
+//    connect(ui->saveCharts_toolButton, &QToolButton::clicked, this, &MainWindow::on_saveCharts_toolButton_clicked);
+
     // --- Tools Menu ---
     QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
     QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
     toolsMenu->addAction(cableLossCalcAction);
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
 
-
-    //autoconnector works fine
-    //connect(ui->range_spinBox, SIGNAL(valueChanged(int)), this, SLOT(on_range_spinBox_valueChanged(int)));
-    //connect(ui->saveCharts_toolButton, SIGNAL(clicked()), this, SLOT(on_saveCharts_toolButton_clicked()));
 }
 
 MainWindow::~MainWindow()
 {
+    if (m_useThreading && m_deviceThread) {
+        if(m_activeDeviceObject) {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+        }
+        m_deviceThread->quit();
+        m_deviceThread->wait();
+    }
     delete ui;
 }
 
@@ -292,27 +315,44 @@ void MainWindow::onDeviceSelector_currentIndexChanged(int index)
 void MainWindow::createDevice(const QString &deviceId)
 {
     if (m_activeDeviceObject) {
-        // Disconnect signals for the old device to prevent dangling connections
+        if (m_useThreading && m_deviceThread) {
+            // Tell the device in the other thread to disconnect
+            QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+            m_deviceThread->quit();
+            m_deviceThread->wait();
+        } else {
+            m_activeDeviceObject->disconnectDevice();
+            m_activeDeviceObject->deleteLater();
+        }
+        // Disconnect UI signals
         disconnect(ui->internalAtt_spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
                    attenuationMgr, &AttenuationManager::setInternalAttenuation);
         disconnect(attenuationMgr, &AttenuationManager::internalAttenuationChanged,
                    this, &MainWindow::onDeviceInternalAttChanged);
-
-        // Clean up the UI and the old device object
         attenuationMgr->removeInternalAttenuator();
-        m_activeDeviceObject->disconnectDevice();
-        m_activeDeviceObject->deleteLater();
+        
         m_activeDeviceObject = nullptr;
     }
 
-    m_activeDeviceObject = m_deviceFactory->createDevice(deviceId, this);
+    // Create device with no parent so it can be moved to a thread
+    m_activeDeviceObject = m_deviceFactory->createDevice(deviceId, nullptr);
 
     if (m_activeDeviceObject) {
-        connect(m_activeDeviceObject, &AbstractPMDevice::deviceConnected, this, &MainWindow::onDeviceConnected);
-        connect(m_activeDeviceObject, &AbstractPMDevice::deviceDisconnected, this, &MainWindow::onDeviceDisconnected);
-        connect(m_activeDeviceObject, &AbstractPMDevice::deviceError, this, &MainWindow::onDeviceError);
-        connect(m_activeDeviceObject, &AbstractPMDevice::measurementReady, this, &MainWindow::onNewDeviceMeasurement);
-        connect(m_activeDeviceObject, &AbstractPMDevice::newLogMessage, this, &MainWindow::onNewDeviceLogMessage);
+        if (m_useThreading) {
+            m_deviceThread = new QThread(this);
+            m_activeDeviceObject->moveToThread(m_deviceThread);
+            // When thread finishes, delete the device
+            connect(m_deviceThread, &QThread::finished, m_activeDeviceObject, &QObject::deleteLater);
+            // Forward signals from device thread to main thread
+            connect(m_activeDeviceObject, &AbstractPMDevice::deviceConnected, this, &MainWindow::onDeviceConnected, Qt::QueuedConnection);
+            m_deviceThread->start();
+        } else {
+            connect(m_activeDeviceObject, &AbstractPMDevice::deviceConnected, this, &MainWindow::onDeviceConnected);
+        }
+        connect(m_activeDeviceObject, &AbstractPMDevice::deviceDisconnected, this, &MainWindow::onDeviceDisconnected, Qt::QueuedConnection);
+        connect(m_activeDeviceObject, &AbstractPMDevice::deviceError, this, &MainWindow::onDeviceError, Qt::QueuedConnection);
+        connect(m_activeDeviceObject, &AbstractPMDevice::measurementReady, this, &MainWindow::onNewDeviceMeasurement, Qt::QueuedConnection);
+        connect(m_activeDeviceObject, &AbstractPMDevice::newLogMessage, this, &MainWindow::onNewDeviceLogMessage, Qt::QueuedConnection);
 
         if (m_activeDeviceObject->properties().hasInternalAttenuator) {
             const auto& props = m_activeDeviceObject->properties();
@@ -371,39 +411,58 @@ void MainWindow::updateUiForDevice(const PMDeviceProperties &props)
 void MainWindow::on_set_pushButton_clicked()
 {
     qDebug()<<"on_set_pushButton_clicked";
-    if (!m_activeDeviceObject || !isConnected()) {
-        qDebug() << "Set button clicked, but device not connected or doesn't exist.";
+    if (!m_activeDeviceObject) {
+        qDebug() << "Set button clicked, but device object does not exist.";
+        return;
+    }
+    if (!isConnected()) {
+        qDebug() << "Set button clicked, but device not connected.";
         return;
     }
 
     // Set all the properties on the abstract device object.
     // Each device class now handles sending the command immediately within the setter.
     quint64 freqHz = static_cast<quint64>(ui->frequency_spinBox->value()) * 1000000;
-    m_activeDeviceObject->setFrequency(freqHz);
-
+    double offsetDb = 0;
     if (m_activeDeviceObject->properties().hasOffset) {
-        double offsetDb = ui->offset_doubleSpinBox->value();
+        offsetDb = ui->offset_doubleSpinBox->value();
         if (ui->correctionminus_radioButton->isChecked()) {
             offsetDb = -offsetDb;
         }
-        m_activeDeviceObject->setOffset(offsetDb);
     }
-
+    double att = 0;
     if (m_activeDeviceObject->properties().hasInternalAttenuator) {
-        m_activeDeviceObject->setInternalAttenuation(ui->internalAtt_spinBox->value());
+        att = ui->internalAtt_spinBox->value();
     }
 
-    // Manually trigger frequency update for other components
+    if (m_useThreading) {
+        QMetaObject::invokeMethod(m_activeDeviceObject, "setFrequency", Q_ARG(quint64, freqHz));
+        if (m_activeDeviceObject->properties().hasOffset) {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "setOffset", Q_ARG(double, offsetDb));
+        }
+        if (m_activeDeviceObject->properties().hasInternalAttenuator) {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "setInternalAttenuation", Q_ARG(double, att));
+        }
+    } else {
+        m_activeDeviceObject->setFrequency(freqHz);
+        if (m_activeDeviceObject->properties().hasOffset) {
+            m_activeDeviceObject->setOffset(offsetDb);
+        }
+        if (m_activeDeviceObject->properties().hasInternalAttenuator) {
+            m_activeDeviceObject->setInternalAttenuation(att);
+        }
+    }
+
+    // Manually trigger frequency update for other components on the UI thread
     onCurrentFrequencyChanged(ui->frequency_spinBox->value());
 }
 
 
 /* slot to call range changing */
-void MainWindow::on_range_spinBox_valueChanged(int range)
+void MainWindow::onrange_doubleSpinBox_valueChanged(double range)
 {
-    qDebug()<<"on_range_spinBox_valueChanged";
-    //convert to minutes
-    charts->setAllRanges(range * 60);
+    qDebug()<<"on_range_doubleSpinBox_valueChanged";
+    charts->setAllRanges(range*60);
 }
 
 int MainWindow::on_saveCharts_toolButton_clicked()
@@ -444,12 +503,13 @@ void MainWindow::ondevice_comboBox_currentIndexChanged()
 
 void MainWindow::onNewDeviceLogMessage(const QString &message)
 {
-    ui->data_plainTextEdit->appendPlainText(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz") + " [DEVICE] " + message);
+    ui->data_plainTextEdit->appendPlainText(message);
 }
 
-void MainWindow::onNewDeviceMeasurement(double dbm, double vpp_raw)
+void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw)
 {
-    QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
+    //QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
+    QString curdate = timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz");
     ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+ QString(" $%1dBm%2mVpp$").arg(dbm).arg(vpp_raw));
 
     double milliwatts = 0;
@@ -564,7 +624,12 @@ void MainWindow::on_connect_pushButton_clicked()
 
     if(!currentDevice().isEmpty())
     {
-        m_activeDeviceObject->connectDevice(currentDevice());
+        if (m_useThreading)
+        {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "connectDevice", Q_ARG(QString, currentDevice()));
+        } else {
+            m_activeDeviceObject->connectDevice(currentDevice());
+        }
     }
 }
 
@@ -572,7 +637,12 @@ void MainWindow::on_disconnect_pushButton_clicked()
 {
     qDebug()<<"on_disconnect_pushButton_clicked";
     if (m_activeDeviceObject) {
-        m_activeDeviceObject->disconnectDevice();
+        if (m_useThreading) {
+            // Use invokeMethod to call the slot in the object's thread
+            QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
+        } else {
+            m_activeDeviceObject->disconnectDevice();
+        }
     }
 }
 
@@ -744,8 +814,7 @@ void MainWindow::on_simulatorTimer()
 
     double simmvppValue = UnitConverter::milliwattsToVpp(UnitConverter::dBmToMilliwatts(simdbmvalue));
 
-    onNewDeviceMeasurement(simdbmvalue, simmvppValue);
-
+    onNewDeviceMeasurement(QDateTime::currentDateTime(), simdbmvalue, simmvppValue);
 }
 
 
@@ -958,4 +1027,17 @@ void MainWindow::on_actionCableLossCalculator_triggered()
     CableLossCalculatorWindow *cableWindow = new CableLossCalculatorWindow(this);
     cableWindow->setAttribute(Qt::WA_DeleteOnClose);
     cableWindow->show();
+}
+
+void MainWindow::on_deviceInfo_toolButton_clicked()
+{
+    if (!m_activeDeviceObject) {
+        QMessageBox::warning(this, tr("No Device Selected"), tr("Please select a device type first."));
+        return;
+    }
+
+    // MainWindow's only job is to get the properties and pass them to the dialog.
+    const PMDeviceProperties &props = m_activeDeviceObject->properties();
+    HelpDialog *dialog = new HelpDialog(props, this);
+    dialog->show();
 }
