@@ -26,6 +26,7 @@
 #include "qtcoaxcablelosscalcmanager.h"
 #include "cablelosscalculatorwindow.h"
 #include <QThread>
+#include "helpdialog.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -187,6 +188,7 @@ protected:
 
 private slots:
     void ondevice_comboBox_currentIndexChanged();
+    void on_deviceInfo_toolButton_clicked();
     void on_connect_pushButton_clicked();
     void on_disconnect_pushButton_clicked();
     void on_resetMax_toolButton_clicked();

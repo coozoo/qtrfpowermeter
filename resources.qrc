@@ -3,6 +3,7 @@
         <file>images/view-refresh.svg</file>
         <file>images/document-save.svg</file>
         <file>images/process-stop.svg</file>
+        <file>images/info.svg</file>
         <file>images/sine-graphdBm.svg</file>
         <file>images/digiattcontrol.svg</file>
         <file>images/AttenuatorRF.svg</file>
@@ -12,5 +13,7 @@
         <file>images/devices/rf_pm_v7_10.png</file>
         <file>chart_rules.json</file>
         <file>cables.json</file>
+        <file>help/device_help_template.html</file>
+        <file>help/img/rf8000brokenchar.png</file>
     </qresource>
 </RCC>

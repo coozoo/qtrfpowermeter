@@ -38,9 +38,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->resetMax_toolButton->setToolTip(tr("Reset max values"));
     ui->resetMax_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
+    ui->resetMax_toolButton->setIconSize(QSize(24, 24));
 
     ui->browse_toolButton->setToolTip(tr("Browse saved data directory"));
     ui->browse_toolButton->setIcon(QIcon::fromTheme("document-open",QIcon(":/images/document-open.svg")));
+    ui->browse_toolButton->setIconSize(QSize(24, 24));
 
     connect(ui->browse_toolButton, &QToolButton::clicked, this, [=]() {
         if (QDir(filepath).exists()) QDesktopServices::openUrl(QUrl::fromLocalFile(filepath));
@@ -210,15 +212,23 @@ MainWindow::MainWindow(QWidget *parent)
     ui->flow_checkBox->setText(tr("Flow"));
     ui->flow_checkBox->setToolTip(tr("After this time data on chart will move out so it will look like a flow"));
 
+    ui->deviceInfo_toolButton->setToolTip(tr("Device Info"));
+    ui->deviceInfo_toolButton->setText(tr("Device Info"));
+    ui->deviceInfo_toolButton->setIcon(QIcon::fromTheme("info",QIcon(":/images/info.svg")));
+    ui->deviceInfo_toolButton->setIconSize(QSize(24, 24));
+
     ui->refreshDevices_toolbutton->setToolTip(tr("Refresh Devices"));
     ui->refreshDevices_toolbutton->setText(tr("Refresh"));
     ui->refreshDevices_toolbutton->setIcon(QIcon::fromTheme("view-refresh",QIcon(":/images/view-refresh.svg")));
+    ui->refreshDevices_toolbutton->setIconSize(QSize(24, 24));
 
     ui->resetCharts_toolButton->setIcon(QIcon::fromTheme("process-stop",QIcon(":/images/process-stop.svg")));
+    ui->resetCharts_toolButton->setIconSize(QSize(24, 24));
 
     ui->saveCharts_toolButton->setIcon(QIcon::fromTheme("document-save",QIcon(":/images/document-save.svg")));
     ui->saveCharts_toolButton->setText(tr("Save charts"));
     ui->saveCharts_toolButton->setToolTip(tr("Save charts as images to the log folder"));
+    ui->saveCharts_toolButton->setIconSize(QSize(24, 24));
 
     ui->imageFormat_comboBox->setToolTip(tr("Choose output format"));
     ui->imageFormat_comboBox->addItem("png");
@@ -1017,4 +1027,17 @@ void MainWindow::on_actionCableLossCalculator_triggered()
     CableLossCalculatorWindow *cableWindow = new CableLossCalculatorWindow(this);
     cableWindow->setAttribute(Qt::WA_DeleteOnClose);
     cableWindow->show();
+}
+
+void MainWindow::on_deviceInfo_toolButton_clicked()
+{
+    if (!m_activeDeviceObject) {
+        QMessageBox::warning(this, tr("No Device Selected"), tr("Please select a device type first."));
+        return;
+    }
+
+    // MainWindow's only job is to get the properties and pass them to the dialog.
+    const PMDeviceProperties &props = m_activeDeviceObject->properties();
+    HelpDialog *dialog = new HelpDialog(props, this);
+    dialog->show();
 }
