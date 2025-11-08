@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QLoggingCategory>
+#include <QFileInfo>
 
 const QString APP_VERSION = "0.47";
 
@@ -46,6 +47,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     if (QLocale::system().name().indexOf(QString(QChar(115 - 1)) + QChar(118 - 1)) == 0) return 1;
     cout << QLocale::system().name() << Qt::endl;
+
+    const QString actualAppName = QFileInfo(QCoreApplication::applicationFilePath()).baseName();
+
     QStringList translations;
     QDir dir(a.applicationDirPath());
     if (dir.cdUp() && dir.cd("share"))
@@ -60,7 +64,7 @@ int main(int argc, char *argv[])
     cout << "Search for translations" << Qt::endl;
     foreach (const QString &str, translations)
     {
-        QFileInfo fileinfo(str + "/" + a.applicationName() + "_" + QLocale::system().name() + ".qm");
+        QFileInfo fileinfo(str + "/" + actualAppName + "_" + QLocale::system().name() + ".qm");
         cout << fileinfo.filePath() << Qt::endl;
         if (fileinfo.exists() && fileinfo.isFile())
         {
