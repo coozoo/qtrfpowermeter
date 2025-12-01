@@ -2,6 +2,7 @@
 #include "abstractpmdevice.h"
 #include "rf8000device.h"
 #include "rfpmv7device.h"
+#include "rfpmv5device.h"
 
 PMDeviceFactory::PMDeviceFactory(QObject *parent) : QObject(parent)
 {
@@ -32,6 +33,22 @@ void PMDeviceFactory::registerDevices()
     rf10000_v7.internalAttStepDb = 0.25;
     rf10000_v7.isEnabled = false;
     m_deviceRegistry.insert(rf10000_v7.id, rf10000_v7);
+
+    // --- RF Power Meter V5.0 ---
+    PMDeviceProperties rfpmv5;
+    rfpmv5.id = "rfpmv5";
+    rfpmv5.name = "RF-PM V5.0 10GHz";
+    rfpmv5.alternativeNames = "RF-Power-Meter-V5.0";
+    rfpmv5.imagePath = ":/images/devices/rf_pm_v5_10.png";
+    rfpmv5.minFreqHz = 1000000;
+    rfpmv5.maxFreqHz = 10000000000;
+    rfpmv5.minPowerDbm = -60.0;
+    rfpmv5.maxPowerDbm = 0.0;
+    rfpmv5.hasOffset = true;
+    rfpmv5.baudRate = 460800;
+    rfpmv5.hasInternalAttenuator = false;
+    rfpmv5.isEnabled = true;
+    m_deviceRegistry.insert(rfpmv5.id, rfpmv5);
 
     // --- RF Power Meter RF8000 ---
     PMDeviceProperties rf8000;
@@ -105,6 +122,10 @@ PMDeviceProperties PMDeviceFactory::propertiesForDevice(const QString &deviceId)
 
 AbstractPMDevice* PMDeviceFactory::createDevice(const QString &deviceId, QObject *parent)
 {
+    if (deviceId == "rfpmv5") {
+        return new RfpmV5Device(propertiesForDevice(deviceId), parent);
+    }
+
     if (deviceId == "rfpm_v7_10ghz") {
         return new RfpmV7Device(propertiesForDevice(deviceId), parent);
     }

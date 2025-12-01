@@ -42,6 +42,7 @@ SOURCES += \
     src/qtcoaxcablelosscalcmanager.cpp \
     src/qtdigitalattenuator.cpp \
     src/rf8000device.cpp \
+    src/rfpmv5device.cpp \
     src/rfpmv7device.cpp \
     src/serialportinterface.cpp \
     src/targetpowercalculator.cpp \
@@ -72,6 +73,7 @@ HEADERS += \
     src/qtcoaxcablelosscalcmanager.h \
     src/qtdigitalattenuator.h \
     src/rf8000device.h \
+    src/rfpmv5device.h \
     src/rfpmv7device.h \
     src/serialportinterface.h \
     src/targetpowercalculator.h \

@@ -660,8 +660,12 @@ void MainWindow::updateDeviceList()
     int newIndexToSelect = -1;
     for (const QSerialPortInfo &info : infos)
     {
+        if (info.isNull() || !info.hasVendorIdentifier())
+            continue;
+
         // Keep filtering for the specific USB-Serial chip if desired
-        if (info.isNull() || !info.hasVendorIdentifier() || QString::number(info.vendorIdentifier(),16) != "1a86")
+        QString vid = QString::number(info.vendorIdentifier(), 16).toLower();
+        if (vid != "1a86" && vid != "483")
             continue;
 
         qDebug()<<info.hasVendorIdentifier() <<QString::number(info.vendorIdentifier());
