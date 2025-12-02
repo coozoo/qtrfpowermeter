@@ -9,6 +9,7 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QDebug>
+#include <QStringList>
 
 HelpDialog::HelpDialog(const PMDeviceProperties &props, QWidget *parent)
     : QDialog(parent), m_properties(props)
@@ -91,7 +92,14 @@ QString HelpDialog::getDeviceSpecificInfo(const QString &deviceId)
                   "<p>The V7 device uses a complex command set, including commands to start and stop data streams.</p>"
                   "<p><b>Example Command:</b> <code>IC000+W+00.0+00.00+1000</code></p>");
     }
-    return tr("<h2>Additional Information</h2><p>TBD.</p>");
+    if (deviceId == "rfpmv5") {
+        return tr("<h2>Device Description</h2>"
+                  "<p>Device similar to the rf8000 but with a more stable and reliable protocol. It can send up to 3000 updates per second, so the application uses an averaging algorithm to prevent UI overload.</p>"
+                  "<h2>Additional Information</h2>"
+                  "<p>The device uses a modified text-based protocol for communication.</p>"
+                  "<p><b>Command Format:</b> <code>AFFFFS00.00</code> where A is a literal character, FFFF is the frequency in MHz, S is the sign character (+ or -), and 00.00 is the offset in dB.</p>");
+    }
+    return tr("<h2>Additional Information</h2><p>No device-specific information available.</p>");
 }
 
 QString HelpDialog::buildHelpHtml()
@@ -113,6 +121,7 @@ QString HelpDialog::buildHelpHtml()
     html.replace("%POWER_RANGE_TITLE%", tr("Power Range"));
     html.replace("%BAUD_RATE_TITLE%", tr("Baud Rate"));
     html.replace("%INTERNAL_ATT_TITLE%", tr("Internal Attenuator"));
+    html.replace("%VID_PID_TITLE%", tr("VID:PID"));
 
     // Dynamic Values
     html.replace("%DEVICE_NAME%", m_properties.name);
@@ -121,6 +130,14 @@ QString HelpDialog::buildHelpHtml()
     html.replace("%POWER_RANGE_VALUE%", tr("%1 dBm to %2 dBm").arg(m_properties.minPowerDbm).arg(m_properties.maxPowerDbm));
     html.replace("%BAUD_RATE_VALUE%", QString::number(m_properties.baudRate));
     html.replace("%INTERNAL_ATT_VALUE%", m_properties.hasInternalAttenuator ? tr("Yes") : tr("No"));
+
+    // Format VID:PID pairs
+    QStringList vidPidList;
+    for (const auto &pair : m_properties.supportedVidPids) {
+        vidPidList << QString("0x%1:0x%2").arg(pair.first, 4, 16, QChar('0')).arg(pair.second, 4, 16, QChar('0'));
+    }
+    html.replace("%VID_PID_VALUE%", vidPidList.join(", "));
+
 
     // Image Path placeholder
     html.replace("%DEVICE_IMAGE_PATH%", m_properties.imagePath);

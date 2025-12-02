@@ -41,14 +41,14 @@ void PMDeviceFactory::registerDevices()
     rfpmv5.alternativeNames = "RF-Power-Meter-V5.0";
     rfpmv5.imagePath = ":/images/devices/rf_pm_v5.png";
     rfpmv5.minFreqHz = 1000000;
-    rfpmv5.maxFreqHz = 10000000000;
+    rfpmv5.maxFreqHz = 9999000000; // the same case here max 10000 MHz - 9999 is the highest value
     rfpmv5.minPowerDbm = -60.0;
     rfpmv5.maxPowerDbm = 0.0;
     rfpmv5.hasOffset = true;
     rfpmv5.baudRate = 460800;
     rfpmv5.hasInternalAttenuator = false;
     rfpmv5.isEnabled = true;
-    rfpmv5.supportedVidPids.append({0x0483, 0x5740}); 
+    rfpmv5.supportedVidPids.append({0x0483, 0x5740});
     m_deviceRegistry.insert(rfpmv5.id, rfpmv5);
 
     // --- RF Power Meter RF8000 ---
@@ -65,7 +65,7 @@ void PMDeviceFactory::registerDevices()
     rf8000.baudRate = 9600;
     rf8000.hasInternalAttenuator = false;
     rf8000.isEnabled = true;
-    rf8000.supportedVidPids.append({0x1a86, 0x7523}); 
+    rf8000.supportedVidPids.append({0x1a86, 0x7523});
     m_deviceRegistry.insert(rf8000.id, rf8000);
 
     // --- RF Power Meter RF3000 ---

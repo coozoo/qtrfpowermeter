@@ -32,8 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
     // old direct serial port handling
     // serialPortPowerMeter= new SerialPortInterface();
 
-    updateDeviceList();
-    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
     connect(this, &MainWindow::isConnectedChanged, this, &MainWindow::onIsConnectedChanged);
 
     ui->resetMax_toolButton->setToolTip(tr("Reset max values"));
@@ -262,7 +260,8 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
     toolsMenu->addAction(cableLossCalcAction);
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
-
+    updateDeviceList();
+    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
 }
 
 MainWindow::~MainWindow()
@@ -494,10 +493,46 @@ int MainWindow::on_saveCharts_toolButton_clicked()
 
 }
 
+void MainWindow::performSmartSelection()
+{
+    int currentPortIndex = ui->device_comboBox->currentIndex();
+    if (currentPortIndex < 0) return;
+
+    bool vidOk, pidOk;
+    quint16 vid = ui->device_comboBox->itemData(currentPortIndex, VendorIDRole).toString().toUShort(&vidOk, 16);
+    quint16 pid = ui->device_comboBox->itemData(currentPortIndex, ProductIDRole).toString().toUShort(&pidOk, 16);
+
+    if (!vidOk || !pidOk) {
+        qDebug() << "Could not get valid VID/PID for selected port.";
+        return;
+    }
+
+    qDebug() << "Smart-selecting for VID:" << QString::number(vid, 16) << "PID:" << QString::number(pid, 16);
+
+    for (int i = 0; i < ui->deviceType_comboBox->count(); ++i) {
+        QString deviceId = ui->deviceType_comboBox->itemData(i).toString();
+        PMDeviceProperties props = m_deviceFactory->propertiesForDevice(deviceId);
+
+        for (const auto &vidPidPair : props.supportedVidPids) {
+            if (vidPidPair.first == vid && vidPidPair.second == pid) {
+                if (ui->deviceType_comboBox->currentIndex() != i) {
+                    qDebug() << "Match found! Setting device type to" << props.name;
+                    // The onDeviceSelector_currentIndexChanged handles creating the device
+                    // and updating the UI. We just trigger it.
+                    ui->deviceType_comboBox->setCurrentIndex(i);
+                }
+                return; // Found a match, stop searching
+            }
+        }
+    }
+}
+
 
 void MainWindow::ondevice_comboBox_currentIndexChanged()
 {
     qDebug()<<"ondevice_comboBox_currentIndexChanged";
+    if (isConnected()) return;
+    performSmartSelection();
     onIsConnectedChanged(isConnected());
 }
 
@@ -679,9 +714,7 @@ void MainWindow::updateDeviceList()
             tempPort.close();
         }
         QString busyText = isBusy ? tr(" [Busy]") : "";
-        QString s = tr("Port") + ": " + info.portName() +
-                    " (" + info.systemLocation() +
-                    ") " + info.description() +
+        QString s = info.portName() +
                     " " + info.manufacturer() +
                     " " + info.serialNumber() +
                     " (" + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +

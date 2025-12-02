@@ -144,6 +144,7 @@ void RfpmV5Device::onSampleTimerTimeout()
             emit newLogMessage(QString("%1 %2")
                                    .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
                                    .arg(m_lastRawPacket));
+
             m_lastRawPacket.clear();
         }
 
