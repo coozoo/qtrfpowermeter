@@ -14,6 +14,8 @@ public:
     Q_INVOKABLE void disconnectDevice() override;
     void processData(const QString &data) override;
 
+    Q_INVOKABLE void readSettings();
+
 protected slots:
     void sendBufferedCommand() override;
     void onSampleTimerTimeout();
@@ -23,6 +25,8 @@ private:
     double m_accumulatedDbm;
     int m_sampleCount;
     int m_timerIntervalMs;
+    int m_skipCounter;
+    QString m_lastRawPacket;
 };
 
 #endif // RFPMV5DEVICE_H

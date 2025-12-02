@@ -510,7 +510,7 @@ void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double 
 {
     //QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
     QString curdate = timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz");
-    ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+ QString(" $%1dBm%2mVpp$").arg(dbm).arg(vpp_raw));
+    //ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+ QString(" $%1dBm%2mVpp$").arg(dbm).arg(vpp_raw));
 
     double milliwatts = 0;
 
@@ -663,11 +663,10 @@ void MainWindow::updateDeviceList()
         if (info.isNull() || !info.hasVendorIdentifier())
             continue;
 
-        // Keep filtering for the specific USB-Serial chip if desired
         QString vid = QString::number(info.vendorIdentifier(), 16).toLower();
         if (vid != "1a86" && vid != "483")
             continue;
-
+        
         qDebug()<<info.hasVendorIdentifier() <<QString::number(info.vendorIdentifier());
         bool isBusy = false;
         QSerialPort tempPort(info);
