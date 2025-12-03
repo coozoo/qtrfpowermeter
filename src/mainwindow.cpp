@@ -420,7 +420,7 @@ void MainWindow::on_set_pushButton_clicked()
     }
 
     // Set all the properties on the abstract device object.
-    // Each device class now handles sending the command immediately within the setter.
+    // Each device class handles sending the command immediately within the setter.
     quint64 freqHz = static_cast<quint64>(ui->frequency_spinBox->value()) * 1000000;
     double offsetDb = 0;
     if (m_activeDeviceObject->properties().hasOffset) {
@@ -521,7 +521,7 @@ void MainWindow::performSmartSelection()
                     // and updating the UI. We just trigger it.
                     ui->deviceType_comboBox->setCurrentIndex(i);
                 }
-                return; // Found a match, stop searching
+                return;
             }
         }
     }
@@ -532,6 +532,12 @@ void MainWindow::ondevice_comboBox_currentIndexChanged()
 {
     qDebug()<<"ondevice_comboBox_currentIndexChanged";
     if (isConnected()) return;
+    int currentPortIndex = ui->device_comboBox->currentIndex();
+    if (currentPortIndex >= 0)
+    {
+        ui->device_comboBox->setToolTip(ui->device_comboBox->itemData(currentPortIndex,DescriptionRole).toString()+ " " +
+                                        ui->device_comboBox->itemData(currentPortIndex,ManufacturerRole).toString());
+    }
     performSmartSelection();
     onIsConnectedChanged(isConnected());
 }
@@ -716,6 +722,7 @@ void MainWindow::updateDeviceList()
         QString busyText = isBusy ? tr(" [Busy]") : "";
         QString s = info.portName() +
                     " " + info.manufacturer() +
+                    " " + (info.description().length()>13 ? info.description().left(10)+"...":info.description()) +
                     " " + info.serialNumber() +
                     " (" + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
                     ":" + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+
