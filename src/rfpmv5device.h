@@ -26,12 +26,14 @@ private slots:
     void onSerialPortError(const QString &error);
     void sendBufferedCommand();
     void onSampleTimerTimeout();
+    void onIdentificationTimeout();
 
 private:
     SerialPortInterface *m_serialPort;
     QTimer *m_commandTimer;
     QTimer *m_sampleTimer;
     QTimer *m_readbackTimer;
+    QTimer *m_identificationTimer;
 
     QString m_buffer;
     
@@ -45,6 +47,7 @@ private:
     // Device state
     quint64 m_currentFrequencyHz;
     double m_currentOffsetDb;
+    bool m_isIdentified = false;
 };
 
 #endif // RFPMV5DEVICE_H

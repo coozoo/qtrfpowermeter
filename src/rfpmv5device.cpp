@@ -31,6 +31,11 @@ RfpmV5Device::RfpmV5Device(const PMDeviceProperties &props, QObject *parent)
     m_readbackTimer->setSingleShot(true);
     m_readbackTimer->setInterval(3000);
     connect(m_readbackTimer, &QTimer::timeout, this, &RfpmV5Device::readSettings);
+
+    m_identificationTimer = new QTimer(this);
+    m_identificationTimer->setSingleShot(true);
+    m_identificationTimer->setInterval(m_readbackTimer->interval() + 5000);
+    connect(m_identificationTimer, &QTimer::timeout, this, &RfpmV5Device::onIdentificationTimeout);
 }
 
 RfpmV5Device::~RfpmV5Device()
@@ -49,11 +54,13 @@ void RfpmV5Device::connectDevice(const QString &portName)
         m_skipCounter = 0;
         m_lastRawPacket.clear();
         m_buffer.clear();
+        m_isIdentified = false;
 
         m_sampleTimer->start(m_timerIntervalMs);
 
         setSampleRate(1);
         m_readbackTimer->start();
+        m_identificationTimer->start();
     }
 }
 
@@ -62,6 +69,7 @@ void RfpmV5Device::disconnectDevice()
     m_commandTimer->stop();
     m_sampleTimer->stop();
     m_readbackTimer->stop();
+    m_identificationTimer->stop();
     m_serialPort->stopPort();
 }
 
@@ -138,6 +146,11 @@ void RfpmV5Device::processData(const QString &data)
         QRegularExpressionMatch configMatch = configReg.match(m_buffer);
 
         if (configMatch.hasMatch()) {
+            if (!m_isIdentified) {
+                m_isIdentified = true;
+                m_identificationTimer->stop();
+                emit newLogMessage("[DEVICE] RF-PM V5 device identified successfully.");
+            }
             emit newLogMessage(QString("%1 [DEVICE] Config Read: %2")
                                    .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
                                    .arg(configMatch.captured(0)));
@@ -197,4 +210,10 @@ void RfpmV5Device::onSerialPortError(const QString &error)
     emit deviceError(error);
 }
 
-
+void RfpmV5Device::onIdentificationTimeout()
+{
+    if (!m_isIdentified) {
+        emit deviceError(tr("Device did not respond or is not a compatible RF-PM V5 device."));
+        disconnectDevice();
+    }
+}
