@@ -1,0 +1,507 @@
+qtrfpowermeter (0.48-202512050038) Forty; urgency=low
+
+  * Final touches for v5 (0de413e)
+    related to identification of device
+  *  (6105b2c)
+    reimplemented device v5
+    without inheritance as it's a lot of changes yes a bit duplicated code
+    but it's easier in such way
+  *  (d22158e)
+    Final stage of adding new device
+    rf power meter v5
+  *  (166a2cb)
+    Almost final add rfpmv5
+    just few touches left
+  *  (da219bb)
+    Add rf pm v5
+    not ready but supported
+  *  (e9595a0)
+    Merge pull request #38 from coozoo/threadschart
+    Threadschart
+  *  (87b2898)
+    attept to fix translations load in appimage
+  *  (80b394f)
+    Translations update
+  *  (147a747)
+    HelpDialog implementation
+    Add help info button
+    to show window with help with device parameters and how to use it if
+    there is problems
+  *  (8b80858)
+    attempt to fix appimage svg
+    just wild guess related to packaging
+  *  (c02d966)
+    Small fixes and improove
+    small ui fixes
+    and allow select less than 1 min range
+  *  (d326690)
+    Fixes improvements
+    Fix for threaded crash
+    Add failsafe for set button
+    Improve data range scale
+  *  (987699b)
+    Merge pull request #37 from coozoo/threadschart
+    Threadschart
+  *  (5783d7b)
+    damn key
+  *  (afe39e3)
+    make chart smooth
+    accept date time from outside
+    generate date time inside device class instead of UI
+    fixes #36
+  *  (a4c5371)
+    Thread
+    require testing
+  *  (f9102b0)
+    Update README.md
+    [skip ci]
+  *  (28bf6fb)
+    Update changelog
+    [skip ci]
+  *  (7b8d8b0)
+    Merge pull request #34 from coozoo/multitriggerfix
+    Multitriggerfix
+  *  (8c9fb66)
+    Fix multi command send
+    Basically device so fragile if you don't send command it can reposrt
+    broken data, if you send multiple times it can hang.
+    So it is fix to send set command only once by making delay.
+    fixes #33
+  *  (e436136)
+    Merge pull request #32 from coozoo/slave
+    Slave
+  *  (8ab5a7e)
+    Merge pull request #31 from coozoo/calcrashfix
+    Calcrashfix
+  *  (d0569d0)
+    version bump
+  *  (ff498cc)
+    Fix calibration crash
+    Limit spline usage if less than 3 dots
+    fixes #30
+  *  (d2beec0)
+    Merge pull request #29 from coozoo/slave
+    Slave
+  *  (5afdb44)
+    Merge pull request #28 from coozoo/cableloss
+    cable loss calculator
+  *  (9528428)
+    cable loss calculator
+    Integrate cable loss calculator
+    add it to attenuation
+  *  (3f64d1a)
+    Merge pull request #27 from coozoo/pmdevicerefactor
+    Huge refactor to separate device
+  *  (aa7cced)
+    rollback
+  *  (4602bde)
+    try
+  *  (b75710b)
+    try again
+  *  (b51f2e0)
+    try to fix backticks
+  *  (1114802)
+    Huge refactor to separate device
+    Now powermeter is not emeded into mainwindow
+    It's possible to add another powermeter with different protocol
+  *  (3b3e9ac)
+    Merge pull request #26 from coozoo/calibration
+    Calibration
+  *  (30f0f9a)
+    fix high values with offset
+  *  (3bfd3fe)
+    Use spline
+    chane to spline inter extrapolation
+  *  (40de209)
+    rearrange
+    due to growing number of classes and so files rearraned project into
+    folder in order to looks better on github start page
+  *  (eb20897)
+    Merge pull request #24 from coozoo/slave
+    CalibrationManager improve
+  *  (f1bde83)
+    Merge pull request #25 from coozoo/calibration
+    Calibration translationss
+  *  (3ca229d)
+    transslations
+  *  (363045e)
+    Merge pull request #23 from coozoo/calibration
+    Calibration improvements
+  *  (67d2531)
+    improve chart interactions
+  *  (41dc270)
+    improove profiles selection
+    remove editline
+    use combobox value to set names
+    set buttons states
+  *  (be96771)
+    Tabify docks
+    Just or space save
+  *  (6d68ba7)
+    Fix desktop name
+  *  (bd0e14c)
+    Signals rearrange
+    Basic renaming to prevent default connection
+  *  (4a32737)
+    Merge pull request #22 from coozoo/slave
+    Slave
+  *  (c17d497)
+    Merge pull request #21 from coozoo/calibration
+    Calibration
+  *  (b6352da)
+    version
+  *  (9c595bd)
+    Refinements in calibration
+    like combobox limits issualization etc
+  *  (66d67c7)
+    Some calibration
+    Bassically some base functions to perform calibrationmanager.cpp
+  *  (440d2f4)
+    Support hardware buttons
+    Now on change attenuation with hardware buttons program will update
+    value accordingly
+  *  (7f1a9e9)
+    Error handling
+    disconnect and error handling for digital attenuator
+  *  (db81f1e)
+    Merge pull request #19 from coozoo/slave
+    Add system locale check before application start
+  *  (c13e9cf)
+    Add system locale check before application start
+  *  (a63f5be)
+    Merge pull request #18 from coozoo/slave
+    Slave
+  *  (7625697)
+    Update README.md
+    [skip ci]
+  *  (f406d48)
+    Merge pull request #17 from coozoo/attwidget
+    Attwidget
+  *  (bac673e)
+    version update
+  *  (2cc515b)
+    Attenuaion support
+    - Fixed/Digital attenuator support
+    - Attenuation calculator
+    - lot of fixes
+    fixes #6 #5 #16
+  *  (ae28654)
+    fix loop on error
+    when disconnect deice there was loop on error
+  *  (70cdb90)
+    Merge pull request #15 from coozoo/slave
+    Slave
+  *  (e3adf75)
+    Fix artifact name in workflow for code coverage
+  *  (d8165b6)
+    Merge pull request #14 from coozoo/chartmarker
+    Chartmarker
+  *  (df4862b)
+    version increase
+  *  (e3dc759)
+    Small updates and merges
+  *  (1967998)
+    Implement tracer
+    add some highlight forr data points
+    fixes #13
+  *  (da35c31)
+    Update README.md
+    [skip ci]
+  *  (9c04363)
+    deb deps runtime
+  *  (b641925)
+    deb deps more
+  *  (5d29f27)
+    fix relative path
+  *  (d39fde7)
+    try another action
+  *  (0172d19)
+    try another action
+  *  (73077c6)
+    try another action
+  *  (d292b7c)
+    try another action
+  *  (bb65888)
+    try another action
+  *  (a050f21)
+    add deb ver uniueness
+  *  (6d6e84d)
+    add deb deps
+  *  (2f60215)
+    crapbuntu666
+    fuck even their errors why package rejected claiming incorrect errors and you should google that it's not changelog it's maintainer field
+  *  (4635eea)
+    crapbuntu999
+  *  (c38000d)
+    crapuntu3
+  *  (b884d99)
+    crapbbuntu2
+    fuck again
+  *  (1898d7e)
+    crapbuntu
+    their dumb package system the answer why I wll never use it in home and avoid for servers
+  *  (70f19f6)
+    dumbuntu3
+  *  (f6e1bee)
+    dumbuntu2
+  *  (12fba17)
+    dumbuntu
+    yes this commit describes this system with package system
+  *  (75cc2c7)
+    annoying ubuntu
+    I'm close to enough of this ubuntu key shit quest
+  *  (73957c2)
+    trying launchpad
+    attempt to add launchpad
+  *  (17dd218)
+    Fedora desktop
+    nothing can be flawless
+    [skip ci]
+  *  (c0e6a5f)
+    maggeia desktop install
+    [skip ci]
+  *  (4c7a490)
+    mageia install build
+    [skip ci]
+  *  (bb9dd68)
+    mageia should be good now
+    [skip ci]
+  *  (0e6be80)
+    mageia again
+    [skip ci]
+  *  (ad861ec)
+    mageia
+    [skip ci]
+  *  (bbd4f6a)
+    mageiafix
+    [skip ci]
+  *  (c669ab9)
+    fix more build system
+  *  (54ca909)
+    atempt to deb ver update
+  *  (03c4aa0)
+    Bump Qt6 ready version
+    Migrated to qt6
+  *  (6a52457)
+    Update qtrfpowermeter.spec
+    [skip ci]
+  *  (909419d)
+    Update qtrfpowermeter.spec
+    [skip ci]
+  *  (3287e61)
+    Update qtrfpowermeter.spec
+    [skip ci]
+  *  (9a8b96c)
+    Update qtrfpowermeter.spec
+    [skip ci]
+  *  (d53d07d)
+    Update qtrfpowermeter.spec
+  *  (a5f6898)
+    Update qtrfpowermeter.spec
+    update spec for qt6
+    
+    skip ci
+  *  (f63f951)
+    Update main.yml
+  *  (ae323e2)
+    Update main.yml
+    damn libfuse is not default
+  *  (d3cf5f1)
+    Update main.yml
+    qt6 maybe
+  *  (7eb89c5)
+    update this deb...
+  *  (54b8be0)
+    one more
+  *  (0e9cab2)
+    some test
+  *  (b4d34db)
+    fix  deb deps
+    add some more packs
+  *  (34ee5a8)
+    Some qt6 fixes
+    - win build fix
+    - debbuild fix
+  *  (064f160)
+    Update build system for qt6
+    - windows linux
+    - macos
+  *  (c2ab15b)
+    update autobuild with skip
+    skip ci
+  *  (6332b7d)
+    Update code to use qt6
+    - update qcustomplot
+    - update deprecated features
+  *  (b877777)
+    Update main.yml
+  *  (a982a42)
+    Update main.yml
+  *  (136c364)
+    Update main.yml
+  *  (ff7d80b)
+    Update main.yml
+  *  (783ebfe)
+    Update main.yml
+  *  (473ca64)
+    Update main.yml
+  *  (c35114a)
+    Update main.yml
+  *  (06c513c)
+    Update main.yml
+  *  (e502490)
+    Update main.yml
+  *  (0e74098)
+    Update main.yml
+  *  (76659d6)
+    Update main.yml
+  *  (64f0ac0)
+    Update main.yml
+  *  (cc25709)
+    Update main.yml
+  *  (1f8bbfb)
+    Update main.yml
+  *  (1c0a0ea)
+    Update main.yml
+  *  (5a0d0a8)
+    Merge pull request #11 from coozoo/trystupiddeb
+    Trystupiddeb
+  *  (3430cc5)
+    Update main.yml
+  *  (7afba35)
+    Update control
+  *  (83c536b)
+    Update rules
+  *  (ff929c7)
+    Add files via upload
+  *  (50d5c8b)
+    Update rf8000.pro
+    update icon locations
+  *  (3395176)
+    Add debian structure
+    Damn it's so stupid...
+  *  (bacc144)
+    try to buil debian
+  *  (bca4382)
+    Update main.yml
+  *  (c27dac7)
+    Update main.yml
+  *  (1a4c24e)
+    Update main.yml
+  *  (037ef0d)
+    Update main.yml
+  *  (c482e89)
+    Update main.yml
+  *  (0854ddb)
+    Update main.yml
+  *  (5fc41d9)
+    Update main.yml
+  *  (9a81683)
+    Update main.yml
+  *  (446b314)
+    Update qtrfpowermeter.spec
+  *  (1a3429c)
+    Update qtrfpowermeter.spec
+  *  (aa4e692)
+    Update qtrfpowermeter.spec
+  *  (293bb83)
+    Update qtrfpowermeter.spec
+  *  (06a649b)
+    Update qtrfpowermeter.spec
+  *  (fc2c018)
+    Update rf8000.pro
+  *  (facc32b)
+    Update rf8000.pro
+  *  (fde662f)
+    Update qtrfpowermeter.spec
+  *  (b3ec695)
+    Update qtrfpowermeter.spec
+  *  (12d7fd2)
+    Update qtrfpowermeter.spec
+  *  (20420ed)
+    Update README.md
+  *  (4d3ccc1)
+    Update qtrfpowermeter.spec
+  *  (602f725)
+    Update qtrfpowermeter.spec
+  *  (34b549a)
+    Merge pull request #10 from coozoo/rpmbuild
+    addrpm
+  *  (e70472b)
+    addrpm
+  *  (43da770)
+    Update main.yml
+  *  (574353e)
+    Update main.yml
+  *  (78e6aa5)
+    Add files via upload
+  *  (046314e)
+    Update qtrfpowermeter.desktop
+  *  (8061f29)
+    Add files via upload
+  *  (e645397)
+    Add files via upload
+  *  (ad8a2b1)
+    Update main.yml
+  *  (cee2f2e)
+    add translation mockup
+    thus will add nontranslated files to project
+  *  (3eace38)
+    Update main.yml
+  *  (4e378bc)
+    Update main.yml
+  *  (3b80a44)
+    Update MAC_build_RELEASE.sh
+  *  (a6dee65)
+    Update main.yml
+  *  (1a9fdf2)
+    Add files via upload
+  *  (c306ff2)
+    Update main.yml
+  *  (5d0cee8)
+    Merge pull request #9 from coozoo/actionsintegration
+    Actionsintegration
+  *  (cc6dd25)
+    Create main.yml
+  *  (43cbf6e)
+    windowsicons
+  *  (0b794ac)
+    windowsicons
+  *  (d76c7ba)
+    Update README.md
+  *  (833f77d)
+    Update README.md
+  *  (2bbea26)
+    Update README.md
+  *  (89e4e38)
+    Update README.md
+  *  (320e553)
+    Update README.md
+  *  (c3fc22d)
+    Update README.md
+  *  (3fe2db2)
+    Merge pull request #2 from coozoo/usable
+    Make this software usable
+  *  (c26f394)
+    Make this software usable
+  *  (2db584b)
+    Add write
+    Add sett settings possibility
+    lot of new elements
+  *  (1a90a5e)
+    Fix for parsing
+  *  (cde1bde)
+    initial commit
+  *  (242efcc)
+    Update README.md
+  *  (4ef90c4)
+    Update README.md
+  *  (1a6ee3a)
+    Initial commit
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 05 Dec 2025 00:38:03 +0200
+
+qtrfpowermeter (0.2b) UNRELEASED; urgency=low
+
+  * Initial release
+

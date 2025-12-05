@@ -82,6 +82,11 @@ void Rf8000Device::processData(const QString &data)
     if (i.isValid()) {
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
+            
+            emit newLogMessage(QString("%1 %2")
+                                   .arg(timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                                   .arg(match.captured(0)));
+
             bool ok;
             double dbm = match.captured(1).toDouble(&ok);
             if (ok) {

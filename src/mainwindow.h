@@ -158,6 +158,9 @@ public:
 private:
     Ui::MainWindow *ui;
     void updateDeviceList();
+
+    void performSmartSelection();
+
     QTimer simulatorTimer;
     QString curFrequency="0";
     QString curOffset="0";
