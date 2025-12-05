@@ -10,7 +10,7 @@ class Rf8000Device : public AbstractPMDevice
 
 public:
     explicit Rf8000Device(const PMDeviceProperties &props, QObject *parent = nullptr);
-    ~Rf8000Device();
+    virtual ~Rf8000Device();
 
     Q_INVOKABLE void setFrequency(quint64 freqHz) override;
     Q_INVOKABLE void setOffset(double offsetDb) override;
@@ -18,17 +18,18 @@ public:
     Q_INVOKABLE void disconnectDevice() override;
     Q_INVOKABLE void processData(const QString &data) override;
 
-private slots:
+protected slots:
     void onSerialPortNewData(const QString &data);
     void onSerialPortError(const QString &error);
-    void sendBufferedCommand();
+    virtual void sendBufferedCommand();
 
-private:
+protected:
     SerialPortInterface *m_serialPort;
     quint64 m_currentFrequencyHz = 1000000;
     double m_currentOffsetDb = 0.0;
     bool m_isPositiveOffset = true;
     QTimer *m_commandTimer;
+    QString m_buffer;
 
     void sendCommand();
 };

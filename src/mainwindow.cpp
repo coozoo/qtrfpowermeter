@@ -32,8 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
     // old direct serial port handling
     // serialPortPowerMeter= new SerialPortInterface();
 
-    updateDeviceList();
-    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
     connect(this, &MainWindow::isConnectedChanged, this, &MainWindow::onIsConnectedChanged);
 
     ui->resetMax_toolButton->setToolTip(tr("Reset max values"));
@@ -262,7 +260,8 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
     toolsMenu->addAction(cableLossCalcAction);
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
-
+    updateDeviceList();
+    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
 }
 
 MainWindow::~MainWindow()
@@ -421,7 +420,7 @@ void MainWindow::on_set_pushButton_clicked()
     }
 
     // Set all the properties on the abstract device object.
-    // Each device class now handles sending the command immediately within the setter.
+    // Each device class handles sending the command immediately within the setter.
     quint64 freqHz = static_cast<quint64>(ui->frequency_spinBox->value()) * 1000000;
     double offsetDb = 0;
     if (m_activeDeviceObject->properties().hasOffset) {
@@ -494,10 +493,52 @@ int MainWindow::on_saveCharts_toolButton_clicked()
 
 }
 
+void MainWindow::performSmartSelection()
+{
+    int currentPortIndex = ui->device_comboBox->currentIndex();
+    if (currentPortIndex < 0) return;
+
+    bool vidOk, pidOk;
+    quint16 vid = ui->device_comboBox->itemData(currentPortIndex, VendorIDRole).toString().toUShort(&vidOk, 16);
+    quint16 pid = ui->device_comboBox->itemData(currentPortIndex, ProductIDRole).toString().toUShort(&pidOk, 16);
+
+    if (!vidOk || !pidOk) {
+        qDebug() << "Could not get valid VID/PID for selected port.";
+        return;
+    }
+
+    qDebug() << "Smart-selecting for VID:" << QString::number(vid, 16) << "PID:" << QString::number(pid, 16);
+
+    for (int i = 0; i < ui->deviceType_comboBox->count(); ++i) {
+        QString deviceId = ui->deviceType_comboBox->itemData(i).toString();
+        PMDeviceProperties props = m_deviceFactory->propertiesForDevice(deviceId);
+
+        for (const auto &vidPidPair : props.supportedVidPids) {
+            if (vidPidPair.first == vid && vidPidPair.second == pid) {
+                if (ui->deviceType_comboBox->currentIndex() != i) {
+                    qDebug() << "Match found! Setting device type to" << props.name;
+                    // The onDeviceSelector_currentIndexChanged handles creating the device
+                    // and updating the UI. We just trigger it.
+                    ui->deviceType_comboBox->setCurrentIndex(i);
+                }
+                return;
+            }
+        }
+    }
+}
+
 
 void MainWindow::ondevice_comboBox_currentIndexChanged()
 {
     qDebug()<<"ondevice_comboBox_currentIndexChanged";
+    if (isConnected()) return;
+    int currentPortIndex = ui->device_comboBox->currentIndex();
+    if (currentPortIndex >= 0)
+    {
+        ui->device_comboBox->setToolTip(ui->device_comboBox->itemData(currentPortIndex,DescriptionRole).toString()+ " " +
+                                        ui->device_comboBox->itemData(currentPortIndex,ManufacturerRole).toString());
+    }
+    performSmartSelection();
     onIsConnectedChanged(isConnected());
 }
 
@@ -510,7 +551,7 @@ void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double 
 {
     //QString curdate=QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz");
     QString curdate = timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz");
-    ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+ QString(" $%1dBm%2mVpp$").arg(dbm).arg(vpp_raw));
+    //ui->data_plainTextEdit->appendPlainText(curdate+" "+ui->device_comboBox->currentData().toString()+ QString(" $%1dBm%2mVpp$").arg(dbm).arg(vpp_raw));
 
     double milliwatts = 0;
 
@@ -660,10 +701,13 @@ void MainWindow::updateDeviceList()
     int newIndexToSelect = -1;
     for (const QSerialPortInfo &info : infos)
     {
-        // Keep filtering for the specific USB-Serial chip if desired
-        if (info.isNull() || !info.hasVendorIdentifier() || QString::number(info.vendorIdentifier(),16) != "1a86")
+        if (info.isNull() || !info.hasVendorIdentifier())
             continue;
 
+        QString vid = QString::number(info.vendorIdentifier(), 16).toLower();
+        if (vid != "1a86" && vid != "483")
+            continue;
+        
         qDebug()<<info.hasVendorIdentifier() <<QString::number(info.vendorIdentifier());
         bool isBusy = false;
         QSerialPort tempPort(info);
@@ -676,10 +720,9 @@ void MainWindow::updateDeviceList()
             tempPort.close();
         }
         QString busyText = isBusy ? tr(" [Busy]") : "";
-        QString s = tr("Port") + ": " + info.portName() +
-                    " (" + info.systemLocation() +
-                    ") " + info.description() +
+        QString s = info.portName() +
                     " " + info.manufacturer() +
+                    " " + (info.description().length()>13 ? info.description().left(10)+"...":info.description()) +
                     " " + info.serialNumber() +
                     " (" + (info.hasVendorIdentifier() ? QString::number(info.vendorIdentifier(), 16) : QString()) +
                     ":" + (info.hasProductIdentifier() ? QString::number(info.productIdentifier(), 16) : QString()) +")"+

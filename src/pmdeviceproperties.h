@@ -28,6 +28,8 @@ struct PMDeviceProperties
 
     bool isEnabled = true;
 
+    QList<QPair<quint16, quint16>> supportedVidPids;
+
     QIcon icon() const { return QIcon(imagePath); }
 };
 

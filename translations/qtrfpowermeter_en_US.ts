@@ -424,87 +424,97 @@ Calculated correction: %2 dB</source>
 <context>
     <name>HelpDialog</name>
     <message>
-        <location filename="../src/helpdialog.cpp" line="16"/>
+        <location filename="../src/helpdialog.cpp" line="17"/>
         <source>Help: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="23"/>
+        <location filename="../src/helpdialog.cpp" line="24"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="72"/>
+        <location filename="../src/helpdialog.cpp" line="73"/>
         <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;The group devices that communicates using a text-based protocol over serial.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Command Format:&lt;/b&gt; &lt;code&gt;$FFFF+00.0#&lt;/code&gt; where FFFF is the frequency in MHz and 00.0 is the offset in dB.&lt;/p&gt;&lt;h3&gt;Problems&lt;/h3&gt;&lt;p&gt;Device has very fragile protocol, there is two main problems with it and sure they persist in original software because actual problem is in firmware:&lt;/p&gt;&lt;p&gt;&lt;b&gt;Broken character:&lt;/b&gt;&lt;br&gt;Device screen has updates, there is incoming data in log. &lt;br&gt;There is broken character on screen (see image below) and as well in protocol, so the data is incorrect and cannot be parsed.&lt;/p&gt;&lt;br&gt;&lt;img src=&quot;qrc:/help/img/rf8000brokenchar.png&quot; alt=&quot;rf8000 broken charachters&quot; width=&quot;300&quot;&gt;&lt;p&gt;&lt;b&gt;Hanging:&lt;/b&gt;&lt;br&gt;Device screen is frozen, no incoming data. &lt;br&gt;Device can hang if send commands to often or some unknown reason.&lt;/p&gt;&lt;h3&gt;Solutions&lt;/h3&gt;&lt;p&gt;&lt;b&gt;Broken character:&lt;/b&gt;&lt;br&gt;Simply press Set device parameters in app, like frequency, and it will be fixed.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Hanging:&lt;/b&gt;&lt;br&gt;&lt;p&gt;Connect device in safe proof order&lt;ul&gt;&lt;li&gt;Connect/restart device (device in wait mode. It shows logo on device screen)&lt;/li&gt;&lt;li&gt;Refresh devices list in app (select correct device type)&lt;/li&gt;&lt;li&gt;Press connect in app&lt;/li&gt;&lt;li&gt;On device press middle button to start capture&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;Other sequences could work but sometimes glitches may appear.&lt;/p&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="90"/>
+        <location filename="../src/helpdialog.cpp" line="91"/>
         <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;The V7 device uses a complex command set, including commands to start and stop data streams.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Example Command:&lt;/b&gt; &lt;code&gt;IC000+W+00.0+00.00+1000&lt;/code&gt;&lt;/p&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="94"/>
-        <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;TBD.&lt;/p&gt;</source>
+        <location filename="../src/helpdialog.cpp" line="96"/>
+        <source>&lt;h2&gt;Device Description&lt;/h2&gt;&lt;p&gt;Device similar to the rf8000 but with a more stable and reliable protocol. It can send up to 3000 updates per second, so the application uses an averaging algorithm to prevent UI overload.&lt;/p&gt;&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;The device uses a modified text-based protocol for communication.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Command Format:&lt;/b&gt; &lt;code&gt;AFFFFS00.00&lt;/code&gt; where A is a literal character, FFFF is the frequency in MHz, S is the sign character (+ or -), and 00.00 is the offset in dB.&lt;/p&gt;</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/helpdialog.cpp" line="102"/>
-        <source>&lt;h2&gt;Error&lt;/h2&gt;&lt;p&gt;Could not load help template.&lt;/p&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/helpdialog.cpp" line="109"/>
-        <source>Device Specifications</source>
+        <source>&lt;h2&gt;Additional Information&lt;/h2&gt;&lt;p&gt;No device-specific information available.&lt;/p&gt;</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/helpdialog.cpp" line="110"/>
+        <source>&lt;h2&gt;Error&lt;/h2&gt;&lt;p&gt;Could not load help template.&lt;/p&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="117"/>
+        <source>Device Specifications</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="118"/>
         <source>Parameter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="111"/>
+        <location filename="../src/helpdialog.cpp" line="119"/>
         <source>Value</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="112"/>
+        <location filename="../src/helpdialog.cpp" line="120"/>
         <source>Frequency Range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="113"/>
+        <location filename="../src/helpdialog.cpp" line="121"/>
         <source>Power Range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="114"/>
+        <location filename="../src/helpdialog.cpp" line="122"/>
         <source>Baud Rate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="115"/>
+        <location filename="../src/helpdialog.cpp" line="123"/>
         <source>Internal Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="120"/>
+        <location filename="../src/helpdialog.cpp" line="124"/>
+        <source>VID:PID</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/helpdialog.cpp" line="129"/>
         <source>%1 MHz to %2 MHz</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="121"/>
+        <location filename="../src/helpdialog.cpp" line="130"/>
         <source>%1 dBm to %2 dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="123"/>
+        <location filename="../src/helpdialog.cpp" line="132"/>
         <source>Yes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/helpdialog.cpp" line="123"/>
+        <location filename="../src/helpdialog.cpp" line="132"/>
         <source>No</source>
         <translation></translation>
     </message>
@@ -531,7 +541,7 @@ Calculated correction: %2 dB</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="64"/>
-        <location filename="../src/mainwindow.cpp" line="221"/>
+        <location filename="../src/mainwindow.cpp" line="219"/>
         <source>Refresh</source>
         <translation></translation>
     </message>
@@ -593,8 +603,8 @@ Calculated correction: %2 dB</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="297"/>
-        <location filename="../src/mainwindow.cpp" line="165"/>
-        <location filename="../src/mainwindow.cpp" line="947"/>
+        <location filename="../src/mainwindow.cpp" line="163"/>
+        <location filename="../src/mainwindow.cpp" line="983"/>
         <source>Attenuation:</source>
         <translation></translation>
     </message>
@@ -605,19 +615,19 @@ Calculated correction: %2 dB</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="325"/>
-        <location filename="../src/mainwindow.cpp" line="55"/>
+        <location filename="../src/mainwindow.cpp" line="53"/>
         <source>dBm</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="353"/>
-        <location filename="../src/mainwindow.cpp" line="57"/>
+        <location filename="../src/mainwindow.cpp" line="55"/>
         <source>mW</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="369"/>
-        <location filename="../src/mainwindow.cpp" line="56"/>
+        <location filename="../src/mainwindow.cpp" line="54"/>
         <source>mVpp</source>
         <translation></translation>
     </message>
@@ -695,7 +705,7 @@ Calculated correction: %2 dB</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="518"/>
-        <location filename="../src/mainwindow.cpp" line="212"/>
+        <location filename="../src/mainwindow.cpp" line="210"/>
         <source>Flow</source>
         <translation></translation>
     </message>
@@ -706,153 +716,148 @@ Calculated correction: %2 dB</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="566"/>
-        <location filename="../src/mainwindow.cpp" line="249"/>
+        <location filename="../src/mainwindow.cpp" line="247"/>
         <source>csv</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="39"/>
+        <location filename="../src/mainwindow.cpp" line="37"/>
         <source>Reset max values</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="43"/>
+        <location filename="../src/mainwindow.cpp" line="41"/>
         <source>Browse saved data directory</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="50"/>
+        <location filename="../src/mainwindow.cpp" line="48"/>
         <source>Session data not saved yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="54"/>
+        <location filename="../src/mainwindow.cpp" line="52"/>
         <source>Time</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="58"/>
+        <location filename="../src/mainwindow.cpp" line="56"/>
         <source>Frequency MHz</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="59"/>
+        <location filename="../src/mainwindow.cpp" line="57"/>
         <source>Correction dB</source>
         <translation>Offset dB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="60"/>
+        <location filename="../src/mainwindow.cpp" line="58"/>
         <source>Attenuation dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="61"/>
+        <location filename="../src/mainwindow.cpp" line="59"/>
         <source>Total dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="62"/>
+        <location filename="../src/mainwindow.cpp" line="60"/>
         <source>Total mW</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="213"/>
+        <location filename="../src/mainwindow.cpp" line="211"/>
         <source>After this time data on chart will move out so it will look like a flow</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="215"/>
-        <location filename="../src/mainwindow.cpp" line="216"/>
+        <location filename="../src/mainwindow.cpp" line="213"/>
+        <location filename="../src/mainwindow.cpp" line="214"/>
         <source>Device Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="220"/>
+        <location filename="../src/mainwindow.cpp" line="218"/>
         <source>Refresh Devices</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="229"/>
+        <location filename="../src/mainwindow.cpp" line="227"/>
         <source>Save charts</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="230"/>
+        <location filename="../src/mainwindow.cpp" line="228"/>
         <source>Save charts as images to the log folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="233"/>
+        <location filename="../src/mainwindow.cpp" line="231"/>
         <source>Choose output format</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="237"/>
+        <location filename="../src/mainwindow.cpp" line="235"/>
         <source>Set image width</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="243"/>
+        <location filename="../src/mainwindow.cpp" line="241"/>
         <source>Set image height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="250"/>
+        <location filename="../src/mainwindow.cpp" line="248"/>
         <source>Write on fly data to csv file into log folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="261"/>
+        <location filename="../src/mainwindow.cpp" line="259"/>
         <source>&amp;Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="262"/>
+        <location filename="../src/mainwindow.cpp" line="260"/>
         <source>Cable Loss Calculator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="487"/>
+        <location filename="../src/mainwindow.cpp" line="486"/>
         <source>Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="488"/>
+        <location filename="../src/mainwindow.cpp" line="487"/>
         <source>Saved</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="760"/>
+        <location filename="../src/mainwindow.cpp" line="796"/>
         <source>Connected to %1 on %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1035"/>
+        <location filename="../src/mainwindow.cpp" line="1071"/>
         <source>No Device Selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1035"/>
+        <location filename="../src/mainwindow.cpp" line="1071"/>
         <source>Please select a device type first.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="679"/>
-        <source>Port</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cpp" line="766"/>
+        <location filename="../src/mainwindow.cpp" line="802"/>
         <source>Error: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="770"/>
+        <location filename="../src/mainwindow.cpp" line="806"/>
         <source>Disconnected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="678"/>
+        <location filename="../src/mainwindow.cpp" line="716"/>
         <source> [Busy]</source>
         <translation></translation>
     </message>
@@ -1066,7 +1071,7 @@ Calculated correction: %2 dB</source>
 <context>
     <name>Rf8000Device</name>
     <message>
-        <location filename="../src/rf8000device.cpp" line="92"/>
+        <location filename="../src/rf8000device.cpp" line="97"/>
         <source>Could not parse dBm value from device.</source>
         <translation></translation>
     </message>
