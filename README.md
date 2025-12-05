@@ -2,20 +2,31 @@
 [<img src="https://copr.fedorainfracloud.org/coprs/yura/qtrfpowermeter/package/qtrfpowermeter/status_image/last_build.png"></img>](https://copr.fedorainfracloud.org/coprs/yura/qtrfpowermeter/)
 
 # QT RF Power Meter
-This application few hours project (not anymore now add week to that) intended to improve usage of Chinese RF power meter RF8000. Chinese default application is terrible unreliable with no functionality and lot of crashes.
+This application few hours project (not anymore now add week to that) intended to improve usage of Chinese RF power meters. The default applications are often terrible and unreliable, with no functionality and lot of crashes.
 
-Device shown on image below.
+## Supported Devices
 
-![image](https://github.com/coozoo/qtrfpowermeter/assets/25594311/392a07ee-0ab3-42d0-b2da-7b5d18c994e4)
+### RF8000
+This is the original device the application was built for. There are versions of this device with lower frequency ranges, and while they may be compatible, the only limitation might be the ability to set higher frequencies in the software.
+
+![RF8000](images/devices/rf8000.png)
+
+*   **Protocol:** Simple serial protocol that reports dbm and Vpp values.
+*   **Issues:** Can have bugs with broken characters which can often be fixed by setting the frequency and offset within the program. If you see no captures and broken symbols on the device screen, try setting the frequency using the program.
+*   **Identification:** The application cannot automatically identify this device. If you have multiple serial devices connected, you must select the correct one manually.
+
+### RF Power Meter v5
+A newer version of the device with a pretty similar protocol logic (a bit extended) but different formats.
+
+![RF Power Meter v5](images/devices/rf_pm_v5.png)
+
+*   **Protocol:** Similar to the RF8000 but different enough.
+*   **Identification:** The application attempts to identify this device at least to say that it's not the one what you connected for.
 
 
-There are versions of device with lower frequency range I'm not aware if they're compatible, but I suspect the only limitation will be the ability to set higher frequencies.
+## Features
 
-Simple serial protocol that reports dbm and Vpp values, with some bugs of broken characters can be fixed with setting frequency and offset (basically most of the times program will do that for you, but if you see no captures and broken symbols on device screen simply try to set frequency using program).
-
-There is no way to identify device for sure so you should do that by your own if you have more than one serial devices connected.
-
-To initiate connection press connect. After that raw data captured from device will be in log tab. 
+To initiate connection press connect. After that raw data captured from device will be in log tab.
 
 On data tab there is parsed and calculated data exactly in the same way it's written to csv if such option selected on status tab.
 

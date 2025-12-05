@@ -1,4 +1,1464 @@
-qtrfpowermeter (0.2b) UNRELEASED; urgency=low
+qtrfpowermeter (0.48-202512050728) Forty; urgency=low
 
-  * Initial release
+  * Final touches for v5
+  * related to identification of device
+
+ -- happiness <realcoozoo@gmail.com>  Thu, 04 Dec 2025 08:35:36 +0200
+
+
+qtrfpowermeter (6105b2c) Forty; urgency=low
+
+  * reimplemented device v5
+  * without inheritance as it's a lot of changes yes a bit duplicated code
+  * but it's easier in such way
+
+ -- happiness <realcoozoo@gmail.com>  Wed, 03 Dec 2025 09:54:27 +0200
+
+
+qtrfpowermeter (d22158e) Forty; urgency=low
+
+  * Final stage of adding new device
+  * rf power meter v5
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 02 Dec 2025 17:57:56 +0200
+
+
+qtrfpowermeter (166a2cb) Forty; urgency=low
+
+  * Almost final add rfpmv5
+  * just few touches left
+
+ -- happiness <realcoozoo@gmail.com>  Tue, 02 Dec 2025 09:39:39 +0200
+
+
+qtrfpowermeter (da219bb) Forty; urgency=low
+
+  * Add rf pm v5
+  * not ready but supported
+
+ -- happiness <realcoozoo@gmail.com>  Mon, 01 Dec 2025 10:12:08 +0200
+
+
+qtrfpowermeter (e9595a0) Forty; urgency=low
+
+  * Merge pull request #38 from coozoo/threadschart
+  * Threadschart
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 08 Nov 2025 20:34:01 +0200
+
+
+qtrfpowermeter (87b2898) Forty; urgency=low
+
+  * attept to fix translations load in appimage
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 08 Nov 2025 19:55:07 +0200
+
+
+qtrfpowermeter (80b394f) Forty; urgency=low
+
+  * Translations update
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 08 Nov 2025 19:37:15 +0200
+
+
+qtrfpowermeter (147a747) Forty; urgency=low
+
+  * HelpDialog implementation
+  * Add help info button
+  * to show window with help with device parameters and how to use it if
+  * there is problems
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 08 Nov 2025 14:41:54 +0200
+
+
+qtrfpowermeter (8b80858) Forty; urgency=low
+
+  * attempt to fix appimage svg
+  * just wild guess related to packaging
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 07 Nov 2025 23:11:16 +0200
+
+
+qtrfpowermeter (c02d966) Forty; urgency=low
+
+  * Small fixes and improove
+  * small ui fixes
+  * and allow select less than 1 min range
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 07 Nov 2025 22:16:34 +0200
+
+
+qtrfpowermeter (d326690) Forty; urgency=low
+
+  * Fixes improvements
+  * Fix for threaded crash
+  * Add failsafe for set button
+  * Improve data range scale
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 07 Nov 2025 20:52:11 +0200
+
+
+qtrfpowermeter (987699b) Forty; urgency=low
+
+  * Merge pull request #37 from coozoo/threadschart
+  * Threadschart
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 07 Nov 2025 15:33:20 +0200
+
+
+qtrfpowermeter (5783d7b) Forty; urgency=low
+
+  * damn key
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 07 Nov 2025 15:14:29 +0200
+
+
+qtrfpowermeter (afe39e3) Forty; urgency=low
+
+  * make chart smooth
+  * accept date time from outside
+  * generate date time inside device class instead of UI
+  * fixes #36
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 07 Nov 2025 15:05:07 +0200
+
+
+qtrfpowermeter (a4c5371) Forty; urgency=low
+
+  * Thread
+  * require testing
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 07 Nov 2025 09:36:09 +0200
+
+
+qtrfpowermeter (f9102b0) Forty; urgency=low
+
+  * Update README.md
+  * [skip ci]
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 06 Nov 2025 17:10:18 +0200
+
+
+qtrfpowermeter (28bf6fb) Forty; urgency=low
+
+  * Update changelog
+  * [skip ci]
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 06 Nov 2025 16:59:07 +0200
+
+
+qtrfpowermeter (7b8d8b0) Forty; urgency=low
+
+  * Merge pull request #34 from coozoo/multitriggerfix
+  * Multitriggerfix
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 06 Nov 2025 16:46:32 +0200
+
+
+qtrfpowermeter (8c9fb66) Forty; urgency=low
+
+  * Fix multi command send
+  * Basically device so fragile if you don't send command it can reposrt
+  * broken data, if you send multiple times it can hang.
+  * So it is fix to send set command only once by making delay.
+  * fixes #33
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 06 Nov 2025 16:08:23 +0200
+
+
+qtrfpowermeter (0.45-202511051510_refs/heads/main) Forty; urgency=low
+
+  * Merge pull request #32 from coozoo/slave
+  * Slave
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 05 Nov 2025 17:10:31 +0200
+
+
+qtrfpowermeter (8ab5a7e) Forty; urgency=low
+
+  * Merge pull request #31 from coozoo/calcrashfix
+  * Calcrashfix
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 05 Nov 2025 16:07:31 +0200
+
+
+qtrfpowermeter (d0569d0) Forty; urgency=low
+
+  * version bump
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 05 Nov 2025 15:22:00 +0200
+
+
+qtrfpowermeter (ff498cc) Forty; urgency=low
+
+  * Fix calibration crash
+  * Limit spline usage if less than 3 dots
+  * fixes #30
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 05 Nov 2025 15:03:16 +0200
+
+
+qtrfpowermeter (0.44-202510262321_refs/heads/main) Forty; urgency=low
+
+  * Merge pull request #29 from coozoo/slave
+  * Slave
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Mon, 27 Oct 2025 01:21:35 +0200
+
+
+qtrfpowermeter (5afdb44) Forty; urgency=low
+
+  * Merge pull request #28 from coozoo/cableloss
+  * cable loss calculator
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Mon, 27 Oct 2025 00:55:13 +0200
+
+
+qtrfpowermeter (9528428) Forty; urgency=low
+
+  * cable loss calculator
+  * Integrate cable loss calculator
+  * add it to attenuation
+
+ -- happiness <realcoozoo@gmail.com>  Mon, 27 Oct 2025 00:40:15 +0200
+
+
+qtrfpowermeter (3f64d1a) Forty; urgency=low
+
+  * Merge pull request #27 from coozoo/pmdevicerefactor
+  * Huge refactor to separate device
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 26 Oct 2025 11:07:57 +0200
+
+
+qtrfpowermeter (aa7cced) Forty; urgency=low
+
+  * rollback
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 26 Oct 2025 10:58:25 +0200
+
+
+qtrfpowermeter (4602bde) Forty; urgency=low
+
+  * try
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 26 Oct 2025 10:55:41 +0200
+
+
+qtrfpowermeter (b75710b) Forty; urgency=low
+
+  * try again
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 26 Oct 2025 10:45:10 +0200
+
+
+qtrfpowermeter (b51f2e0) Forty; urgency=low
+
+  * try to fix backticks
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 26 Oct 2025 10:38:57 +0200
+
+
+qtrfpowermeter (1114802) Forty; urgency=low
+
+  * Huge refactor to separate device
+  * Now powermeter is not emeded into mainwindow
+  * It's possible to add another powermeter with different protocol
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 26 Oct 2025 10:03:37 +0200
+
+
+qtrfpowermeter (3b3e9ac) Forty; urgency=low
+
+  * Merge pull request #26 from coozoo/calibration
+  * Calibration
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 24 Oct 2025 11:39:22 +0300
+
+
+qtrfpowermeter (30f0f9a) Forty; urgency=low
+
+  * fix high values with offset
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 24 Oct 2025 09:21:01 +0300
+
+
+qtrfpowermeter (3bfd3fe) Forty; urgency=low
+
+  * Use spline
+  * chane to spline inter extrapolation
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 05 Oct 2025 11:49:43 +0300
+
+
+qtrfpowermeter (40de209) Forty; urgency=low
+
+  * rearrange
+  * due to growing number of classes and so files rearraned project into
+  * folder in order to looks better on github start page
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 05 Oct 2025 06:43:06 +0300
+
+
+qtrfpowermeter (0.43-202510041156_refs/heads/main) Forty; urgency=low
+
+  * Merge pull request #24 from coozoo/slave
+  * CalibrationManager improve
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 04 Oct 2025 14:56:02 +0300
+
+
+qtrfpowermeter (f1bde83) Forty; urgency=low
+
+  * Merge pull request #25 from coozoo/calibration
+  * Calibration translationss
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 04 Oct 2025 14:36:09 +0300
+
+
+qtrfpowermeter (3ca229d) Forty; urgency=low
+
+  * transslations
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 04 Oct 2025 13:58:15 +0300
+
+
+qtrfpowermeter (363045e) Forty; urgency=low
+
+  * Merge pull request #23 from coozoo/calibration
+  * Calibration improvements
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 04 Oct 2025 13:09:05 +0300
+
+
+qtrfpowermeter (67d2531) Forty; urgency=low
+
+  * improve chart interactions
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 04 Oct 2025 12:54:09 +0300
+
+
+qtrfpowermeter (41dc270) Forty; urgency=low
+
+  * improove profiles selection
+  * remove editline
+  * use combobox value to set names
+  * set buttons states
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 04 Oct 2025 09:51:00 +0300
+
+
+qtrfpowermeter (be96771) Forty; urgency=low
+
+  * Tabify docks
+  * Just or space save
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 04 Oct 2025 09:11:02 +0300
+
+
+qtrfpowermeter (6d68ba7) Forty; urgency=low
+
+  * Fix desktop name
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 04 Oct 2025 09:10:13 +0300
+
+
+qtrfpowermeter (bd0e14c) Forty; urgency=low
+
+  * Signals rearrange
+  * Basic renaming to prevent default connection
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 04 Oct 2025 09:09:30 +0300
+
+
+qtrfpowermeter (0.42-202510030804_refs/heads/main) Forty; urgency=low
+
+  * Merge pull request #22 from coozoo/slave
+  * Slave
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 03 Oct 2025 11:04:11 +0300
+
+
+qtrfpowermeter (c17d497) Forty; urgency=low
+
+  * Merge pull request #21 from coozoo/calibration
+  * Calibration
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 03 Oct 2025 09:42:19 +0300
+
+
+qtrfpowermeter (b6352da) Forty; urgency=low
+
+  * version
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 03 Oct 2025 09:14:42 +0300
+
+
+qtrfpowermeter (9c595bd) Forty; urgency=low
+
+  * Refinements in calibration
+  * like combobox limits issualization etc
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 03 Oct 2025 09:13:15 +0300
+
+
+qtrfpowermeter (66d67c7) Forty; urgency=low
+
+  * Some calibration
+  * Bassically some base functions to perform calibrationmanager.cpp
+
+ -- happiness <realcoozoo@gmail.com>  Thu, 02 Oct 2025 09:44:32 +0300
+
+
+qtrfpowermeter (440d2f4) Forty; urgency=low
+
+  * Support hardware buttons
+  * Now on change attenuation with hardware buttons program will update
+  * value accordingly
+
+ -- happiness <realcoozoo@gmail.com>  Wed, 01 Oct 2025 22:29:16 +0300
+
+
+qtrfpowermeter (7f1a9e9) Forty; urgency=low
+
+  * Error handling
+  * disconnect and error handling for digital attenuator
+
+ -- happiness <realcoozoo@gmail.com>  Wed, 01 Oct 2025 19:09:47 +0300
+
+
+qtrfpowermeter (0.41-202509250559_refs/heads/main) Forty; urgency=low
+
+  * Merge pull request #19 from coozoo/slave
+  * Add system locale check before application start
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 25 Sep 2025 08:59:07 +0300
+
+
+qtrfpowermeter (c13e9cf) Forty; urgency=low
+
+  * Add system locale check before application start
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 25 Sep 2025 08:42:47 +0300
+
+
+qtrfpowermeter (0.41-202509250533_refs/heads/main) Forty; urgency=low
+
+  * Merge pull request #18 from coozoo/slave
+  * Slave
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 25 Sep 2025 08:33:22 +0300
+
+
+qtrfpowermeter (7625697) Forty; urgency=low
+
+  * Update README.md
+  * [skip ci]
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 25 Sep 2025 08:30:43 +0300
+
+
+qtrfpowermeter (f406d48) Forty; urgency=low
+
+  * Merge pull request #17 from coozoo/attwidget
+  * Attwidget
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Thu, 25 Sep 2025 08:11:15 +0300
+
+
+qtrfpowermeter (bac673e) Forty; urgency=low
+
+  * version update
+
+ -- happiness <realcoozoo@gmail.com>  Thu, 25 Sep 2025 07:58:04 +0300
+
+
+qtrfpowermeter (2cc515b) Forty; urgency=low
+
+  * Attenuaion support
+  * - Fixed/Digital attenuator support
+  * - Attenuation calculator
+  * - lot of fixes
+  * fixes #6 #5 #16
+
+ -- happiness <realcoozoo@gmail.com>  Thu, 25 Sep 2025 07:48:20 +0300
+
+
+qtrfpowermeter (ae28654) Forty; urgency=low
+
+  * fix loop on error
+  * when disconnect deice there was loop on error
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 19 Sep 2025 21:19:58 +0300
+
+
+qtrfpowermeter (0.40-202508311626_refs/heads/main) Forty; urgency=low
+
+  * Merge pull request #15 from coozoo/slave
+  * Slave
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 31 Aug 2025 19:25:57 +0300
+
+
+qtrfpowermeter (e3adf75) Forty; urgency=low
+
+  * Fix artifact name in workflow for code coverage
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 31 Aug 2025 18:52:33 +0300
+
+
+qtrfpowermeter (d8165b6) Forty; urgency=low
+
+  * Merge pull request #14 from coozoo/chartmarker
+  * Chartmarker
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 31 Aug 2025 18:43:35 +0300
+
+
+qtrfpowermeter (df4862b) Forty; urgency=low
+
+  * version increase
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 31 Aug 2025 18:38:29 +0300
+
+
+qtrfpowermeter (e3dc759) Forty; urgency=low
+
+  * Small updates and merges
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 31 Aug 2025 18:35:15 +0300
+
+
+qtrfpowermeter (1967998) Forty; urgency=low
+
+  * Implement tracer
+  * add some highlight forr data points
+  * fixes #13
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 31 Aug 2025 17:32:35 +0300
+
+
+qtrfpowermeter (da35c31) Forty; urgency=low
+
+  * Update README.md
+  * [skip ci]
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Mon, 18 Aug 2025 07:53:01 +0300
+
+
+qtrfpowermeter (0.3b-202508172157_refs/heads/main) Forty; urgency=low
+
+  * deb deps runtime
+
+ -- happiness <realcoozoo@gmail.com>  Mon, 18 Aug 2025 00:57:11 +0300
+
+
+qtrfpowermeter (b641925) Forty; urgency=low
+
+  * deb deps more
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 23:30:04 +0300
+
+
+qtrfpowermeter (5d29f27) Forty; urgency=low
+
+  * fix relative path
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 19:48:42 +0300
+
+
+qtrfpowermeter (d39fde7) Forty; urgency=low
+
+  * try another action
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 19:12:07 +0300
+
+
+qtrfpowermeter (0172d19) Forty; urgency=low
+
+  * try another action
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 18:53:52 +0300
+
+
+qtrfpowermeter (73077c6) Forty; urgency=low
+
+  * try another action
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 18:17:29 +0300
+
+
+qtrfpowermeter (d292b7c) Forty; urgency=low
+
+  * try another action
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 18:15:00 +0300
+
+
+qtrfpowermeter (bb65888) Forty; urgency=low
+
+  * try another action
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 18:09:13 +0300
+
+
+qtrfpowermeter (a050f21) Forty; urgency=low
+
+  * add deb ver uniueness
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 16:41:02 +0300
+
+
+qtrfpowermeter (6d6e84d) Forty; urgency=low
+
+  * add deb deps
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 16:01:02 +0300
+
+
+qtrfpowermeter (2f60215) Forty; urgency=low
+
+  * crapbuntu666
+  * fuck even their errors why package rejected claiming incorrect errors and you should google that it's not changelog it's maintainer field
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 15:40:54 +0300
+
+
+qtrfpowermeter (4635eea) Forty; urgency=low
+
+  * crapbuntu999
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 12:39:35 +0300
+
+
+qtrfpowermeter (c38000d) Forty; urgency=low
+
+  * crapuntu3
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 12:30:00 +0300
+
+
+qtrfpowermeter (b884d99) Forty; urgency=low
+
+  * crapbbuntu2
+  * fuck again
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 12:11:58 +0300
+
+
+qtrfpowermeter (1898d7e) Forty; urgency=low
+
+  * crapbuntu
+  * their dumb package system the answer why I wll never use it in home and avoid for servers
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 12:02:42 +0300
+
+
+qtrfpowermeter (70f19f6) Forty; urgency=low
+
+  * dumbuntu3
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 17 Aug 2025 11:46:18 +0300
+
+
+qtrfpowermeter (f6e1bee) Forty; urgency=low
+
+  * dumbuntu2
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 17 Aug 2025 11:41:13 +0300
+
+
+qtrfpowermeter (12fba17) Forty; urgency=low
+
+  * dumbuntu
+  * yes this commit describes this system with package system
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 17 Aug 2025 11:31:04 +0300
+
+
+qtrfpowermeter (75cc2c7) Forty; urgency=low
+
+  * annoying ubuntu
+  * I'm close to enough of this ubuntu key shit quest
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 17 Aug 2025 11:22:16 +0300
+
+
+qtrfpowermeter (73957c2) Forty; urgency=low
+
+  * trying launchpad
+  * attempt to add launchpad
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 17 Aug 2025 10:20:05 +0300
+
+
+qtrfpowermeter (17dd218) Forty; urgency=low
+
+  * Fedora desktop
+  * nothing can be flawless
+  * [skip ci]
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 06:15:09 +0300
+
+
+qtrfpowermeter (c0e6a5f) Forty; urgency=low
+
+  * maggeia desktop install
+  * [skip ci]
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 05:58:39 +0300
+
+
+qtrfpowermeter (4c7a490) Forty; urgency=low
+
+  * mageia install build
+  * [skip ci]
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 05:27:47 +0300
+
+
+qtrfpowermeter (bb9dd68) Forty; urgency=low
+
+  * mageia should be good now
+  * [skip ci]
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 17 Aug 2025 00:21:42 +0300
+
+
+qtrfpowermeter (0e6be80) Forty; urgency=low
+
+  * mageia again
+  * [skip ci]
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 16 Aug 2025 18:35:49 +0300
+
+
+qtrfpowermeter (ad861ec) Forty; urgency=low
+
+  * mageia
+  * [skip ci]
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 16 Aug 2025 18:22:50 +0300
+
+
+qtrfpowermeter (bbd4f6a) Forty; urgency=low
+
+  * mageiafix
+  * [skip ci]
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 16 Aug 2025 17:43:53 +0300
+
+
+qtrfpowermeter (c669ab9) Forty; urgency=low
+
+  * fix more build system
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 16 Aug 2025 17:25:51 +0300
+
+
+qtrfpowermeter (54ca909) Forty; urgency=low
+
+  * atempt to deb ver update
+
+ -- happiness <realcoozoo@gmail.com>  Sat, 16 Aug 2025 11:07:16 +0300
+
+
+qtrfpowermeter (03c4aa0) Forty; urgency=low
+
+  * Bump Qt6 ready version
+  * Migrated to qt6
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 16 Aug 2025 10:06:43 +0300
+
+
+qtrfpowermeter (6a52457) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+  * [skip ci]
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 16 Aug 2025 09:54:29 +0300
+
+
+qtrfpowermeter (909419d) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+  * [skip ci]
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 16 Aug 2025 09:36:33 +0300
+
+
+qtrfpowermeter (3287e61) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+  * [skip ci]
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 22:12:53 +0300
+
+
+qtrfpowermeter (9a8b96c) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+  * [skip ci]
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 21:48:10 +0300
+
+
+qtrfpowermeter (d53d07d) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 21:28:30 +0300
+
+
+qtrfpowermeter (a5f6898) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+  * update spec for qt6
+  * 
+  * skip ci
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 20:41:43 +0300
+
+
+qtrfpowermeter (f63f951) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 19:19:51 +0300
+
+
+qtrfpowermeter (ae323e2) Forty; urgency=low
+
+  * Update main.yml
+  * damn libfuse is not default
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 19:05:57 +0300
+
+
+qtrfpowermeter (d3cf5f1) Forty; urgency=low
+
+  * Update main.yml
+  * qt6 maybe
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 18:57:09 +0300
+
+
+qtrfpowermeter (7eb89c5) Forty; urgency=low
+
+  * update this deb...
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 17:04:35 +0300
+
+
+qtrfpowermeter (54b8be0) Forty; urgency=low
+
+  * one more
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 16:53:26 +0300
+
+
+qtrfpowermeter (0e9cab2) Forty; urgency=low
+
+  * some test
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 16:44:46 +0300
+
+
+qtrfpowermeter (b4d34db) Forty; urgency=low
+
+  * fix  deb deps
+  * add some more packs
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 16:01:19 +0300
+
+
+qtrfpowermeter (34ee5a8) Forty; urgency=low
+
+  * Some qt6 fixes
+  * - win build fix
+  * - debbuild fix
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 15:51:13 +0300
+
+
+qtrfpowermeter (064f160) Forty; urgency=low
+
+  * Update build system for qt6
+  * - windows linux
+  * - macos
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 15 Aug 2025 15:29:51 +0300
+
+
+qtrfpowermeter (c2ab15b) Forty; urgency=low
+
+  * update autobuild with skip
+  * skip ci
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 15 Aug 2025 09:51:10 +0300
+
+
+qtrfpowermeter (6332b7d) Forty; urgency=low
+
+  * Update code to use qt6
+  * - update qcustomplot
+  * - update deprecated features
+
+ -- coozoo <realcoozoo@gmail.com>  Fri, 15 Aug 2025 08:10:11 +0300
+
+
+qtrfpowermeter (0.2b-202403270458_refs/heads/main) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 27 Mar 2024 06:58:20 +0200
+
+
+qtrfpowermeter (0.2b-202403262134_refs/heads/main) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 23:34:34 +0200
+
+
+qtrfpowermeter (0.2b-202403261514_refs/heads/main) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 17:13:50 +0200
+
+
+qtrfpowermeter (ff7d80b) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 16:52:42 +0200
+
+
+qtrfpowermeter (783ebfe) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 16:42:01 +0200
+
+
+qtrfpowermeter (473ca64) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 16:28:33 +0200
+
+
+qtrfpowermeter (c35114a) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 15:34:46 +0200
+
+
+qtrfpowermeter (06c513c) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 12:29:29 +0200
+
+
+qtrfpowermeter (e502490) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 10:38:43 +0200
+
+
+qtrfpowermeter (0e74098) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 09:16:32 +0200
+
+
+qtrfpowermeter (76659d6) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 09:02:25 +0200
+
+
+qtrfpowermeter (64f0ac0) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 07:46:57 +0200
+
+
+qtrfpowermeter (cc25709) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 07:39:20 +0200
+
+
+qtrfpowermeter (1f8bbfb) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 07:33:34 +0200
+
+
+qtrfpowermeter (1c0a0ea) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 07:30:50 +0200
+
+
+qtrfpowermeter (5a0d0a8) Forty; urgency=low
+
+  * Merge pull request #11 from coozoo/trystupiddeb
+  * Trystupiddeb
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 07:25:35 +0200
+
+
+qtrfpowermeter (3430cc5) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 07:25:04 +0200
+
+
+qtrfpowermeter (7afba35) Forty; urgency=low
+
+  * Update control
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 26 Mar 2024 07:06:52 +0200
+
+
+qtrfpowermeter (83c536b) Forty; urgency=low
+
+  * Update rules
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Mon, 25 Mar 2024 22:52:36 +0200
+
+
+qtrfpowermeter (ff929c7) Forty; urgency=low
+
+  * Add files via upload
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Mon, 25 Mar 2024 22:51:34 +0200
+
+
+qtrfpowermeter (50d5c8b) Forty; urgency=low
+
+  * Update rf8000.pro
+  * update icon locations
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Mon, 25 Mar 2024 22:49:12 +0200
+
+
+qtrfpowermeter (3395176) Forty; urgency=low
+
+  * Add debian structure
+  * Damn it's so stupid...
+
+ -- coozoo <realcoozoo@gmail.com>  Mon, 25 Mar 2024 10:57:04 +0200
+
+
+qtrfpowermeter (bacc144) Forty; urgency=low
+
+  * try to buil debian
+
+ -- happiness <realcoozoo@gmail.com>  Sun, 24 Mar 2024 17:20:39 +0200
+
+
+qtrfpowermeter (bca4382) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 24 Mar 2024 08:55:32 +0200
+
+
+qtrfpowermeter (c27dac7) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 24 Mar 2024 08:28:07 +0200
+
+
+qtrfpowermeter (1a4c24e) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 24 Mar 2024 08:24:04 +0200
+
+
+qtrfpowermeter (037ef0d) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 24 Mar 2024 08:21:02 +0200
+
+
+qtrfpowermeter (c482e89) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 24 Mar 2024 07:59:52 +0200
+
+
+qtrfpowermeter (0.2b-202403240545_refs/heads/main) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sun, 24 Mar 2024 07:44:58 +0200
+
+
+qtrfpowermeter (5fc41d9) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 23 Mar 2024 17:31:00 +0200
+
+
+qtrfpowermeter (9a81683) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Sat, 23 Mar 2024 17:20:37 +0200
+
+
+qtrfpowermeter (0.2b-202403201122_refs/heads/main) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 13:21:48 +0200
+
+
+qtrfpowermeter (0.2b-202403201042_refs/heads/main) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 12:42:26 +0200
+
+
+qtrfpowermeter (0.2b-202403200949_refs/heads/main) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 11:49:38 +0200
+
+
+qtrfpowermeter (0.2b-202403200832_refs/heads/main) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 10:32:47 +0200
+
+
+qtrfpowermeter (0.2b-202403200717_refs/heads/main) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 09:17:44 +0200
+
+
+qtrfpowermeter (0.2b-202403200711_refs/heads/main) Forty; urgency=low
+
+  * Update rf8000.pro
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 09:11:01 +0200
+
+
+qtrfpowermeter (0.2b-202403200655_refs/heads/main) Forty; urgency=low
+
+  * Update rf8000.pro
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 08:55:42 +0200
+
+
+qtrfpowermeter (fde662f) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 07:51:34 +0200
+
+
+qtrfpowermeter (b3ec695) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 20 Mar 2024 07:46:49 +0200
+
+
+qtrfpowermeter (0.2b-202403192128_refs/heads/main) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 23:28:40 +0200
+
+
+qtrfpowermeter (0.2b-202403192122_refs/heads/main) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 23:21:55 +0200
+
+
+qtrfpowermeter (0.2b-202403192102_refs/heads/main) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 23:02:47 +0200
+
+
+qtrfpowermeter (0.2b-202403192051_refs/heads/main) Forty; urgency=low
+
+  * Update qtrfpowermeter.spec
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 22:51:33 +0200
+
+
+qtrfpowermeter (0.2b-202403192018_refs/heads/main) Forty; urgency=low
+
+  * Merge pull request #10 from coozoo/rpmbuild
+  * addrpm
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 22:18:01 +0200
+
+
+qtrfpowermeter (e70472b) Forty; urgency=low
+
+  * addrpm
+
+ -- happiness <realcoozoo@gmail.com>  Tue, 19 Mar 2024 22:03:00 +0200
+
+
+qtrfpowermeter (0.2b-202403191532_refs/heads/main) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 17:31:57 +0200
+
+
+qtrfpowermeter (574353e) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 17:21:01 +0200
+
+
+qtrfpowermeter (78e6aa5) Forty; urgency=low
+
+  * Add files via upload
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 17:16:22 +0200
+
+
+qtrfpowermeter (046314e) Forty; urgency=low
+
+  * Update qtrfpowermeter.desktop
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 17:15:11 +0200
+
+
+qtrfpowermeter (8061f29) Forty; urgency=low
+
+  * Add files via upload
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 17:08:28 +0200
+
+
+qtrfpowermeter (e645397) Forty; urgency=low
+
+  * Add files via upload
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 17:01:19 +0200
+
+
+qtrfpowermeter (ad8a2b1) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 16:52:11 +0200
+
+
+qtrfpowermeter (cee2f2e) Forty; urgency=low
+
+  * add translation mockup
+  * thus will add nontranslated files to project
+
+ -- coozoo <realcoozoo@gmail.com>  Tue, 19 Mar 2024 16:34:03 +0200
+
+
+qtrfpowermeter (3eace38) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 14:42:17 +0200
+
+
+qtrfpowermeter (4e378bc) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 14:37:45 +0200
+
+
+qtrfpowermeter (3b80a44) Forty; urgency=low
+
+  * Update MAC_build_RELEASE.sh
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 14:31:19 +0200
+
+
+qtrfpowermeter (a6dee65) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 14:24:49 +0200
+
+
+qtrfpowermeter (1a9fdf2) Forty; urgency=low
+
+  * Add files via upload
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 14:11:34 +0200
+
+
+qtrfpowermeter (c306ff2) Forty; urgency=low
+
+  * Update main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 14:03:58 +0200
+
+
+qtrfpowermeter (5d0cee8) Forty; urgency=low
+
+  * Merge pull request #9 from coozoo/actionsintegration
+  * Actionsintegration
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 13:54:45 +0200
+
+
+qtrfpowermeter (cc6dd25) Forty; urgency=low
+
+  * Create main.yml
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Tue, 19 Mar 2024 13:54:05 +0200
+
+
+qtrfpowermeter (43cbf6e) Forty; urgency=low
+
+  * windowsicons
+
+ -- happiness <realcoozoo@gmail.com>  Tue, 19 Mar 2024 13:33:01 +0200
+
+
+qtrfpowermeter (0b794ac) Forty; urgency=low
+
+  * windowsicons
+
+ -- happiness <realcoozoo@gmail.com>  Tue, 19 Mar 2024 12:55:56 +0200
+
+
+qtrfpowermeter (d76c7ba) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 08 Mar 2024 18:43:23 +0200
+
+
+qtrfpowermeter (833f77d) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 08 Mar 2024 18:41:26 +0200
+
+
+qtrfpowermeter (2bbea26) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 08 Mar 2024 15:39:52 +0200
+
+
+qtrfpowermeter (89e4e38) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 08 Mar 2024 15:08:44 +0200
+
+
+qtrfpowermeter (320e553) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 08 Mar 2024 15:07:56 +0200
+
+
+qtrfpowermeter (c3fc22d) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 08 Mar 2024 15:06:13 +0200
+
+
+qtrfpowermeter (3fe2db2) Forty; urgency=low
+
+  * Merge pull request #2 from coozoo/usable
+  * Make this software usable
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Fri, 08 Mar 2024 14:46:45 +0200
+
+
+qtrfpowermeter (c26f394) Forty; urgency=low
+
+  * Make this software usable
+
+ -- happiness <realcoozoo@gmail.com>  Fri, 08 Mar 2024 14:45:30 +0200
+
+
+qtrfpowermeter (2db584b) Forty; urgency=low
+
+  * Add write
+  * Add sett settings possibility
+  * lot of new elements
+
+ -- happiness <realcoozoo@gmail.com>  Thu, 07 Mar 2024 08:09:50 +0200
+
+
+qtrfpowermeter (1a90a5e) Forty; urgency=low
+
+  * Fix for parsing
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 06 Mar 2024 17:45:27 +0200
+
+
+qtrfpowermeter (cde1bde) Forty; urgency=low
+
+  * initial commit
+
+ -- happiness <realcoozoo@gmail.com>  Wed, 06 Mar 2024 09:26:12 +0200
+
+
+qtrfpowermeter (242efcc) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 06 Mar 2024 09:24:16 +0200
+
+
+qtrfpowermeter (4ef90c4) Forty; urgency=low
+
+  * Update README.md
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 06 Mar 2024 09:23:11 +0200
+
+
+qtrfpowermeter (1a6ee3a) Forty; urgency=low
+
+  * Initial commit
+
+ -- Yuriy Kuzin <realcoozoo@gmail.com>  Wed, 06 Mar 2024 09:22:44 +0200
+
 
