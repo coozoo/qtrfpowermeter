@@ -30,6 +30,7 @@ signals:
 public slots:
     void onNewMeasurement(double dbmValue);
     void setActiveProfile(const QString &name);
+    void onDeviceConnectionStateChanged(bool connected);
 
 private slots:
     void ongenerateButton_clicked();
