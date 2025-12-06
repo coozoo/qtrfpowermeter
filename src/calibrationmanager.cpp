@@ -55,13 +55,24 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
 
     connect(ui->plotWidget, &QCustomPlot::mousePress, this, &CalibrationManager::onPlotMousePress);
 
+    // --- Connect signals for saving settings on change ---
+    connect(ui->profileComboBox, &QComboBox::currentTextChanged, this, [](const QString &text){
+        QSettings settings;
+        settings.setValue("CalibrationManager/profile", text);
+    });
+    connect(ui->referencePowerSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [](double value){
+        QSettings settings;
+        settings.setValue("CalibrationManager/referencePower", value);
+    });
+    connect(ui->sampleCountSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [](int value){
+        QSettings settings;
+        settings.setValue("CalibrationManager/sampleCount", value);
+    });
 
     ui->calibrateSelected_progressBar->setVisible(false);
     ui->calibrateSelected_progressBar->setTextVisible(false);
-
     ui->pickAverageButton->setEnabled(false);
 
-    loadProfiles();
     setupPlot();
     onStartFreqChanged(ui->startFreqSpinBox->value());
     onEndFreqChanged(ui->endFreqSpinBox->value());
@@ -71,6 +82,37 @@ CalibrationManager::~CalibrationManager()
 {
     delete ui;
 }
+
+void CalibrationManager::loadSettings()
+{
+    QSettings settings;
+    settings.beginGroup("CalibrationManager");
+
+    ui->profileComboBox->blockSignals(true);
+    ui->referencePowerSpinBox->blockSignals(true);
+    ui->sampleCountSpinBox->blockSignals(true);
+
+    ui->referencePowerSpinBox->setValue(settings.value("referencePower", -20.0).toDouble());
+    ui->sampleCountSpinBox->setValue(settings.value("sampleCount", 5).toInt());
+    QString lastProfile = settings.value("profile", "").toString();
+    loadProfiles();
+
+    int profileIndex = ui->profileComboBox->findText(lastProfile);
+    if (profileIndex != -1) {
+        ui->profileComboBox->setCurrentIndex(profileIndex);
+    }
+
+    ui->profileComboBox->blockSignals(false);
+    ui->referencePowerSpinBox->blockSignals(false);
+    ui->sampleCountSpinBox->blockSignals(false);
+
+    if(ui->profileComboBox->currentIndex() != -1) {
+        onloadProfileButton_clicked();
+    }
+
+    settings.endGroup();
+}
+
 
 void CalibrationManager::setupPlot()
 {
@@ -466,7 +508,8 @@ void CalibrationManager::onloadProfileButton_clicked()
     QFile file(getProfilesPath() + "/" + name + ".json");
     if (!file.open(QIODevice::ReadOnly))
         {
-            QMessageBox::critical(this, tr("Error"), tr("Could not load profile '%1'.").arg(name));
+            qWarning() << "Could not load profile" << name << " - file does not exist or is not readable.";
+            m_model->setPoints({});
             return;
         }
 
@@ -497,7 +540,8 @@ void CalibrationManager::ondeleteProfileButton_clicked()
             if (file.remove())
                 {
                     QMessageBox::information(this, tr("Success"), tr("Profile '%1' deleted.").arg(name));
-                    loadProfiles();
+                    loadProfiles(); 
+                    m_model->setPoints({});
                 }
             else
                 {

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QSettings>
 #include "calibrationmodel.h"
 #include "qcustomplot.h"
 
@@ -22,6 +23,7 @@ public:
     ~CalibrationManager();
 
     double getCorrection(double frequencyMHz) const;
+    void loadSettings();
 
 signals:
     void frequencySelected(double frequencyMHz);

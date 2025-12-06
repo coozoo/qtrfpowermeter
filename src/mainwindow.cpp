@@ -253,6 +253,33 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->frequency_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_set_pushButton_clicked);
 
+    // --- Connect signals for saving settings on change ---
+    connect(ui->range_doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [=](double value){
+        QSettings settings;
+        settings.setValue("MainWindow/range_doubleSpinBox", value);
+    });
+    connect(ui->imageFormat_comboBox, &QComboBox::currentTextChanged, this, [=](const QString &text){
+        QSettings settings;
+        settings.setValue("MainWindow/imageFormat_comboBox", text);
+    });
+    connect(ui->flow_checkBox, &QCheckBox::stateChanged, this, [=](int state){
+        QSettings settings;
+        settings.setValue("MainWindow/flow_checkBox", state == Qt::Checked);
+    });
+    connect(ui->imageWidth_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value){
+        QSettings settings;
+        settings.setValue("MainWindow/imageWidth_spinBox", value);
+    });
+    connect(ui->imageHeight_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value){
+        QSettings settings;
+        settings.setValue("MainWindow/imageHeight_spinBox", value);
+    });
+    connect(ui->writeCSV_checkBox, &QCheckBox::stateChanged, this, [=](int state){
+        QSettings settings;
+        settings.setValue("MainWindow/writeCSV_checkBox", state == Qt::Checked);
+    });
+
+
 //    connect(ui->saveCharts_toolButton, &QToolButton::clicked, this, &MainWindow::on_saveCharts_toolButton_clicked);
 
     // --- Tools Menu ---
@@ -315,7 +342,6 @@ void MainWindow::setupSettingsMenu()
     connect(m_actionSimulate, &QAction::triggered, this, &MainWindow::onToggleSimulate);
     settingsMenu->addAction(m_actionSimulate);
 
-    // Hide original checkbox, as its function is now in the menu
     ui->simulate_checkBox->hide();
 }
 
@@ -323,47 +349,70 @@ void MainWindow::loadSettings()
 {
     QSettings settings;
 
-    // Load visibility settings for "Current" panels
-    bool showDbPanel = settings.value("ui/showDbPanel", true).toBool();
-    m_actionShowDbGroup->setChecked(showDbPanel);
-    onToggleDbGroup(showDbPanel);
+    m_actionShowDbGroup->setChecked(settings.value("UI/showDbPanel", true).toBool());
+    onToggleDbGroup(m_actionShowDbGroup->isChecked());
 
-    bool showWattagePanel = settings.value("ui/showWattagePanel", true).toBool();
-    m_actionShowWattageGroup->setChecked(showWattagePanel);
-    onToggleWattageGroup(showWattagePanel);
+    m_actionShowWattageGroup->setChecked(settings.value("UI/showWattagePanel", true).toBool());
+    onToggleWattageGroup(m_actionShowWattageGroup->isChecked());
 
-    bool showMvppPanel = settings.value("ui/showMvppPanel", true).toBool();
-    m_actionShowMvppGroup->setChecked(showMvppPanel);
-    onToggleMvppGroup(showMvppPanel);
+    m_actionShowMvppGroup->setChecked(settings.value("UI/showMvppPanel", true).toBool());
+    onToggleMvppGroup(m_actionShowMvppGroup->isChecked());
 
-    bool showLogTab = settings.value("ui/showLogTab", true).toBool();
-    m_actionShowLogTab->setChecked(showLogTab);
-    onToggleLogTab(showLogTab);
+    m_actionShowLogTab->setChecked(settings.value("UI/showLogTab", true).toBool());
+    onToggleLogTab(m_actionShowLogTab->isChecked());
 
-    bool simulate = settings.value("device/simulate", false).toBool();
-    m_actionSimulate->setChecked(simulate);
-    onToggleSimulate(simulate);
+    settings.beginGroup("MainWindow");
+
+    ui->range_doubleSpinBox->blockSignals(true);
+    ui->range_doubleSpinBox->setValue(settings.value("range_doubleSpinBox", 5.0).toDouble());
+    ui->range_doubleSpinBox->blockSignals(false);
+    onrange_doubleSpinBox_valueChanged(ui->range_doubleSpinBox->value());
+
+    ui->imageFormat_comboBox->blockSignals(true);
+    ui->imageFormat_comboBox->setCurrentText(settings.value("imageFormat_comboBox", "png").toString());
+    ui->imageFormat_comboBox->blockSignals(false);
+
+    ui->flow_checkBox->blockSignals(true);
+    ui->flow_checkBox->setChecked(settings.value("flow_checkBox", true).toBool());
+    ui->flow_checkBox->blockSignals(false);
+
+    ui->imageWidth_spinBox->blockSignals(true);
+    ui->imageWidth_spinBox->setValue(settings.value("imageWidth_spinBox", 1366).toInt());
+    ui->imageWidth_spinBox->blockSignals(false);
+
+    ui->imageHeight_spinBox->blockSignals(true);
+    ui->imageHeight_spinBox->setValue(settings.value("imageHeight_spinBox", 768).toInt());
+    ui->imageHeight_spinBox->blockSignals(false);
+
+    ui->writeCSV_checkBox->blockSignals(true);
+    ui->writeCSV_checkBox->setChecked(settings.value("writeCSV_checkBox", false).toBool());
+    ui->writeCSV_checkBox->blockSignals(false);
+
+    settings.endGroup();
+
+    m_calibrationManager->loadSettings();
+
 }
 
 void MainWindow::onToggleDbGroup(bool checked)
 {
     ui->db_groupBox->setVisible(checked);
     QSettings settings;
-    settings.setValue("ui/showDbPanel", checked);
+    settings.setValue("UI/showDbPanel", checked);
 }
 
 void MainWindow::onToggleWattageGroup(bool checked)
 {
     ui->wattage_groupBox->setVisible(checked);
     QSettings settings;
-    settings.setValue("ui/showWattagePanel", checked);
+    settings.setValue("UI/showWattagePanel", checked);
 }
 
 void MainWindow::onToggleMvppGroup(bool checked)
 {
     ui->mvpp_groupBox->setVisible(checked);
     QSettings settings;
-    settings.setValue("ui/showMvppPanel", checked);
+    settings.setValue("UI/showMvppPanel", checked);
 }
 
 void MainWindow::onToggleLogTab(bool checked)
@@ -373,7 +422,7 @@ void MainWindow::onToggleLogTab(bool checked)
         ui->tabWidget->setTabVisible(logTabIndex, checked);
     }
     QSettings settings;
-    settings.setValue("ui/showLogTab", checked);
+    settings.setValue("UI/showLogTab", checked);
 
     if (m_activeDeviceObject) {
         if (m_useThreading) {
@@ -395,8 +444,6 @@ void MainWindow::onToggleSimulate(bool checked)
             simulatorTimer.stop();
         }
     }
-    QSettings settings;
-    settings.setValue("device/simulate", checked);
 }
 
 void MainWindow::setupDeviceSelector()
