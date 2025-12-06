@@ -62,9 +62,11 @@ void Rf8000Device::sendBufferedCommand()
     QString command = QString("$%1%2#").arg(freqStr).arg(offsetStr);
 
     m_serialPort->writeData(command.toLatin1());
-    emit newLogMessage(QString("%1 [DEVICE] Sent command: %2")
-                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
-                           .arg(command));
+    if (m_loggingEnabled) {
+        emit newLogMessage(QString("%1 [DEVICE] Sent command: %2")
+                               .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                               .arg(command));
+    }
 }
 
 void Rf8000Device::onSerialPortNewData(const QString &data)
@@ -83,9 +85,11 @@ void Rf8000Device::processData(const QString &data)
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             
-            emit newLogMessage(QString("%1 %2")
-                                   .arg(timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz"))
-                                   .arg(match.captured(0)));
+            if (m_loggingEnabled) {
+                emit newLogMessage(QString("%1 %2")
+                                       .arg(timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                                       .arg(match.captured(0)));
+            }
 
             bool ok;
             double dbm = match.captured(1).toDouble(&ok);
@@ -98,9 +102,11 @@ void Rf8000Device::processData(const QString &data)
             }
         }
     } else {
-        emit newLogMessage(QString("%1 [DEVICE] Non-measurement data: %2")
-                               .arg(timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz"))
-                               .arg(data));
+        if (m_loggingEnabled) {
+            emit newLogMessage(QString("%1 [DEVICE] Non-measurement data: %2")
+                                   .arg(timestamp.toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                                   .arg(data));
+        }
     }
 }
 

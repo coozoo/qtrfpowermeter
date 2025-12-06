@@ -94,8 +94,10 @@ void RfpmV5Device::setOffset(double offsetDb)
 void RfpmV5Device::readSettings()
 {
     if (m_serialPort->isPortOpen()) {
-        emit newLogMessage(QString("%1 [DEVICE] Sending Read command...")
-                               .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz")));
+        if (m_loggingEnabled) {
+            emit newLogMessage(QString("%1 [DEVICE] Sending Read command...")
+                                   .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz")));
+        }
         m_serialPort->writeData(QString("Read\r\n").toLatin1());
     }
 }
@@ -110,9 +112,11 @@ void RfpmV5Device::setSampleRate(int rate)
 
     QString command = QString("K%1\r\n").arg(rate, 2, 10, QChar('0'));
     m_serialPort->writeData(command.toLatin1());
-    emit newLogMessage(QString("%1 [DEVICE] Sent Sample Rate: %2")
-                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
-                           .arg(command.trimmed()));
+    if (m_loggingEnabled) {
+        emit newLogMessage(QString("%1 [DEVICE] Sent Sample Rate: %2")
+                               .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                               .arg(command.trimmed()));
+    }
 }
 
 void RfpmV5Device::sendBufferedCommand()
@@ -124,9 +128,11 @@ void RfpmV5Device::sendBufferedCommand()
                           .arg(((m_currentOffsetDb >= 0) ? "+" : "-") + QString::number(qAbs(m_currentOffsetDb), 'f', 1).rightJustified(4, '0'));
 
     m_serialPort->writeData(command.toLatin1());
-    emit newLogMessage(QString("%1 [DEVICE] Sent: %2")
-                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
-                           .arg(command.trimmed()));
+    if (m_loggingEnabled) {
+        emit newLogMessage(QString("%1 [DEVICE] Sent: %2")
+                               .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                               .arg(command.trimmed()));
+    }
 
     m_readbackTimer->start();
 }
@@ -149,11 +155,15 @@ void RfpmV5Device::processData(const QString &data)
             if (!m_isIdentified) {
                 m_isIdentified = true;
                 m_identificationTimer->stop();
-                emit newLogMessage("[DEVICE] RF-PM V5 device identified successfully.");
+                if (m_loggingEnabled) {
+                    emit newLogMessage("[DEVICE] RF-PM V5 device identified successfully.");
+                }
             }
-            emit newLogMessage(QString("%1 [DEVICE] Config Read: %2")
-                                   .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
-                                   .arg(configMatch.captured(0)));
+            if (m_loggingEnabled) {
+                emit newLogMessage(QString("%1 [DEVICE] Config Read: %2")
+                                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                                       .arg(configMatch.captured(0)));
+            }
             m_buffer.remove(configMatch.capturedStart(), configMatch.capturedLength());
         }
     }
@@ -193,9 +203,11 @@ void RfpmV5Device::onSampleTimerTimeout()
 {
     if (m_sampleCount > 0) {
         if (!m_lastRawPacket.isEmpty()) {
-            emit newLogMessage(QString("%1 %2")
-                                   .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
-                                   .arg(m_lastRawPacket));
+            if (m_loggingEnabled) {
+                emit newLogMessage(QString("%1 %2")
+                                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-ddTHH:mm:ss.zzz"))
+                                       .arg(m_lastRawPacket));
+            }
             m_lastRawPacket.clear();
         }
         double avgDbm = m_accumulatedDbm / m_sampleCount;

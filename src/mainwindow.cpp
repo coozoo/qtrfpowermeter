@@ -195,8 +195,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QMainWindow::tabifyDockWidget(ui->attenuation_dockWidget, ui->calibration_dockWidget);
 
-    onDeviceSelector_currentIndexChanged(ui->deviceType_comboBox->currentIndex());
-    Q_EMIT(on_set_pushButton_clicked());
+//    onDeviceSelector_currentIndexChanged(ui->deviceType_comboBox->currentIndex());
+//    Q_EMIT(on_set_pushButton_clicked());
 
     connect(ui->range_doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::onrange_doubleSpinBox_valueChanged);
     ui->range_doubleSpinBox->setMinimum(0.2);
@@ -253,6 +253,33 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->frequency_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_set_pushButton_clicked);
 
+    // --- Connect signals for saving settings on change ---
+    connect(ui->range_doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [=](double value){
+        QSettings settings;
+        settings.setValue("MainWindow/range_doubleSpinBox", value);
+    });
+    connect(ui->imageFormat_comboBox, &QComboBox::currentTextChanged, this, [=](const QString &text){
+        QSettings settings;
+        settings.setValue("MainWindow/imageFormat_comboBox", text);
+    });
+    connect(ui->flow_checkBox, &QCheckBox::stateChanged, this, [=](int state){
+        QSettings settings;
+        settings.setValue("MainWindow/flow_checkBox", state == Qt::Checked);
+    });
+    connect(ui->imageWidth_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value){
+        QSettings settings;
+        settings.setValue("MainWindow/imageWidth_spinBox", value);
+    });
+    connect(ui->imageHeight_spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value){
+        QSettings settings;
+        settings.setValue("MainWindow/imageHeight_spinBox", value);
+    });
+    connect(ui->writeCSV_checkBox, &QCheckBox::stateChanged, this, [=](int state){
+        QSettings settings;
+        settings.setValue("MainWindow/writeCSV_checkBox", state == Qt::Checked);
+    });
+
+
 //    connect(ui->saveCharts_toolButton, &QToolButton::clicked, this, &MainWindow::on_saveCharts_toolButton_clicked);
 
     // --- Tools Menu ---
@@ -262,6 +289,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
     updateDeviceList();
     connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
+
+    setupSettingsMenu();
+    loadSettings();
+    onDeviceSelector_currentIndexChanged(ui->deviceType_comboBox->currentIndex());
+    Q_EMIT(on_set_pushButton_clicked());
 }
 
 MainWindow::~MainWindow()
@@ -274,6 +306,144 @@ MainWindow::~MainWindow()
         m_deviceThread->wait();
     }
     delete ui;
+}
+
+void MainWindow::setupSettingsMenu()
+{
+    QMenu *settingsMenu = menuBar()->addMenu(tr("&Settings"));
+
+    // --- Create the "Current" Sub-Menu ---
+    QMenu *currentMenu = settingsMenu->addMenu(tr("Current"));
+
+    m_actionShowDbGroup = currentMenu->addAction(tr("Show dBm Panel"));
+    m_actionShowDbGroup->setCheckable(true);
+    connect(m_actionShowDbGroup, &QAction::triggered, this, &MainWindow::onToggleDbGroup);
+
+    m_actionShowWattageGroup = currentMenu->addAction(tr("Show Wattage Panel"));
+    m_actionShowWattageGroup->setCheckable(true);
+    connect(m_actionShowWattageGroup, &QAction::triggered, this, &MainWindow::onToggleWattageGroup);
+
+    m_actionShowMvppGroup = currentMenu->addAction(tr("Show mVpp Panel"));
+    m_actionShowMvppGroup->setCheckable(true);
+    connect(m_actionShowMvppGroup, &QAction::triggered, this, &MainWindow::onToggleMvppGroup);
+
+    settingsMenu->addSeparator();
+
+    // --- Add other settings to the main Settings menu ---
+    m_actionShowLogTab = settingsMenu->addAction(tr("Show Log Tab"));
+    m_actionShowLogTab->setCheckable(true);
+    connect(m_actionShowLogTab, &QAction::triggered, this, &MainWindow::onToggleLogTab);
+    settingsMenu->addAction(m_actionShowLogTab);
+
+    settingsMenu->addSeparator();
+
+    m_actionSimulate = settingsMenu->addAction(tr("Simulate Device"));
+    m_actionSimulate->setCheckable(true);
+    connect(m_actionSimulate, &QAction::triggered, this, &MainWindow::onToggleSimulate);
+    settingsMenu->addAction(m_actionSimulate);
+
+    ui->simulate_checkBox->hide();
+}
+
+void MainWindow::loadSettings()
+{
+    QSettings settings;
+
+    m_actionShowDbGroup->setChecked(settings.value("UI/showDbPanel", true).toBool());
+    onToggleDbGroup(m_actionShowDbGroup->isChecked());
+
+    m_actionShowWattageGroup->setChecked(settings.value("UI/showWattagePanel", true).toBool());
+    onToggleWattageGroup(m_actionShowWattageGroup->isChecked());
+
+    m_actionShowMvppGroup->setChecked(settings.value("UI/showMvppPanel", true).toBool());
+    onToggleMvppGroup(m_actionShowMvppGroup->isChecked());
+
+    m_actionShowLogTab->setChecked(settings.value("UI/showLogTab", true).toBool());
+    onToggleLogTab(m_actionShowLogTab->isChecked());
+
+    settings.beginGroup("MainWindow");
+
+    ui->range_doubleSpinBox->blockSignals(true);
+    ui->range_doubleSpinBox->setValue(settings.value("range_doubleSpinBox", 5.0).toDouble());
+    ui->range_doubleSpinBox->blockSignals(false);
+    onrange_doubleSpinBox_valueChanged(ui->range_doubleSpinBox->value());
+
+    ui->imageFormat_comboBox->blockSignals(true);
+    ui->imageFormat_comboBox->setCurrentText(settings.value("imageFormat_comboBox", "png").toString());
+    ui->imageFormat_comboBox->blockSignals(false);
+
+    ui->flow_checkBox->blockSignals(true);
+    ui->flow_checkBox->setChecked(settings.value("flow_checkBox", true).toBool());
+    ui->flow_checkBox->blockSignals(false);
+
+    ui->imageWidth_spinBox->blockSignals(true);
+    ui->imageWidth_spinBox->setValue(settings.value("imageWidth_spinBox", 1366).toInt());
+    ui->imageWidth_spinBox->blockSignals(false);
+
+    ui->imageHeight_spinBox->blockSignals(true);
+    ui->imageHeight_spinBox->setValue(settings.value("imageHeight_spinBox", 768).toInt());
+    ui->imageHeight_spinBox->blockSignals(false);
+
+    ui->writeCSV_checkBox->blockSignals(true);
+    ui->writeCSV_checkBox->setChecked(settings.value("writeCSV_checkBox", false).toBool());
+    ui->writeCSV_checkBox->blockSignals(false);
+
+    settings.endGroup();
+
+    m_calibrationManager->loadSettings();
+
+}
+
+void MainWindow::onToggleDbGroup(bool checked)
+{
+    ui->db_groupBox->setVisible(checked);
+    QSettings settings;
+    settings.setValue("UI/showDbPanel", checked);
+}
+
+void MainWindow::onToggleWattageGroup(bool checked)
+{
+    ui->wattage_groupBox->setVisible(checked);
+    QSettings settings;
+    settings.setValue("UI/showWattagePanel", checked);
+}
+
+void MainWindow::onToggleMvppGroup(bool checked)
+{
+    ui->mvpp_groupBox->setVisible(checked);
+    QSettings settings;
+    settings.setValue("UI/showMvppPanel", checked);
+}
+
+void MainWindow::onToggleLogTab(bool checked)
+{
+    int logTabIndex = ui->tabWidget->indexOf(ui->log_tab);
+    if(logTabIndex != -1) {
+        ui->tabWidget->setTabVisible(logTabIndex, checked);
+    }
+    QSettings settings;
+    settings.setValue("UI/showLogTab", checked);
+
+    if (m_activeDeviceObject) {
+        if (m_useThreading) {
+            QMetaObject::invokeMethod(m_activeDeviceObject, "setLoggingEnabled", Q_ARG(bool, checked));
+        } else {
+            m_activeDeviceObject->setLoggingEnabled(checked);
+        }
+    }
+}
+
+void MainWindow::onToggleSimulate(bool checked)
+{
+    if(checked) {
+        if (!simulatorTimer.isActive()) {
+            simulatorTimer.start(500);
+        }
+    } else {
+        if (simulatorTimer.isActive()) {
+            simulatorTimer.stop();
+        }
+    }
 }
 
 void MainWindow::setupDeviceSelector()
@@ -337,6 +507,8 @@ void MainWindow::createDevice(const QString &deviceId)
     m_activeDeviceObject = m_deviceFactory->createDevice(deviceId, nullptr);
 
     if (m_activeDeviceObject) {
+        m_activeDeviceObject->setLoggingEnabled(m_actionShowLogTab->isChecked());
+
         if (m_useThreading) {
             m_deviceThread = new QThread(this);
             m_activeDeviceObject->moveToThread(m_deviceThread);
@@ -544,7 +716,10 @@ void MainWindow::ondevice_comboBox_currentIndexChanged()
 
 void MainWindow::onNewDeviceLogMessage(const QString &message)
 {
-    ui->data_plainTextEdit->appendPlainText(message);
+    int logTabIndex = ui->tabWidget->indexOf(ui->log_tab);
+    if (logTabIndex != -1 && ui->tabWidget->isTabVisible(logTabIndex)) {
+        ui->data_plainTextEdit->appendPlainText(message);
+    }
 }
 
 void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw)
@@ -829,7 +1004,7 @@ void MainWindow::on_data_model_rowsInserted(const QModelIndex & parent, int star
 
 }
 
-void MainWindow::on_simulate_checkBox_clicked()
+/*void MainWindow::on_simulate_checkBox_clicked()
 {
     qDebug()<<"on_simulate_checkBox_clicked";
     if(ui->simulate_checkBox->isChecked())
@@ -847,7 +1022,7 @@ void MainWindow::on_simulate_checkBox_clicked()
             simulatorTimer.stop();
         }
     }
-}
+}*/
 
 void MainWindow::on_simulatorTimer()
 {

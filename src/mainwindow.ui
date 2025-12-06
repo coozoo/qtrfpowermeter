@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1112</width>
-    <height>644</height>
+    <width>1118</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,6 +56,12 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>400</width>
+          <height>16777215</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -89,6 +95,19 @@
         </property>
        </widget>
       </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </item>
     <item row="1" column="1">
@@ -98,7 +117,7 @@
         <property name="currentIndex">
          <number>2</number>
         </property>
-        <widget class="QWidget" name="tab">
+        <widget class="QWidget" name="log_tab">
          <attribute name="title">
           <string>Log</string>
          </attribute>
@@ -108,7 +127,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_2">
+        <widget class="QWidget" name="data_tab">
          <attribute name="title">
           <string>Data</string>
          </attribute>
@@ -118,7 +137,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_3">
+        <widget class="QWidget" name="status_tab">
          <attribute name="title">
           <string>Status</string>
          </attribute>
@@ -452,8 +471,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>932</width>
-                    <height>188</height>
+                    <width>940</width>
+                    <height>193</height>
                    </rect>
                   </property>
                  </widget>
@@ -605,7 +624,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1112</width>
+     <width>1118</width>
      <height>24</height>
     </rect>
    </property>

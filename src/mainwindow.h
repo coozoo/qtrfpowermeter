@@ -27,6 +27,10 @@
 #include "cablelosscalculatorwindow.h"
 #include <QThread>
 #include "helpdialog.h"
+#include <QSettings>
+#include <QAction>
+#include <QMenu>
+#include <QToolButton>
 
 
 QT_BEGIN_NAMESPACE
@@ -186,6 +190,16 @@ private:
     void updateUiForDevice(const PMDeviceProperties &props);
     void createDevice(const QString &deviceId);
 
+    // --- Settings Menu ---
+    void setupSettingsMenu();
+    void loadSettings();
+
+    QAction *m_actionShowDbGroup;
+    QAction *m_actionShowWattageGroup;
+    QAction *m_actionShowMvppGroup;
+    QAction *m_actionShowLogTab;
+    QAction *m_actionSimulate;
+
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -197,7 +211,6 @@ private slots:
     void on_resetMax_toolButton_clicked();
     void on_refreshDevices_toolbutton_clicked();
     void on_data_model_rowsInserted(const QModelIndex & parent, int start, int end);
-    void on_simulate_checkBox_clicked();
     void on_set_pushButton_clicked();
     void on_simulatorTimer();
     void writeStatCSV(const QString &appendFileName, const QString &logLine, const QString &headersList);
@@ -223,6 +236,14 @@ private slots:
     void onCurrentFrequencyChanged(int freqMHz);
 
     void on_actionCableLossCalculator_triggered();
+
+    // --- Settings Menu Slots ---
+    void onToggleDbGroup(bool checked);
+    void onToggleWattageGroup(bool checked);
+    void onToggleMvppGroup(bool checked);
+    void onToggleLogTab(bool checked);
+    void onToggleSimulate(bool checked);
+
 
 public slots:
     void onrange_doubleSpinBox_valueChanged(double range);

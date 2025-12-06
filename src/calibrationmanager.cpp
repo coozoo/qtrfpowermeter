@@ -55,7 +55,24 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
 
     connect(ui->plotWidget, &QCustomPlot::mousePress, this, &CalibrationManager::onPlotMousePress);
 
-    loadProfiles();
+    // --- Connect signals for saving settings on change ---
+    connect(ui->profileComboBox, &QComboBox::currentTextChanged, this, [](const QString &text){
+        QSettings settings;
+        settings.setValue("CalibrationManager/profile", text);
+    });
+    connect(ui->referencePowerSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [](double value){
+        QSettings settings;
+        settings.setValue("CalibrationManager/referencePower", value);
+    });
+    connect(ui->sampleCountSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [](int value){
+        QSettings settings;
+        settings.setValue("CalibrationManager/sampleCount", value);
+    });
+
+    ui->calibrateSelected_progressBar->setVisible(false);
+    ui->calibrateSelected_progressBar->setTextVisible(false);
+    ui->pickAverageButton->setEnabled(false);
+
     setupPlot();
     onStartFreqChanged(ui->startFreqSpinBox->value());
     onEndFreqChanged(ui->endFreqSpinBox->value());
@@ -65,6 +82,37 @@ CalibrationManager::~CalibrationManager()
 {
     delete ui;
 }
+
+void CalibrationManager::loadSettings()
+{
+    QSettings settings;
+    settings.beginGroup("CalibrationManager");
+
+    ui->profileComboBox->blockSignals(true);
+    ui->referencePowerSpinBox->blockSignals(true);
+    ui->sampleCountSpinBox->blockSignals(true);
+
+    ui->referencePowerSpinBox->setValue(settings.value("referencePower", -20.0).toDouble());
+    ui->sampleCountSpinBox->setValue(settings.value("sampleCount", 5).toInt());
+    QString lastProfile = settings.value("profile", "").toString();
+    loadProfiles();
+
+    int profileIndex = ui->profileComboBox->findText(lastProfile);
+    if (profileIndex != -1) {
+        ui->profileComboBox->setCurrentIndex(profileIndex);
+    }
+
+    ui->profileComboBox->blockSignals(false);
+    ui->referencePowerSpinBox->blockSignals(false);
+    ui->sampleCountSpinBox->blockSignals(false);
+
+    if(ui->profileComboBox->currentIndex() != -1) {
+        onloadProfileButton_clicked();
+    }
+
+    settings.endGroup();
+}
+
 
 void CalibrationManager::setupPlot()
 {
@@ -162,6 +210,7 @@ void CalibrationManager::updatePlot()
 
 void CalibrationManager::highlightPoint(const QModelIndex &index)
 {
+    qDebug() << Q_FUNC_INFO;
     if (!index.isValid())
         {
             m_highlightGraph->setVisible(false);
@@ -186,6 +235,7 @@ void CalibrationManager::highlightPoint(const QModelIndex &index)
 
 void CalibrationManager::onPlotMousePress(QMouseEvent *event)
 {
+    qDebug() << Q_FUNC_INFO;
     QCPGraph *graph = ui->plotWidget->graph(1);
     if (!graph || graph->dataCount() == 0) return;
 
@@ -292,19 +342,34 @@ void CalibrationManager::onStepUnitChanged(const QString &newUnit)
 }
 
 
+void CalibrationManager::onDeviceConnectionStateChanged(bool connected)
+{
+    qDebug() << Q_FUNC_INFO << "Connected:" << connected;
+    if (!connected) {
+        m_samplesToTake = 0;
+        m_measurements.clear();
+        ui->calibrateSelected_progressBar->setVisible(false);
+    }
+}
+
 void CalibrationManager::onNewMeasurement(double dbmValue)
 {
+    qDebug() << Q_FUNC_INFO ;
     // If we are not in measurement mode, just ignore the data.
     if (m_samplesToTake <= 0)
         {
+            qDebug() << Q_FUNC_INFO << ": exiting because m_samplesToTake <= 0";
             return;
         }
 
     m_measurements.append(dbmValue);
 
+    ui->calibrateSelected_progressBar->setValue(m_measurements.count());
+
     // Check if we have collected enough samples
     if (m_measurements.count() >= m_samplesToTake)
         {
+            qDebug() << Q_FUNC_INFO << ": measurement complete.";
             double sum = std::accumulate(m_measurements.begin(), m_measurements.end(), 0.0);
             double averageDbm = sum / m_measurements.count();
 
@@ -312,8 +377,9 @@ void CalibrationManager::onNewMeasurement(double dbmValue)
             double correction = referenceDbm - averageDbm;
 
             m_model->setData(m_model->index(m_selectedIndex.row(), CalibrationModel::Correction), correction, Qt::EditRole);
-            QMessageBox::information(this, tr("Measurement Complete"), tr("Average measured power: %1 dBm\nCalculated correction: %2 dB").arg(averageDbm, 0, 'f', 2).arg(correction, 0, 'f', 2));
             m_samplesToTake = 0;
+
+            ui->calibrateSelected_progressBar->setVisible(false);
         }
 }
 
@@ -360,15 +426,22 @@ void CalibrationManager::onpickAverageButton_clicked()
     qDebug()<<Q_FUNC_INFO;
     if (!m_selectedIndex.isValid())
         {
+            qDebug() << Q_FUNC_INFO << "Aborting: No item selected in table.";
             QMessageBox::information(this, tr("No Selection"), tr("Please select a frequency in the table first."));
             return;
         }
     m_measurements.clear();
     m_samplesToTake = ui->sampleCountSpinBox->value();
+    qDebug() << Q_FUNC_INFO << "Starting. m_samplesToTake set to" << m_samplesToTake;
+
+    ui->calibrateSelected_progressBar->setRange(0, m_samplesToTake);
+    ui->calibrateSelected_progressBar->setValue(0);
+    ui->calibrateSelected_progressBar->setVisible(true);
 }
 
 double CalibrationManager::getCorrection(double frequencyMHz) const
 {
+    qDebug() << Q_FUNC_INFO << "for freq:" << frequencyMHz;
     return m_model->getCorrection(frequencyMHz);
 }
 
@@ -435,7 +508,8 @@ void CalibrationManager::onloadProfileButton_clicked()
     QFile file(getProfilesPath() + "/" + name + ".json");
     if (!file.open(QIODevice::ReadOnly))
         {
-            QMessageBox::critical(this, tr("Error"), tr("Could not load profile '%1'.").arg(name));
+            qWarning() << "Could not load profile" << name << " - file does not exist or is not readable.";
+            m_model->setPoints({});
             return;
         }
 
@@ -466,7 +540,8 @@ void CalibrationManager::ondeleteProfileButton_clicked()
             if (file.remove())
                 {
                     QMessageBox::information(this, tr("Success"), tr("Profile '%1' deleted.").arg(name));
-                    loadProfiles();
+                    loadProfiles(); 
+                    m_model->setPoints({});
                 }
             else
                 {

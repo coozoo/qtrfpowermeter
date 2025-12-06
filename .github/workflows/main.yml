@@ -60,6 +60,11 @@ jobs:
           COMMIT_LOG="${COMMIT_LOG//$'\r'/'%0D'}"
           
           echo "changelog_body=${COMMIT_LOG}" >> $GITHUB_OUTPUT
+      - name: Debug changelog body
+        run: |
+          echo "--- Start of Changelog Body ---"
+          echo "${{ steps.generate_notes.outputs.changelog_body }}"
+          echo "--- End of Changelog Body ---"
       - name: Create release
         if: github.ref == 'refs/heads/main'
         id: create_release
