@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QSettings>
 #include "calibrationmodel.h"
 #include "qcustomplot.h"
 
@@ -22,6 +23,7 @@ public:
     ~CalibrationManager();
 
     double getCorrection(double frequencyMHz) const;
+    void loadSettings();
 
 signals:
     void frequencySelected(double frequencyMHz);
@@ -30,6 +32,7 @@ signals:
 public slots:
     void onNewMeasurement(double dbmValue);
     void setActiveProfile(const QString &name);
+    void onDeviceConnectionStateChanged(bool connected);
 
 private slots:
     void ongenerateButton_clicked();

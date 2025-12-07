@@ -12,18 +12,23 @@ class AbstractPMDevice : public QObject
 
 public:
     explicit AbstractPMDevice(const PMDeviceProperties &props, QObject *parent = nullptr)
-        : QObject(parent), m_properties(props) {}
+        : QObject(parent), m_properties(props), m_loggingEnabled(true) {}
     virtual ~AbstractPMDevice() = default;
 
     const PMDeviceProperties& properties() const { return m_properties; }
 
-    virtual void setFrequency(quint64 freqHz) = 0;
-    virtual void setOffset(double offsetDb) = 0;
-    virtual void setInternalAttenuation(double attDb) { Q_UNUSED(attDb); }
-    virtual void connectDevice(const QString &portName) = 0;
+    // --- Public API ---
+    Q_INVOKABLE virtual void setFrequency(quint64 freqHz) = 0;
+    Q_INVOKABLE virtual void setOffset(double offsetDb) = 0;
+    Q_INVOKABLE virtual void setInternalAttenuation(double attDb) { Q_UNUSED(attDb); }
+    Q_INVOKABLE virtual void connectDevice(const QString &portName) = 0;
     Q_INVOKABLE virtual void disconnectDevice() = 0;
 
     virtual void processData(const QString &data) = 0;
+
+    // --- Logging Control ---
+    Q_INVOKABLE void setLoggingEnabled(bool enabled) { m_loggingEnabled = enabled; }
+    bool isLoggingEnabled() const { return m_loggingEnabled; }
 
 signals:
     void deviceConnected();
@@ -37,6 +42,7 @@ signals:
 
 protected:
     PMDeviceProperties m_properties;
+    bool m_loggingEnabled;
 };
 
 #endif // ABSTRACTPMDEVICE_H

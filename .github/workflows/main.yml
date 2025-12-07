@@ -34,9 +34,10 @@ jobs:
       build_lin: ${{ steps.set_flags.outputs.build_lin }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
+          fetch-depth: 0
       - name: get app version
         run: |
           echo "VER_TAG_NAME=$(cat main.cpp |grep 'const QString APP'|awk -F\" '{print $2;}')-$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
@@ -60,6 +61,11 @@ jobs:
           COMMIT_LOG="${COMMIT_LOG//$'\r'/'%0D'}"
           
           echo "changelog_body=${COMMIT_LOG}" >> $GITHUB_OUTPUT
+      - name: Debug changelog body
+        run: |
+          echo "--- Start of Changelog Body ---"
+          echo "${{ steps.generate_notes.outputs.changelog_body }}"
+          echo "--- End of Changelog Body ---"
       - name: Create release
         if: github.ref == 'refs/heads/main'
         id: create_release
