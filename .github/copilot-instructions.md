@@ -1,4 +1,4 @@
-# Copilot instructions for `coozoo/qtrfpowermeter`
+# Copilot instructions for this repository
 
 ## Project at a glance
 - Qt6/C++17 desktop application (`qmake` project) for serial-port RF power meters.
@@ -47,9 +47,9 @@
 - Preserve existing qmake/project structure and packaging files unless task explicitly targets build/release configuration.
 
 ## Errors encountered and workarounds
-- Encountered during onboarding validation:
+- Encountered in this onboarding session environment:
   - Running `qmake6 && make -j$(nproc)` failed with `qmake6: command not found`.
 - Workaround:
-  - Install Qt6 toolchain/dependencies first (see dependency list above, also reflected in `debian/control` and `.github/workflows/main.yml`), then re-run:
+  - Install the Qt6 toolchain/dependencies listed above (also reflected in `debian/control` and `.github/workflows/main.yml`), then re-run:
     - `qmake6`
     - `make -j$(nproc)`
