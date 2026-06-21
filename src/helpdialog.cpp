@@ -99,6 +99,21 @@ QString HelpDialog::getDeviceSpecificInfo(const QString &deviceId)
                   "<p>The device uses a modified text-based protocol for communication.</p>"
                   "<p><b>Command Format:</b> <code>AFFFFS00.00</code> where A is a literal character, FFFF is the frequency in MHz, S is the sign character (+ or -), and 00.00 is the offset in dB.</p>");
     }
+    if (deviceId == "concept_rf_rpm_binary") {
+        return tr("<h2>Device Description</h2>"
+                  "<p>ConceptRF RPM-series USB RF power meters. Four models share this driver and the same USB ID (CH340, <code>0x1a86:0x7523</code>); the specific model is auto-detected at connect.</p>"
+                  "<table cellspacing=\"0\" cellpadding=\"4\" border=\"1\">"
+                  "<tr><th>Model</th><th>Frequency</th><th>Power</th><th>Sensor</th></tr>"
+                  "<tr><td>RPM-3GS</td><td>50 Hz &ndash; 3 GHz</td><td>&minus;50 &hellip; +10 dBm</td><td>AD8362</td></tr>"
+                  "<tr><td>RPM-9G</td><td>10 MHz &ndash; 9 GHz</td><td>&minus;40 &hellip; +10 dBm</td><td>ARW22347</td></tr>"
+                  "<tr><td>RPM-6GH</td><td>10 MHz &ndash; 6 GHz</td><td>&minus;80 &hellip; +20 dBm</td><td>ARW22283</td></tr>"
+                  "<tr><td>RPM-20GS</td><td>10 MHz &ndash; 20 GHz</td><td>&minus;40 &hellip; +10 dBm</td><td>ARW28340</td></tr>"
+                  "</table>"
+                  "<h2>Calibration</h2>"
+                  "<p>Each unit ships with an excellent factory calibration stored in non-volatile memory on the device itself — the host downloads the full per-frequency detector-voltage table at every connect and applies bilinear interpolation to recover dBm from the raw ADC readings. No manual calibration is needed in normal use.</p>"
+                  "<h2>Additional Information</h2>"
+                  "<p>Binary serial protocol at 460&thinsp;800&nbsp;baud. See <code>docs/protocol/rpm-series.md</code> in the source tree for the full wire format (framing, command set, init handshake, voltage&rarr;power decode).</p>");
+    }
     return tr("<h2>Additional Information</h2><p>No device-specific information available.</p>");
 }
 

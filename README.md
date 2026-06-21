@@ -23,6 +23,22 @@ A newer version of the device with a pretty similar protocol logic (a bit extend
 *   **Protocol:** Similar to the RF8000 but different enough.
 *   **Identification:** The application attempts to identify this device at least to say that it's not the one what you connected for.
 
+### ConceptRF RPM family (RPM-20GS / RPM-9G / RPM-6GH / RPM-3GS)
+A USB RF power meter that is genuinely well built - the unit ships with an excellent factory calibration burned into non-volatile memory on the device itself, so no manual calibration is needed in normal use. The same driver handles all four models; the specific one is auto-detected at connect.
+
+![ConceptRF RPM](images/devices/conceptrfrpm.png)
+
+| Model     | Frequency       | Power            | Sensor   |
+|-----------|-----------------|------------------|----------|
+| RPM-3GS   | 50 Hz - 3 GHz   | -50 … +10 dBm    | AD8362   |
+| RPM-9G    | 10 MHz - 9 GHz  | -40 … +10 dBm    | ARW22347 |
+| RPM-6GH   | 10 MHz - 6 GHz  | -80 … +20 dBm    | ARW22283 |
+| RPM-20GS  | 10 MHz - 20 GHz | -40 … +10 dBm    | ARW28340 |
+
+*   **Protocol:** Binary, 460 800 baud. Frames are `0x55 0xAA <cmd> <len> <~len> <data…> <checksum>`. Full specification lives in [`docs/protocol/rpm-series.md`](../docs/protocol/rpm-series.md).
+*   **Identification:** The device reports its model id, firmware version and serial number at connect; the status bar shows them as e.g. `RPM-20GS | fw 1.10 | S/N 52852392`. Sample rate is reset to 10 Hz on every connect to match the reference Windows app's behaviour and is changeable while live (10 / 40 / 640 / 1280 Hz). The host downloads the full per-frequency calibration table from the device and applies bilinear interpolation to recover dBm from the raw ADC readings.
+*   **USB ID collision:** All four models share the CH340 USB ID `0x1a86:0x7523` with the RF8000 family. The first time you pick a device type for a given port, the application remembers your choice; subsequent plug-ins of the same VID:PID auto-select what you used last time. If you see "No identify response — not a compatible Concept RF RPM" in the status line, the device on that port is probably an RF8000 — switch the device type and retry.
+*   **Fast view:** A "Fast view…" button at the bottom of the main window opens a rolling oscilloscope-style chart that plots every raw sample at uniform sample-domain spacing (the same way the reference app draws). Adjustable window length, left/right flow direction, auto/manual Y-scale, pause, and silent save-to-PNG / save-to-CSV with min/max/avg.
 
 ## Features
 

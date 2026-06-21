@@ -86,14 +86,13 @@ void RfpmV7Device::onSerialPortNewData(const QString &data)
 
 void RfpmV7Device::processData(const QString &data)
 {
-    static QString buffer;
-    buffer += data;
+    m_buffer += data;
 
-    QStringList lines = buffer.split(QRegularExpression("[\r\n]"), Qt::SkipEmptyParts);
-    if (!buffer.endsWith('\n') && !buffer.endsWith('\r')) {
-        buffer = lines.isEmpty() ? "" : lines.takeLast();
+    QStringList lines = m_buffer.split(QRegularExpression("[\r\n]"), Qt::SkipEmptyParts);
+    if (!m_buffer.endsWith('\n') && !m_buffer.endsWith('\r')) {
+        m_buffer = lines.isEmpty() ? "" : lines.takeLast();
     } else {
-        buffer.clear();
+        m_buffer.clear();
     }
 
     for (const QString &line : lines) {
