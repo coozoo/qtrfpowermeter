@@ -1,0 +1,22 @@
+QT += testlib gui widgets serialport
+CONFIG += console testcase c++17
+CONFIG -= app_bundle
+
+TARGET = tst_conceptrfrpm_parser
+
+INCLUDEPATH += ../../src
+
+SOURCES += \
+    test_conceptrfrpm_parser.cpp \
+    ../../src/conceptrfrpmdevice.cpp \
+    ../../src/conceptrfrpmlookuptables.cpp \
+    ../../src/serialportinterface.cpp \
+    ../../src/unitconverter.cpp
+
+HEADERS += \
+    ../../src/abstractpmdevice.h \
+    ../../src/pmdeviceproperties.h \
+    ../../src/conceptrfrpmdevice.h \
+    ../../src/conceptrfrpmlookuptables.h \
+    ../../src/serialportinterface.h \
+    ../../src/unitconverter.h

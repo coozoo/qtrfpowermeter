@@ -51,6 +51,11 @@ public slots:
     void stopPort();
     void writeData(const QByteArray &data);
 
+    // Emit the data-arrival signals for a chunk of bytes. readData()
+    // delegates to this so tests can verify the emit wiring without
+    // opening a real port.
+    void processIncomingBytes(const QByteArray &data);
+
 private:
     QString portName;
     int baudRate;
@@ -62,6 +67,7 @@ private:
 signals:
     void serialPortNewData(QString line);
     void serialPortNewRFData(QString line);
+    void serialPortNewBinaryData(const QByteArray &data);
     void serialLoRaAppMessage(QByteArray header, QString line);
     void portName_changed();
     void baudRate_changed();

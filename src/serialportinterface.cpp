@@ -63,9 +63,15 @@ void SerialPortInterface::readData()
     qDebug()<<"readData()";
     QByteArray data = m_serialPort->readAll();
     qDebug()<<data;
-    emit serialPortNewData(QString(data));
-    QRegularExpression reg("[$].+?[$]");
+    processIncomingBytes(data);
+}
 
+void SerialPortInterface::processIncomingBytes(const QByteArray &data)
+{
+    emit serialPortNewData(QString(data));
+    emit serialPortNewBinaryData(data);
+
+    QRegularExpression reg("[$].+?[$]");
     QRegularExpressionMatchIterator i = reg.globalMatch(data);
     if (i.isValid())
     {
@@ -75,7 +81,6 @@ void SerialPortInterface::readData()
             qDebug()<<match.captured(0);
             emit serialPortNewRFData(QString(match.captured(0).trimmed()));
         }
-
     }
 }
 

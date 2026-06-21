@@ -8,6 +8,8 @@
 #include <QSerialPortInfo>
 #include <QStandardItemModel>
 #include <QScrollBar>
+#include <QLabel>
+#include <QComboBox>
 #include <QDateTime>
 #include <QTimer>
 #include <QRandomGenerator>
@@ -186,9 +188,17 @@ private:
     AbstractPMDevice *m_activeDeviceObject = nullptr;
     bool m_useThreading;
     QThread *m_deviceThread = nullptr;
+    bool m_inProgrammaticDeviceTypeChange = false;
     void setupDeviceSelector();
-    void updateUiForDevice(const PMDeviceProperties &props);
+
     void createDevice(const QString &deviceId);
+
+    // Persisted user choice of deviceId per VID:PID. When the user
+    // manually changes the device-type combobox we save their pick so
+    // the next plug-in of the same VID:PID auto-selects it.
+    static QString settingsKeyForVidPid(quint16 vid, quint16 pid);
+    QString rememberedDeviceForVidPid(quint16 vid, quint16 pid) const;
+    void rememberDeviceForVidPid(quint16 vid, quint16 pid, const QString &deviceId);
 
     // --- Settings Menu ---
     void setupSettingsMenu();
@@ -199,6 +209,31 @@ private:
     QAction *m_actionShowMvppGroup;
     QAction *m_actionShowLogTab;
     QAction *m_actionSimulate;
+
+    // Status-bar label that shows the connected device's model / firmware
+    // version / serial number once the device reports identity. Stays
+    // hidden for devices that never emit deviceIdentityChanged.
+    QLabel *m_identityStatusLabel = nullptr;
+
+    // Sampling-rate control. Populated from the active device's
+    // supportedSamplingRatesHz() at device-creation time; hidden when the
+    // device does not expose a programmable sample rate.
+    QLabel    *m_samplingRateLabel = nullptr;
+    QComboBox *m_samplingRateCombo = nullptr;
+
+    // On-demand fast-view dialog (raw-sample rolling chart + stats).
+    // Owned by the dialog itself (Qt::WA_DeleteOnClose); we keep a
+    // QPointer so we can detect closure and stop feeding it.
+    class FastViewDialog *m_fastView = nullptr;
+
+    // Long-term-chart decimation accumulator. We average raw incoming
+    // samples down to ~10 Hz before feeding the chart / table / CSV so
+    // the per-sample cost at 1280 Hz doesn't melt the UI.
+    static constexpr int kChartTargetHz = 10;
+    int    m_decimTarget = 1;     // samples-per-aggregate
+    int    m_decimCount  = 0;
+    double m_decimSumDbm = 0.0;
+    double m_decimSumVpp = 0.0;
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -223,6 +258,11 @@ private slots:
     void onDeviceSelector_currentIndexChanged(int index);
     void onDeviceConnected();
     void onDeviceDisconnected();
+    void onDeviceIdentityChanged(const QString &modelName,
+                                 const QString &firmwareVersion,
+                                 const QString &serialNumber);
+    void onSamplingRateComboChanged(int index);
+    void openFastView();
     void onDeviceError(const QString &error);
     void onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw);
     void onNewDeviceLogMessage(const QString &message);
@@ -248,6 +288,7 @@ private slots:
 public slots:
     void onrange_doubleSpinBox_valueChanged(double range);
     int on_saveCharts_toolButton_clicked();
+    void updateUiForDevice(const PMDeviceProperties &props);
 
 signals:
     void newData(QString headersList,QString dataList);
