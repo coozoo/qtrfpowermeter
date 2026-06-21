@@ -110,7 +110,7 @@ QString HelpDialog::getDeviceSpecificInfo(const QString &deviceId)
                   "<tr><td>RPM-20GS</td><td>10 MHz &ndash; 20 GHz</td><td>&minus;40 &hellip; +10 dBm</td><td>ARW28340</td></tr>"
                   "</table>"
                   "<h2>Calibration</h2>"
-                  "<p>Each unit ships with an excellent factory calibration stored in non-volatile memory on the device itself — the host downloads the full per-frequency detector-voltage table at every connect and applies bilinear interpolation to recover dBm from the raw ADC readings. No manual calibration is needed in normal use.</p>"
+                  "<p>Each unit ships with an factory calibration stored in non-volatile memory on the device itself - the host downloads the full per-frequency detector-voltage table at every connect and applies bilinear interpolation to recover dBm from the raw ADC readings. No manual calibration is needed in normal use.</p>"
                   "<h2>Additional Information</h2>"
                   "<p>Binary serial protocol at 460&thinsp;800&nbsp;baud. See <code>docs/protocol/rpm-series.md</code> in the source tree for the full wire format (framing, command set, init handshake, voltage&rarr;power decode).</p>");
     }

@@ -359,13 +359,13 @@ void ConceptRfRpmDevice::onIdentificationTimeout()
     QString reason;
     switch (m_state) {
     case Identifying:
-        reason = tr("No identify response \xe2\x80\x94 not a compatible Concept RF RPM.");
+        reason = tr("No identify response - not a compatible Concept RF RPM.");
         break;
     case SettingSampling:
-        reason = tr("Sampling config not acknowledged \xe2\x80\x94 reconnect.");
+        reason = tr("Sampling config not acknowledged - reconnect.");
         break;
     case DownloadingCalibration:
-        reason = tr("Calibration download stalled \xe2\x80\x94 reconnect.");
+        reason = tr("Calibration download stalled - reconnect.");
         break;
     default:
         reason = tr("Device failed to respond in time.");

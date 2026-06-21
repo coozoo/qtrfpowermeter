@@ -394,7 +394,7 @@ void FastViewDialog::onSaveScreenshotClicked()
 void FastViewDialog::onSaveCsvClicked()
 {
     if (m_samples.empty()) {
-        notify::showSavedToast(this, tr("Nothing to save \xe2\x80\x94 buffer is empty"));
+        notify::showSavedToast(this, tr("Nothing to save - buffer is empty"));
         return;
     }
 
