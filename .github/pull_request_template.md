@@ -1,3 +1,0 @@
-<!--
-Do NOT use backticks (`).
--->

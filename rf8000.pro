@@ -33,7 +33,10 @@ SOURCES += \
     src/calibrationpoint.cpp \
     src/chartmanager.cpp \
     src/chartrealtime.cpp \
+    src/conceptrfrpmdevice.cpp \
+    src/conceptrfrpmlookuptables.cpp \
     src/devicecomboboxdelegate.cpp \
+    src/fastviewdialog.cpp \
     src/fixedattenuatorcontrol.cpp \
     src/helpdialog.cpp \
     src/internalattenuatorcontrol.cpp \
@@ -44,6 +47,7 @@ SOURCES += \
     src/rf8000device.cpp \
     src/rfpmv5device.cpp \
     src/rfpmv7device.cpp \
+    src/savedtoast.cpp \
     src/serialportinterface.cpp \
     src/targetpowercalculator.cpp \
     src/unitconverter.cpp
@@ -63,7 +67,10 @@ HEADERS += \
     src/calibrationpoint.h \
     src/chartmanager.h \
     src/chartrealtime.h \
+    src/conceptrfrpmdevice.h \
+    src/conceptrfrpmlookuptables.h \
     src/devicecomboboxdelegate.h \
+    src/fastviewdialog.h \
     src/fixedattenuatorcontrol.h \
     src/helpdialog.h \
     src/internalattenuatorcontrol.h \
@@ -75,6 +82,7 @@ HEADERS += \
     src/rf8000device.h \
     src/rfpmv5device.h \
     src/rfpmv7device.h \
+    src/savedtoast.h \
     src/serialportinterface.h \
     src/targetpowercalculator.h \
     src/unitconverter.h

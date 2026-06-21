@@ -3,6 +3,7 @@
 #include "rf8000device.h"
 #include "rfpmv7device.h"
 #include "rfpmv5device.h"
+#include "conceptrfrpmdevice.h"
 
 PMDeviceFactory::PMDeviceFactory(QObject *parent) : QObject(parent)
 {
@@ -13,6 +14,30 @@ PMDeviceFactory::~PMDeviceFactory() {}
 
 void PMDeviceFactory::registerDevices()
 {
+    // --- Concept RF RPM (Binary Protocol Family) ---
+    // This is the single, generic entry for the new device family.
+    // The driver will auto-detect the specific model and update properties at runtime.
+    PMDeviceProperties conceptRpm;
+    conceptRpm.id = "concept_rf_rpm_binary";
+    conceptRpm.name = "Concept RF RPM";
+    conceptRpm.alternativeNames = "RPM-20GS, RPM-3GS, RPM-9G, RPM-6GH";
+    conceptRpm.imagePath = ":/images/devices/conceptrfrpm.png";
+    // Placeholder ranges shown before the device identifies itself. Use
+    // values that read sensibly in the UI (the RPM-20GS shape: 10 MHz -
+    // 20 GHz, -40..+10 dBm). After identify, ConceptRfRpmDevice merges
+    // the real per-model range from s_deviceSpecificProperties on top.
+    // RPM-3GS goes down to 50 Hz; that caveat lives in the Help dialog.
+    conceptRpm.minFreqHz = 10000000;            // 10 MHz
+    conceptRpm.maxFreqHz = 20000000000ULL;      // 20 GHz
+    conceptRpm.minPowerDbm = -40.0;
+    conceptRpm.maxPowerDbm = 10.0;
+    conceptRpm.hasOffset = true;
+    conceptRpm.baudRate = 460800;
+    conceptRpm.hasInternalAttenuator = false;
+    conceptRpm.isEnabled = true;
+    conceptRpm.supportedVidPids.append({0x1a86, 0x7523});
+    m_deviceRegistry.insert(conceptRpm.id, conceptRpm);
+
     // --- RF Power Meter 10GHz V7 ---
     // this one added just as example how to add custom serial attenuator
     // current implementation will not work and require device to implement it
@@ -126,6 +151,10 @@ PMDeviceProperties PMDeviceFactory::propertiesForDevice(const QString &deviceId)
 
 AbstractPMDevice* PMDeviceFactory::createDevice(const QString &deviceId, QObject *parent)
 {
+    if (deviceId == "concept_rf_rpm_binary") {
+        return new ConceptRfRpmDevice(propertiesForDevice(deviceId), parent);
+    }
+
     if (deviceId == "rfpmv5") {
         return new RfpmV5Device(propertiesForDevice(deviceId), parent);
     }

@@ -41,6 +41,12 @@ private:
 
     double m_lastDbm = -999.0;
     bool m_waitingForPower = false;
+
+    // Holds the trailing partial line between processData calls so a
+    // chunk like "Level: -10.5dBm\r\nPow" doesn't lose its "Pow" tail.
+    // Per-instance (used to be function-static, which leaked state
+    // across devices).
+    QString m_buffer;
 };
 
 #endif // RFPMV7DEVICE_H

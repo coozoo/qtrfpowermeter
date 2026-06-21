@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "fastviewdialog.h"
+#include "savedtoast.h"
+#include <QPushButton>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -29,6 +32,29 @@ MainWindow::MainWindow(QWidget *parent)
     // --- New Device Abstraction Setup ---
     m_deviceFactory = new PMDeviceFactory(this);
     setupDeviceSelector();
+
+    // Identity readout (model / fw / S/N) for devices that report it.
+    // Hidden until a deviceIdentityChanged signal fires.
+    m_identityStatusLabel = new QLabel(this);
+    m_identityStatusLabel->setVisible(false);
+    statusBar()->addPermanentWidget(m_identityStatusLabel);
+
+    // Sampling-rate combobox (left-side permanent widget). Hidden until a
+    // device that supports cmd 0x83 is created.
+    m_samplingRateLabel = new QLabel(tr("Sampling:"), this);
+    m_samplingRateCombo = new QComboBox(this);
+    m_samplingRateLabel->setVisible(false);
+    m_samplingRateCombo->setVisible(false);
+    statusBar()->addPermanentWidget(m_samplingRateLabel);
+    statusBar()->addPermanentWidget(m_samplingRateCombo);
+    connect(m_samplingRateCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onSamplingRateComboChanged);
+
+    // Fast-view button. Always visible; the dialog itself works at any
+    // sample rate.
+    QPushButton *fastViewBtn = new QPushButton(tr("Fast view..."), this);
+    statusBar()->addPermanentWidget(fastViewBtn);
+    connect(fastViewBtn, &QPushButton::clicked, this, &MainWindow::openFastView);
     // old direct serial port handling
     // serialPortPowerMeter= new SerialPortInterface();
 
@@ -287,11 +313,17 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
     toolsMenu->addAction(cableLossCalcAction);
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
-    updateDeviceList();
-    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
 
+    // Settings menu must run before updateDeviceList(). If a device is
+    // already plugged in, updateDeviceList -> ondevice_comboBox change ->
+    // performSmartSelection -> setCurrentIndex -> createDevice, and
+    // createDevice reads m_actionShowLogTab. Without this ordering the
+    // app crashes at startup when a known device is already present.
     setupSettingsMenu();
     loadSettings();
+
+    updateDeviceList();
+    connect(ui->device_comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::ondevice_comboBox_currentIndexChanged);
     onDeviceSelector_currentIndexChanged(ui->deviceType_comboBox->currentIndex());
     Q_EMIT(on_set_pushButton_clicked());
 }
@@ -478,12 +510,27 @@ void MainWindow::onDeviceSelector_currentIndexChanged(int index)
     if (index < 0) return;
 
     QString deviceId = ui->deviceType_comboBox->itemData(index).toString();
+
+    // If this index change came from the user (not from performSmartSelection
+    // calling setCurrentIndex), persist it against the currently-shown port's
+    // VID:PID so the next plug-in re-selects this device type.
+    if (!m_inProgrammaticDeviceTypeChange) {
+        const int portIdx = ui->device_comboBox->currentIndex();
+        if (portIdx >= 0) {
+            bool vidOk = false, pidOk = false;
+            const quint16 vid = ui->device_comboBox->itemData(portIdx, VendorIDRole).toString().toUShort(&vidOk, 16);
+            const quint16 pid = ui->device_comboBox->itemData(portIdx, ProductIDRole).toString().toUShort(&pidOk, 16);
+            if (vidOk && pidOk) rememberDeviceForVidPid(vid, pid, deviceId);
+        }
+    }
+
     createDevice(deviceId);
 }
 
 void MainWindow::createDevice(const QString &deviceId)
 {
     if (m_activeDeviceObject) {
+        disconnect(m_activeDeviceObject, nullptr, this, nullptr);
         if (m_useThreading && m_deviceThread) {
             // Tell the device in the other thread to disconnect
             QMetaObject::invokeMethod(m_activeDeviceObject, "disconnectDevice");
@@ -499,7 +546,7 @@ void MainWindow::createDevice(const QString &deviceId)
         disconnect(attenuationMgr, &AttenuationManager::internalAttenuationChanged,
                    this, &MainWindow::onDeviceInternalAttChanged);
         attenuationMgr->removeInternalAttenuator();
-        
+
         m_activeDeviceObject = nullptr;
     }
 
@@ -507,7 +554,11 @@ void MainWindow::createDevice(const QString &deviceId)
     m_activeDeviceObject = m_deviceFactory->createDevice(deviceId, nullptr);
 
     if (m_activeDeviceObject) {
-        m_activeDeviceObject->setLoggingEnabled(m_actionShowLogTab->isChecked());
+        // Settings menu (and therefore m_actionShowLogTab) may not be
+        // constructed yet during the initial device probe in the
+        // constructor. Defer to "logging on" until it exists.
+        const bool loggingOn = m_actionShowLogTab ? m_actionShowLogTab->isChecked() : true;
+        m_activeDeviceObject->setLoggingEnabled(loggingOn);
 
         if (m_useThreading) {
             m_deviceThread = new QThread(this);
@@ -524,6 +575,9 @@ void MainWindow::createDevice(const QString &deviceId)
         connect(m_activeDeviceObject, &AbstractPMDevice::deviceError, this, &MainWindow::onDeviceError, Qt::QueuedConnection);
         connect(m_activeDeviceObject, &AbstractPMDevice::measurementReady, this, &MainWindow::onNewDeviceMeasurement, Qt::QueuedConnection);
         connect(m_activeDeviceObject, &AbstractPMDevice::newLogMessage, this, &MainWindow::onNewDeviceLogMessage, Qt::QueuedConnection);
+        connect(m_activeDeviceObject, &AbstractPMDevice::propertiesUpdated, this, &MainWindow::updateUiForDevice, Qt::QueuedConnection);
+        connect(m_activeDeviceObject, &AbstractPMDevice::deviceIdentityChanged,
+                this, &MainWindow::onDeviceIdentityChanged, Qt::QueuedConnection);
 
         if (m_activeDeviceObject->properties().hasInternalAttenuator) {
             const auto& props = m_activeDeviceObject->properties();
@@ -537,9 +591,40 @@ void MainWindow::createDevice(const QString &deviceId)
         }
 
         updateUiForDevice(m_activeDeviceObject->properties());
+
+        // Populate the sampling-rate combobox from the device's supported
+        // list. Hidden when the device doesn't expose a programmable rate.
+        //
+        // The control stays *disabled* while not connected: changing it
+        // pre-connect would set a host-side decimation target that doesn't
+        // match what the device boots up at. The C# reference app behaves
+        // the same way and resets to its first rate (10 Hz here) on every
+        // connect via beginSamplingConfig(). The UI mirrors that on the
+        // deviceConnected signal.
+        const QList<int> rates = m_activeDeviceObject->supportedSamplingRatesHz();
+        m_samplingRateCombo->blockSignals(true);
+        m_samplingRateCombo->clear();
+        for (int hz : rates) m_samplingRateCombo->addItem(QString("%1 Hz").arg(hz), hz);
+        if (!rates.isEmpty()) m_samplingRateCombo->setCurrentIndex(0);
+        m_samplingRateCombo->blockSignals(false);
+        const bool hasSamplingControl = !rates.isEmpty();
+        m_samplingRateLabel->setVisible(hasSamplingControl);
+        m_samplingRateCombo->setVisible(hasSamplingControl);
+        m_samplingRateCombo->setEnabled(false);
+
+        // Initial decimation target matches what beginSamplingConfig will
+        // send (index 0). Reset the accumulator so leftover samples from
+        // a previous session don't bias the first averaged chart point.
+        const int initialHz = rates.isEmpty() ? kChartTargetHz : rates.first();
+        m_decimTarget = qMax(1, initialHz / kChartTargetHz);
+        m_decimCount = 0;
+        m_decimSumDbm = 0.0;
+        m_decimSumVpp = 0.0;
     } else {
         qWarning() << "Failed to create device object for" << deviceId;
         updateUiForDevice(PMDeviceProperties()); // Reset UI to a default state
+        m_samplingRateLabel->setVisible(false);
+        m_samplingRateCombo->setVisible(false);
     }
 }
 
@@ -645,24 +730,15 @@ int MainWindow::on_saveCharts_toolButton_clicked()
     if (!createDir(chart_filepath))
     {
         qDebug()<<"no such directory"<<chart_filepath;
+        notify::showSavedToast(this, tr("Save failed: could not create %1").arg(chart_filepath));
+        return 0;
     }
-    else
-    {
-        charts->saveAllCharts(chart_filepath + "/", ui->imageFormat_comboBox->currentText(), ui->imageWidth_spinBox->value(), ui->imageHeight_spinBox->value());
 
-    }
-    //show messagebox that saved (really I'm not checking if it's saved or not :) )
-    QMessageBox msgbox;
-
-    msgbox.setIcon(QMessageBox::Information);
-    msgbox.setWindowTitle(tr("Info"));
-    msgbox.setText(tr("Saved"));
-    QRect widgetRect = this->geometry();
-    msgbox.move(this->parentWidget()->mapToGlobal(widgetRect.center()));
-    msgbox.exec();
-
+    charts->saveAllCharts(chart_filepath + "/", ui->imageFormat_comboBox->currentText(), ui->imageWidth_spinBox->value(), ui->imageHeight_spinBox->value());
+    notify::showSavedToast(this,
+                           tr("Saved charts \xe2\x86\x92 %1").arg(chart_filepath),
+                           chart_filepath);
     return 0;
-
 }
 
 void MainWindow::performSmartSelection()
@@ -681,6 +757,32 @@ void MainWindow::performSmartSelection()
 
     qDebug() << "Smart-selecting for VID:" << QString::number(vid, 16) << "PID:" << QString::number(pid, 16);
 
+    auto selectByDeviceId = [this](const QString &deviceId) -> bool {
+        for (int i = 0; i < ui->deviceType_comboBox->count(); ++i) {
+            if (ui->deviceType_comboBox->itemData(i).toString() == deviceId) {
+                if (ui->deviceType_comboBox->currentIndex() != i) {
+                    m_inProgrammaticDeviceTypeChange = true;
+                    ui->deviceType_comboBox->setCurrentIndex(i);
+                    m_inProgrammaticDeviceTypeChange = false;
+                }
+                return true;
+            }
+        }
+        return false;
+    };
+
+    // Preferred: the user's last explicit pick for this VID:PID.
+    const QString remembered = rememberedDeviceForVidPid(vid, pid);
+    if (!remembered.isEmpty()) {
+        if (selectByDeviceId(remembered)) {
+            qDebug() << "Selected remembered device" << remembered << "for" << QString::number(vid, 16) << ":" << QString::number(pid, 16);
+            return;
+        }
+        // Remembered id no longer present in the combobox (device-type list
+        // changed). Fall through to the heuristic.
+    }
+
+    // Fallback: pick the first registered device that claims this VID:PID.
     for (int i = 0; i < ui->deviceType_comboBox->count(); ++i) {
         QString deviceId = ui->deviceType_comboBox->itemData(i).toString();
         PMDeviceProperties props = m_deviceFactory->propertiesForDevice(deviceId);
@@ -689,14 +791,33 @@ void MainWindow::performSmartSelection()
             if (vidPidPair.first == vid && vidPidPair.second == pid) {
                 if (ui->deviceType_comboBox->currentIndex() != i) {
                     qDebug() << "Match found! Setting device type to" << props.name;
-                    // The onDeviceSelector_currentIndexChanged handles creating the device
-                    // and updating the UI. We just trigger it.
+                    m_inProgrammaticDeviceTypeChange = true;
                     ui->deviceType_comboBox->setCurrentIndex(i);
+                    m_inProgrammaticDeviceTypeChange = false;
                 }
                 return;
             }
         }
     }
+}
+
+QString MainWindow::settingsKeyForVidPid(quint16 vid, quint16 pid)
+{
+    return QStringLiteral("deviceSelection/%1_%2")
+            .arg(vid, 4, 16, QChar('0'))
+            .arg(pid, 4, 16, QChar('0'));
+}
+
+QString MainWindow::rememberedDeviceForVidPid(quint16 vid, quint16 pid) const
+{
+    QSettings settings;
+    return settings.value(settingsKeyForVidPid(vid, pid)).toString();
+}
+
+void MainWindow::rememberDeviceForVidPid(quint16 vid, quint16 pid, const QString &deviceId)
+{
+    QSettings settings;
+    settings.setValue(settingsKeyForVidPid(vid, pid), deviceId);
 }
 
 
@@ -740,6 +861,10 @@ void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double 
     // Update main displays with actual values
     ui->dbm_lcdNumber->display(actual_dbm);
     emit newMeasurement(dbm); // Still emit raw value for calibration
+
+    // Stream every raw sample into the fast-view dialog if it's open.
+    // No throttling -- the dialog manages its own visible window.
+    if (m_fastView) m_fastView->appendSample(actual_dbm);
     QPair<double, QString> formattedPower = UnitConverter::formatPower(actual_milliwatts);
     ui->mW_lcdNumber->display(formattedPower.first);
     ui->wattage_groupBox->setTitle(formattedPower.second);
@@ -760,6 +885,21 @@ void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double 
         ui->maxmw_lineEdit->setText(QString::number(formattedMaxPower.first, 'f', 4));
         ui->maxmw_label->setText(formattedMaxPower.second + ":");
     }
+
+    // --- Decimate raw stream down to ~kChartTargetHz before populating
+    // the table / chart / CSV. The LCD/max-tracking above runs every
+    // sample; everything below this point runs once per averaged group
+    // so high device rates (640/1280 Hz) don't drown the table model.
+    m_decimSumDbm += dbm;
+    m_decimSumVpp += vpp_raw;
+    m_decimCount++;
+    if (m_decimCount < m_decimTarget) return;
+
+    dbm     = m_decimSumDbm / m_decimCount;
+    vpp_raw = m_decimSumVpp / m_decimCount;
+    m_decimSumDbm = 0.0;
+    m_decimSumVpp = 0.0;
+    m_decimCount  = 0;
 
     // --- Table Population Logic ---
     int row = data_model->rowCount();
@@ -946,7 +1086,65 @@ void MainWindow::onDeviceDisconnected()
 {
     qDebug()<<Q_FUNC_INFO;
     setIsConnected(false);
+    if (m_identityStatusLabel) {
+        m_identityStatusLabel->clear();
+        m_identityStatusLabel->setVisible(false);
+    }
     updateDeviceList();
+}
+
+void MainWindow::onDeviceIdentityChanged(const QString &modelName,
+                                         const QString &firmwareVersion,
+                                         const QString &serialNumber)
+{
+    if (!m_identityStatusLabel) return;
+    m_identityStatusLabel->setText(
+        QStringLiteral("%1  |  fw %2  |  S/N %3")
+            .arg(modelName, firmwareVersion, serialNumber));
+    m_identityStatusLabel->setVisible(true);
+}
+
+void MainWindow::openFastView()
+{
+    if (!m_fastView) {
+        m_fastView = new FastViewDialog(this);
+        m_fastView->setAttribute(Qt::WA_DeleteOnClose);
+        m_fastView->setSaveBaseDirectory(filepath);
+        connect(m_fastView, &QObject::destroyed, this, [this]() { m_fastView = nullptr; });
+    }
+    // Seed with the device's current rate so the dialog can position
+    // samples uniformly on the X axis (matches the C# reference app's
+    // oscilloscope-style index-domain plotting).
+    int hz = 10;
+    if (m_activeDeviceObject) {
+        const int reported = m_activeDeviceObject->currentSamplingRateHz();
+        if (reported > 0) hz = reported;
+    }
+    m_fastView->setSamplingRateHz(hz);
+    m_fastView->show();
+    m_fastView->raise();
+    m_fastView->activateWindow();
+}
+
+void MainWindow::onSamplingRateComboChanged(int index)
+{
+    if (!m_activeDeviceObject || index < 0) return;
+    QMetaObject::invokeMethod(m_activeDeviceObject, "setSamplingRateIndex",
+                              Q_ARG(int, index));
+    // Update decimation target eagerly from the host-side knowledge of
+    // the chosen rate. The device confirms with a 0x03 ack but we don't
+    // need to wait for it to right-size the accumulator.
+    const QList<int> rates = m_activeDeviceObject->supportedSamplingRatesHz();
+    if (index < rates.size()) {
+        const int hz = rates.at(index);
+        m_decimTarget = qMax(1, hz / kChartTargetHz);
+        m_decimCount  = 0;
+        m_decimSumDbm = 0.0;
+        m_decimSumVpp = 0.0;
+        // Keep the fast view's X-axis spacing aligned to the new rate
+        // (it will clear its buffer and start fresh).
+        if (m_fastView) m_fastView->setSamplingRateHz(hz);
+    }
 }
 
 void MainWindow::onDeviceError(const QString &error)
@@ -963,6 +1161,34 @@ void MainWindow::onIsConnectedChanged(bool connected)
     ui->device_comboBox->setEnabled(!connected);
     ui->deviceType_comboBox->setEnabled(!connected);
     ui->disconnect_pushButton->setEnabled(connected);
+
+    // Sampling-rate combobox tracks connection state:
+    //   - disabled when not connected (prevents picking a rate the device
+    //     won't actually be running at the moment of connect)
+    //   - silently forced to index 0 on connect to match beginSamplingConfig
+    //   - decimation accumulator reset so the first averaged chart point
+    //     is clean.
+    if (m_samplingRateCombo) {
+        m_samplingRateCombo->setEnabled(connected);
+        if (connected && m_samplingRateCombo->count() > 0
+                && m_samplingRateCombo->currentIndex() != 0) {
+            QSignalBlocker block(m_samplingRateCombo);
+            m_samplingRateCombo->setCurrentIndex(0);
+        }
+        if (!connected && m_samplingRateCombo->count() > 0
+                && m_samplingRateCombo->currentIndex() != 0) {
+            QSignalBlocker block(m_samplingRateCombo);
+            m_samplingRateCombo->setCurrentIndex(0);
+        }
+        if (m_activeDeviceObject) {
+            const QList<int> rates = m_activeDeviceObject->supportedSamplingRatesHz();
+            const int hz = rates.isEmpty() ? kChartTargetHz : rates.first();
+            m_decimTarget = qMax(1, hz / kChartTargetHz);
+            m_decimCount  = 0;
+            m_decimSumDbm = 0.0;
+            m_decimSumVpp = 0.0;
+        }
+    }
 
     if (ui->device_comboBox->currentIndex() == -1)
     {
