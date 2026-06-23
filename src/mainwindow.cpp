@@ -435,6 +435,12 @@ void MainWindow::loadSettings()
     settings.endGroup();
     if (!geom.isEmpty())  restoreGeometry(geom);
     if (!state.isEmpty()) restoreState(state);
+
+    // restoreState() flips dock visibility directly, bypassing the
+    // button.toggled -> dock.setVisible connection, so the toggle buttons
+    // would stay unchecked even when their docks come back visible.
+    ui->att_pushButton->setChecked(!ui->attenuation_dockWidget->isHidden());
+    ui->calibration_pushButton->setChecked(!ui->calibration_dockWidget->isHidden());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
