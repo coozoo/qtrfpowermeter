@@ -894,7 +894,10 @@ void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double 
     double actual_milliwatts = UnitConverter::dBmToMilliwatts(actual_dbm);
 
     // Update main displays with actual values
-    ui->dbm_lcdNumber->display(actual_dbm);
+    // Always two decimals so the LCD doesn't jitter between -35.25, -35.,
+    // -35.2 etc. QLCDNumber::display(double) truncates trailing digits;
+    // formatting to a fixed-precision string preserves the trailing zeros.
+    ui->dbm_lcdNumber->display(QString::number(actual_dbm, 'f', 2));
     emit newMeasurement(dbm); // Still emit raw value for calibration
 
     // Stream every raw sample into the fast-view dialog if it's open.
