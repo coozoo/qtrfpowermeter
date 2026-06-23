@@ -18,6 +18,11 @@ class SerialPortInterface : public QObject
                    READ getbaudRate
                        WRITE setbaudRate
                )
+    // Opt-in raw mode. When enabled, readData() / processIncomingBytes()
+    // emit ONLY serialPortNewRawData() and skip the legacy
+    // line/binary/RF-regex split. Default off so every existing device
+    // driver keeps its old wiring. TinySa flips this on at construction.
+    Q_PROPERTY(bool rawMode READ getRawMode WRITE setRawMode)
 public:
     explicit SerialPortInterface(QObject *parent = nullptr);
     ~SerialPortInterface();
@@ -45,6 +50,13 @@ public:
 
     bool isPortOpen() const;
 
+    void setRawMode(bool mode) { m_rawMode = mode; }
+    bool getRawMode() const { return m_rawMode; }
+
+    // Drop bytes sitting in the input buffer. Used by TinySa between
+    // handshake retries; legacy devices have no reason to call it.
+    void clearInputBuffer();
+
 
 public slots:
     void startPort();
@@ -62,12 +74,14 @@ private:
     QSerialPort *m_serialPort = nullptr;
     QByteArray m_readData;
     QByteArray key16;
+    bool m_rawMode = false;
 
 
 signals:
     void serialPortNewData(QString line);
     void serialPortNewRFData(QString line);
     void serialPortNewBinaryData(const QByteArray &data);
+    void serialPortNewRawData(const QByteArray &data); // TinySa raw stream
     void serialLoRaAppMessage(QByteArray header, QString line);
     void portName_changed();
     void baudRate_changed();

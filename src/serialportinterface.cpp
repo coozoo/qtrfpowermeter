@@ -68,6 +68,14 @@ void SerialPortInterface::readData()
 
 void SerialPortInterface::processIncomingBytes(const QByteArray &data)
 {
+    // TinySa-style raw mode: bypass the legacy line/binary/RF-regex split
+    // and emit the chunk as-is. Existing devices keep the default off and
+    // never see this branch.
+    if (m_rawMode) {
+        emit serialPortNewRawData(data);
+        return;
+    }
+
     emit serialPortNewData(QString(data));
     emit serialPortNewBinaryData(data);
 
@@ -81,6 +89,13 @@ void SerialPortInterface::processIncomingBytes(const QByteArray &data)
             qDebug()<<match.captured(0);
             emit serialPortNewRFData(QString(match.captured(0).trimmed()));
         }
+    }
+}
+
+void SerialPortInterface::clearInputBuffer()
+{
+    if (m_serialPort && m_serialPort->isOpen()) {
+        m_serialPort->clear(QSerialPort::Input);
     }
 }
 

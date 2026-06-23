@@ -7,6 +7,7 @@ CONFIG  += ordered
 SUBDIRS = \
     unitconverter \
     calibrationmodel \
+    advanced_calibration_adapter \
     cablemodel \
     pmdevicefactory \
     rf8000_parser \

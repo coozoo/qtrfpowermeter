@@ -29,6 +29,7 @@
 #include "cablelosscalculatorwindow.h"
 #include <QThread>
 #include "helpdialog.h"
+#include <QPushButton>
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
@@ -237,6 +238,7 @@ private:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void ondevice_comboBox_currentIndexChanged();

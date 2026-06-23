@@ -6,7 +6,7 @@
 #include <QLoggingCategory>
 #include <QFileInfo>
 
-const QString APP_VERSION = "0.50";
+const QString APP_VERSION = "0.51";
 
 void qtLogger(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {

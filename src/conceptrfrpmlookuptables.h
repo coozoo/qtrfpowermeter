@@ -16,6 +16,11 @@ public:
     int getFreqTableSize() const { return m_freqAxisHz.size(); }
     int getPowerTableSize() const { return m_powerAxisDb.size(); }
 
+    // Read-only accessors used by the device-calibration viewer.
+    const QVector<quint64> &freqAxisHz() const { return m_freqAxisHz; }
+    const QVector<float>   &powerAxisDb() const { return m_powerAxisDb; }
+    const QVector<QVector<float>> &voltageTableMv() const { return m_voltageTableMv; }
+
     bool isRowFilled(int freqIndex) const;
     int firstUnfilledRow() const;
     bool allRowsFilled() const;

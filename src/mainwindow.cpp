@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "fastviewdialog.h"
 #include "savedtoast.h"
+#include "conceptrfrpmdevice.h"
+#include <QCloseEvent>
 #include <QPushButton>
 
 
@@ -55,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     QPushButton *fastViewBtn = new QPushButton(tr("Fast view..."), this);
     statusBar()->addPermanentWidget(fastViewBtn);
     connect(fastViewBtn, &QPushButton::clicked, this, &MainWindow::openFastView);
+
     // old direct serial port handling
     // serialPortPowerMeter= new SerialPortInterface();
 
@@ -424,6 +427,26 @@ void MainWindow::loadSettings()
 
     m_calibrationManager->loadSettings();
 
+    // Restore window geometry + dock layout last so it overrides any
+    // earlier resize side effects from the controls we just populated.
+    settings.beginGroup("MainWindow");
+    const QByteArray geom = settings.value("geometry").toByteArray();
+    const QByteArray state = settings.value("state").toByteArray();
+    settings.endGroup();
+    if (!geom.isEmpty())  restoreGeometry(geom);
+    if (!state.isEmpty()) restoreState(state);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    // Persist window size/position + dock layout so the next launch
+    // comes back the way the user left it.
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("state",    saveState());
+    settings.endGroup();
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::onToggleDbGroup(bool checked)
@@ -529,6 +552,16 @@ void MainWindow::onDeviceSelector_currentIndexChanged(int index)
 
 void MainWindow::createDevice(const QString &deviceId)
 {
+    // Anchor calibration persistence to the active deviceId so the
+    // CalibrationManager restores the user's last-used mode + auto state
+    // for this driver. Empty string = global default. Drop any prior
+    // ConceptRF lock first so setActiveDeviceId can load the persisted
+    // mode for the new device.
+    if (m_calibrationManager) {
+        m_calibrationManager->setActiveConceptRfDevice(nullptr);
+        m_calibrationManager->setActiveDeviceId(deviceId);
+    }
+
     if (m_activeDeviceObject) {
         disconnect(m_activeDeviceObject, nullptr, this, nullptr);
         if (m_useThreading && m_deviceThread) {
@@ -853,7 +886,9 @@ void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double 
 
     // --- Apply Corrections for Display ---
     double current_freq_mhz = getFrequency().toDouble();
-    double calibration_correction = m_calibrationManager->getCorrection(current_freq_mhz);
+    // Mode-aware lookup: Simple ignores the measured value, Advanced does
+    // bilinear interp on (freq, measured), Disabled returns 0.
+    double calibration_correction = m_calibrationManager->getCorrection(current_freq_mhz, dbm);
 
     double actual_dbm = dbm + m_current_atteuation + calibration_correction;
     double actual_milliwatts = UnitConverter::dBmToMilliwatts(actual_dbm);
@@ -921,7 +956,7 @@ void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double 
 
     data_model->setItem(row, dataValueAttenuationColumnID, new QStandardItem(QString::number(m_current_atteuation, 'f', 2)));
 
-    double calibration_correction_for_table = m_calibrationManager->getCorrection(getFrequency().toDouble());
+    double calibration_correction_for_table = m_calibrationManager->getCorrection(getFrequency().toDouble(), dbm);
     double total_dbm = dbm + m_current_atteuation + calibration_correction_for_table;
     double total_mw = UnitConverter::dBmToMilliwatts(total_dbm);
 
@@ -1022,7 +1057,14 @@ void MainWindow::updateDeviceList()
         QString vid = QString::number(info.vendorIdentifier(), 16).toLower();
         if (vid != "1a86" && vid != "483")
             continue;
-        
+
+        // TinySa shares the STM VID with RF-PM V5 (both are STM32 virtual
+        // COM ports). Identify TinySa by description and keep it out of
+        // the power-meter combo; the calibration panel's own picker
+        // handles it.
+        if (info.description().contains(QStringLiteral("tinysa"), Qt::CaseInsensitive))
+            continue;
+
         qDebug()<<info.hasVendorIdentifier() <<QString::number(info.vendorIdentifier());
         bool isBusy = false;
         QSerialPort tempPort(info);
@@ -1078,6 +1120,12 @@ void MainWindow::onDeviceConnected()
     qDebug()<<Q_FUNC_INFO;
     setDeviceError("");
     setIsConnected(true);
+    ConceptRfRpmDevice *cdev = qobject_cast<ConceptRfRpmDevice *>(m_activeDeviceObject);
+    // Lock the calibration panel to Disabled and surface the factory
+    // table inline; the lookup table is stable now that we're Ready.
+    if (m_calibrationManager) {
+        m_calibrationManager->setActiveConceptRfDevice(cdev);
+    }
     updateDeviceList();
     on_set_pushButton_clicked();
 }
@@ -1089,6 +1137,11 @@ void MainWindow::onDeviceDisconnected()
     if (m_identityStatusLabel) {
         m_identityStatusLabel->clear();
         m_identityStatusLabel->setVisible(false);
+    }
+    // Release the ConceptRF lock so the user can edit calibration again
+    // for the next device (or via the persisted mode if reconnected).
+    if (m_calibrationManager) {
+        m_calibrationManager->setActiveConceptRfDevice(nullptr);
     }
     updateDeviceList();
 }

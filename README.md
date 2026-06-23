@@ -52,7 +52,17 @@ Supports adding fixed and digital attenuators of one kind https://github.com/coo
 
 For convenient measurement there is attenuation calculator to prevent mixing and damaging your equipment but still you need to be cautious.
 
-There is calibration possibility that can be done manually, by selecting level frequency and pressing button, sure you need to set your generator exactly such parameters
+### Calibration
+
+There are three calibration modes plus a built-in viewer for devices that ship their own factory table.
+
+**Simple (manual).** The original mode. Generate a list of frequencies in the table, pick a row, set your reference generator to that row's frequency at the reference power (RefPower spin box), click *Calibrate Selected*. The stored correction is `refPower - measured average`, and the runtime apply path uses a spline across all populated rows. Quick to set up, one correction value per frequency.
+
+**Advanced (2D table).** Same idea but the correction is stored per `(frequency, power level)` cell rather than just per frequency. When you click a cell in the grid the RefPower spin box snaps to the cell's column level and the meter is retuned to the row's frequency, so *Calibrate Selected* targets exactly that point. The runtime apply path is bilinear interpolation on `(frequency, measured dBm)`. It captures generator behaviour that varies with level, not just frequency, but it's a much longer manual process — a 21-column power axis means each row has 21 cells to fill.
+
+**Auto via TinySa.** With a [TinySa](https://www.tinysa.org/) (or TinySa Ultra) plugged into a second USB port and its RF OUT cabled to the meter input, check the *Auto* box and connect the TinySa from the calibration panel. *Calibrate Selected* then drives the TinySa to the target freq/level itself, waits for the signal to settle, samples, and stores. *Calibrate All* sweeps every row in Simple or every `(row, column)` cell in Advanced; the same button toggles to *Cancel calibration* while running so you can abort. Cells the TinySa cannot reach at a given frequency are clamped to the achievable band (max minus 5 dB) and the same clamped value goes into the correction formula, so the meter and the formula agree on what was actually driven. The DUT is tuned for each cell, and calibrated cells in the Advanced grid turn green so you can see progress at a glance.
+
+**ConceptRF factory calibration view.** When a ConceptRF device is connected, the calibration panel locks to *Disabled* and shows the read-only factory table the device sent on connect (model / firmware / serial, the full frequency × power voltage grid, a per-frequency plot, CSV export). Factory calibration is applied internally by the device, so user calibration stays out of the way — no double correction.
 
 <img width="1913" height="1050" alt="image" src="https://github.com/user-attachments/assets/dcfbd7bc-3c20-424d-aad2-d680f0d8e613" />
 
