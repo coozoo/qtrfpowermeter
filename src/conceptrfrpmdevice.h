@@ -90,6 +90,11 @@ public:
     };
     static IdentifyFields decodeIdentifyPayload(const QByteArray &payload);
     static qint32 decodeStreamingSamplePayload(const QByteArray &payload);
+
+    // Exposed for the device-calibration viewer. Safe to read from the GUI
+    // thread once the device has reached Ready: no further writes happen
+    // to the lookup table until the next disconnect.
+    const AbstractRpmLookupTable *lookupTable() const { return m_lookupTable; }
 };
 
 #endif // CONCEPTRFRPMDEVICE_H

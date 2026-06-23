@@ -39,6 +39,12 @@ public:
     virtual int currentSamplingRateHz() const { return 0; }
     Q_INVOKABLE virtual void setSamplingRateIndex(int index) { Q_UNUSED(index); }
 
+    // True if the device emits rawSampleReady(dbm) per incoming sample
+    // (a high-rate stream beyond what measurementReady carries). The
+    // Fast View uses this to decide whether to consume the raw signal
+    // instead of the averaged measurementReady one. Default false.
+    virtual bool emitsRawSampleStream() const { return false; }
+
 signals:
     void deviceConnected();
     void deviceDisconnected();
@@ -46,6 +52,10 @@ signals:
 
     void rawDataReceived(const QString &data);
     void measurementReady(QDateTime timestamp, double dbm, double vpp_raw);
+    // Optional. Emitted per parsed sample by devices with a high-rate
+    // serial stream (RF-PM V5 today). measurementReady stays the
+    // averaged/decimated feed for LCD + long-term chart.
+    void rawSampleReady(double dbm);
     void newLogMessage(const QString &message);
     void internalAttenuationChanged(double attDb);
     

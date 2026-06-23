@@ -41,8 +41,9 @@ class TestRfpmV5Parser : public QObject
 
 private slots:
     void configFrame_marksDeviceIdentified();
-    void noMeasurement_belowSkipThreshold();
-    void thirtiethSample_isAccumulated_andFlushedByTimer();
+    void samples_doNotEmitMeasurementUntilTimerFires();
+    void singleSample_isAccumulated_andFlushedByTimer();
+    void rawSampleReady_firesPerParsedSample();
     void negativeReading_signApplied();
     void fragmentedDataAcrossCalls_eventuallyParses();
 };
@@ -64,31 +65,47 @@ void TestRfpmV5Parser::configFrame_marksDeviceIdentified()
     QVERIFY(sawIdentified);
 }
 
-void TestRfpmV5Parser::noMeasurement_belowSkipThreshold()
+void TestRfpmV5Parser::samples_doNotEmitMeasurementUntilTimerFires()
 {
     RfpmV5Device d(makeProps());
     d.setLoggingEnabled(false);
     QSignalSpy spy(&d, &AbstractPMDevice::measurementReady);
 
-    // Feed 29 valid samples -- skip counter never reaches 30.
-    feedSampleFrames(d, QStringLiteral("+05000500m"), 29);
-    QMetaObject::invokeMethod(&d, "onSampleTimerTimeout", Qt::DirectConnection);
-
+    // Samples accumulate eagerly but measurementReady is only emitted
+    // by the sample timer. Feeding samples without firing the timer
+    // must leave the spy empty.
+    feedSampleFrames(d, QStringLiteral("+05000500m"), 5);
     QCOMPARE(spy.count(), 0);
 }
 
-void TestRfpmV5Parser::thirtiethSample_isAccumulated_andFlushedByTimer()
+void TestRfpmV5Parser::singleSample_isAccumulated_andFlushedByTimer()
 {
     RfpmV5Device d(makeProps());
     d.setLoggingEnabled(false);
     QSignalSpy spy(&d, &AbstractPMDevice::measurementReady);
 
-    // 30 identical samples: "+050<DDDDD><unit>". dbm = "050" / 10 = 5.0
-    feedSampleFrames(d, QStringLiteral("+05000500m"), 30);
+    // One sample: "+050<DDDDD><unit>". dbm = "050" / 10 = 5.0. The
+    // 29-of-every-30 skip is gone; even a single sample is accumulated
+    // and produces a measurement when the timer fires.
+    feedSampleFrames(d, QStringLiteral("+05000500m"), 1);
     QMetaObject::invokeMethod(&d, "onSampleTimerTimeout", Qt::DirectConnection);
 
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy.takeFirst().at(1).toDouble(), 5.0);
+}
+
+void TestRfpmV5Parser::rawSampleReady_firesPerParsedSample()
+{
+    RfpmV5Device d(makeProps());
+    d.setLoggingEnabled(false);
+    QSignalSpy rawSpy(&d, &AbstractPMDevice::rawSampleReady);
+
+    feedSampleFrames(d, QStringLiteral("+05000500m"), 5);
+    QCOMPARE(rawSpy.count(), 5);
+    for (const auto &args : rawSpy) {
+        QCOMPARE(args.at(0).toDouble(), 5.0);
+    }
+    QVERIFY(d.emitsRawSampleStream());
 }
 
 void TestRfpmV5Parser::negativeReading_signApplied()
