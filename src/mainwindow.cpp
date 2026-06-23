@@ -607,6 +607,12 @@ void MainWindow::createDevice(const QString &deviceId)
         connect(m_activeDeviceObject, &AbstractPMDevice::deviceDisconnected, this, &MainWindow::onDeviceDisconnected, Qt::QueuedConnection);
         connect(m_activeDeviceObject, &AbstractPMDevice::deviceError, this, &MainWindow::onDeviceError, Qt::QueuedConnection);
         connect(m_activeDeviceObject, &AbstractPMDevice::measurementReady, this, &MainWindow::onNewDeviceMeasurement, Qt::QueuedConnection);
+        // Devices with a high-rate raw stream (RF-PM V5) emit
+        // rawSampleReady per parsed sample. Feed those straight to Fast
+        // View so the oscilloscope view sees real device cadence. The
+        // chart and LCD still consume the averaged measurementReady.
+        connect(m_activeDeviceObject, &AbstractPMDevice::rawSampleReady,
+                this, &MainWindow::onRawSampleFromDevice, Qt::QueuedConnection);
         connect(m_activeDeviceObject, &AbstractPMDevice::newLogMessage, this, &MainWindow::onNewDeviceLogMessage, Qt::QueuedConnection);
         connect(m_activeDeviceObject, &AbstractPMDevice::propertiesUpdated, this, &MainWindow::updateUiForDevice, Qt::QueuedConnection);
         connect(m_activeDeviceObject, &AbstractPMDevice::deviceIdentityChanged,
@@ -900,9 +906,14 @@ void MainWindow::onNewDeviceMeasurement(QDateTime timestamp, double dbm, double 
     ui->dbm_lcdNumber->display(QString::number(actual_dbm, 'f', 2));
     emit newMeasurement(dbm); // Still emit raw value for calibration
 
-    // Stream every raw sample into the fast-view dialog if it's open.
-    // No throttling -- the dialog manages its own visible window.
-    if (m_fastView) m_fastView->appendSample(actual_dbm);
+    // Stream every (averaged) sample into the fast-view dialog if the
+    // active device DOES NOT expose a high-rate raw stream. Devices that
+    // do (RF-PM V5) feed Fast View via rawSampleReady ->
+    // onRawSampleFromDevice and we'd double-feed if we appended here too.
+    if (m_fastView && m_activeDeviceObject
+        && !m_activeDeviceObject->emitsRawSampleStream()) {
+        m_fastView->appendSample(actual_dbm);
+    }
     QPair<double, QString> formattedPower = UnitConverter::formatPower(actual_milliwatts);
     ui->mW_lcdNumber->display(formattedPower.first);
     ui->wattage_groupBox->setTitle(formattedPower.second);
@@ -1180,6 +1191,14 @@ void MainWindow::openFastView()
     m_fastView->show();
     m_fastView->raise();
     m_fastView->activateWindow();
+}
+
+void MainWindow::onRawSampleFromDevice(double dbm)
+{
+    // No attenuation / calibration math here -- Fast View plots raw
+    // device samples in sample domain. Keep it cheap so we can stream
+    // at the device's native rate (several kHz on RF-PM V5).
+    if (m_fastView) m_fastView->appendSample(dbm);
 }
 
 void MainWindow::onSamplingRateComboChanged(int index)

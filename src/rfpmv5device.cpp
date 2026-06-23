@@ -7,7 +7,6 @@ RfpmV5Device::RfpmV5Device(const PMDeviceProperties &props, QObject *parent)
     : AbstractPMDevice(props, parent)
     , m_accumulatedDbm(0.0)
     , m_sampleCount(0)
-    , m_skipCounter(0)
     , m_timerIntervalMs(100)
 {
     m_serialPort = new SerialPortInterface(this);
@@ -51,8 +50,10 @@ void RfpmV5Device::connectDevice(const QString &portName)
     if (m_serialPort->isPortOpen()) {
         m_accumulatedDbm = 0.0;
         m_sampleCount = 0;
-        m_skipCounter = 0;
         m_lastRawPacket.clear();
+        m_rateWindow.invalidate();
+        m_rateWindowSamples = 0;
+        m_rawSampleRateHz = 0;
         m_buffer.clear();
         m_isIdentified = false;
 
@@ -175,18 +176,38 @@ void RfpmV5Device::processData(const QString &data)
     while (i.hasNext()) {
         QRegularExpressionMatch match = i.next();
         lastEnd = match.capturedEnd();
-        m_skipCounter++;
-        if (m_skipCounter >= 30) {
-            m_skipCounter = 0;
-            m_lastRawPacket = match.captured(0);
+        m_lastRawPacket = match.captured(0);
 
-            double dbm = match.captured(2).toDouble() / 10.0;
-            if (match.captured(1) == "-") {
-                dbm = -dbm;
-            }
+        double dbm = match.captured(2).toDouble() / 10.0;
+        if (match.captured(1) == "-") {
+            dbm = -dbm;
+        }
 
-            m_accumulatedDbm += dbm;
-            m_sampleCount++;
+        // Raw stream: every parsed sample to Fast View. Chart and LCD
+        // continue to consume the averaged measurementReady emitted by
+        // onSampleTimerTimeout below.
+        emit rawSampleReady(dbm);
+        m_accumulatedDbm += dbm;
+        m_sampleCount++;
+
+        // Sample-rate tracker. Start the window on the first sample
+        // after every reset; close it after 250 ms and convert count
+        // to Hz. Smoothed via simple EMA so a long burst doesn't snap
+        // the value Fast View sees.
+        if (!m_rateWindow.isValid()) {
+            m_rateWindow.start();
+            m_rateWindowSamples = 0;
+        }
+        m_rateWindowSamples++;
+        const qint64 elapsedMs = m_rateWindow.elapsed();
+        if (elapsedMs >= 250) {
+            const int instantaneousHz = static_cast<int>(
+                m_rateWindowSamples * 1000LL / elapsedMs);
+            m_rawSampleRateHz = (m_rawSampleRateHz <= 0)
+                                    ? instantaneousHz
+                                    : (m_rawSampleRateHz * 3 + instantaneousHz) / 4;
+            m_rateWindow.restart();
+            m_rateWindowSamples = 0;
         }
     }
 

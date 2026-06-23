@@ -265,6 +265,10 @@ private slots:
                                  const QString &serialNumber);
     void onSamplingRateComboChanged(int index);
     void openFastView();
+    // Pass-through for devices that emit rawSampleReady (RF-PM V5).
+    // Feeds the Fast View dialog without going through the averaged
+    // measurementReady path.
+    void onRawSampleFromDevice(double dbm);
     void onDeviceError(const QString &error);
     void onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw);
     void onNewDeviceLogMessage(const QString &message);
