@@ -35,6 +35,8 @@ SOURCES += \
     src/chartrealtime.cpp \
     src/conceptrfrpmdevice.cpp \
     src/conceptrfrpmlookuptables.cpp \
+    src/advancedcalibrationtablemodel.cpp \
+    src/devicecalibrationviewerwidget.cpp \
     src/devicecomboboxdelegate.cpp \
     src/fastviewdialog.cpp \
     src/fixedattenuatorcontrol.cpp \
@@ -50,6 +52,8 @@ SOURCES += \
     src/savedtoast.cpp \
     src/serialportinterface.cpp \
     src/targetpowercalculator.cpp \
+    src/tinysadevice.cpp \
+    src/tinysasourcecontroller.cpp \
     src/unitconverter.cpp
 
 HEADERS += \
@@ -69,6 +73,8 @@ HEADERS += \
     src/chartrealtime.h \
     src/conceptrfrpmdevice.h \
     src/conceptrfrpmlookuptables.h \
+    src/advancedcalibrationtablemodel.h \
+    src/devicecalibrationviewerwidget.h \
     src/devicecomboboxdelegate.h \
     src/fastviewdialog.h \
     src/fixedattenuatorcontrol.h \
@@ -85,11 +91,14 @@ HEADERS += \
     src/savedtoast.h \
     src/serialportinterface.h \
     src/targetpowercalculator.h \
+    src/tinysadevice.h \
+    src/tinysasourcecontroller.h \
     src/unitconverter.h
 
 FORMS += \
     src/cablelosscalculatorwindow.ui \
     src/calibrationmanager.ui \
+    src/devicecalibrationviewerwidget.ui \
     src/mainwindow.ui \
     src/qtdigitalattenuator.ui
 

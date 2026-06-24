@@ -200,175 +200,395 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
         <translation>Менеджер калібрування</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="20"/>
+        <location filename="../src/calibrationmanager.ui" line="23"/>
+        <location filename="../src/calibrationmanager.cpp" line="1013"/>
+        <source>Calibration is disabled for this device.</source>
+        <translation>Калібрування вимкнено для цього пристрою.</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="35"/>
+        <source>Simple</source>
+        <translation>Просте</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="45"/>
+        <source>Advanced</source>
+        <translation>Просунуте</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="52"/>
+        <source>Disabled</source>
+        <translation>Вимкнено</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="89"/>
         <source>Calibration Profile</source>
         <translation>Профіль калібрування</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="39"/>
+        <location filename="../src/calibrationmanager.ui" line="97"/>
         <source>Profiles:</source>
         <translation>Профілі:</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="46"/>
+        <location filename="../src/calibrationmanager.ui" line="124"/>
         <source>Save</source>
         <translation>Зберегти</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="53"/>
+        <location filename="../src/calibrationmanager.ui" line="117"/>
         <source>Load</source>
         <translation>Завантажити</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="60"/>
+        <location filename="../src/calibrationmanager.ui" line="131"/>
         <source>Delete</source>
         <translation>Видалити</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="70"/>
-        <source>Frequency Setup</source>
-        <translation>Налаштування частот</translation>
-    </message>
-    <message>
-        <location filename="../src/calibrationmanager.ui" line="76"/>
+        <location filename="../src/calibrationmanager.ui" line="142"/>
         <source>Start:</source>
         <translation>Початок:</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="102"/>
+        <location filename="../src/calibrationmanager.ui" line="168"/>
         <source>End:</source>
         <translation>Кінець:</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="125"/>
+        <location filename="../src/calibrationmanager.ui" line="191"/>
         <source>Step:</source>
         <translation>Крок:</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="151"/>
+        <location filename="../src/calibrationmanager.ui" line="217"/>
         <source>Generate Table</source>
         <translation>Створити таблицю</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="154"/>
+        <location filename="../src/calibrationmanager.ui" line="220"/>
         <source>-&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="180"/>
+        <location filename="../src/calibrationmanager.ui" line="248"/>
         <source>Plot</source>
         <translation>Грфік</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="199"/>
+        <location filename="../src/calibrationmanager.ui" line="267"/>
         <source>Calibration Control</source>
         <translation>Калібрування</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="241"/>
-        <location filename="../src/calibrationmanager.ui" line="251"/>
+        <location filename="../src/calibrationmanager.ui" line="309"/>
+        <source>Use TinySa as the signal source and run the calibration loop automatically</source>
+        <translation>Використовувати TinySa як джерело сигналу і запустити цикл калібрування автоматично</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="312"/>
+        <source>Auto</source>
+        <translation>Авто</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="319"/>
+        <location filename="../src/calibrationmanager.ui" line="329"/>
         <source>Reference Power to Use for Calibration</source>
         <translation>Потужність сигналу, що використовується для калібрування</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="244"/>
+        <location filename="../src/calibrationmanager.ui" line="322"/>
         <source>RefPower (dBm):</source>
         <translation>Потужність:</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="205"/>
-        <location filename="../src/calibrationmanager.ui" line="218"/>
+        <location filename="../src/calibrationmanager.ui" line="371"/>
+        <source>TinySa source (auto)</source>
+        <translation>Джерело TinySa (Авто)</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="377"/>
+        <source>Port:</source>
+        <translation>Порт:</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="394"/>
+        <source>Refresh</source>
+        <translation>Оновити</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="401"/>
+        <location filename="../src/calibrationmanager.cpp" line="1202"/>
+        <source>Connect</source>
+        <translation>З&apos;єднати</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="408"/>
+        <location filename="../src/calibrationmanager.cpp" line="1203"/>
+        <source>not connected</source>
+        <translation>не з&apos;єднано</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="418"/>
+        <source>Sweep TinySa across every row; the level is clamped to each frequency&apos;s reachable band if needed</source>
+        <translation>Пройтись TinySa по кожному рядку; рівень за потреби обмежується доступним діапазоном кожної частоти</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="421"/>
+        <location filename="../src/calibrationmanager.cpp" line="126"/>
+        <source>Calibrate All</source>
+        <translation>Калібрувати все</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.ui" line="273"/>
+        <location filename="../src/calibrationmanager.ui" line="286"/>
         <source>Samples to Average</source>
         <translation>Кількість вимірювань для усереднення</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="221"/>
+        <location filename="../src/calibrationmanager.ui" line="289"/>
         <source>Samples:</source>
         <translation>Проби:</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="231"/>
+        <location filename="../src/calibrationmanager.ui" line="299"/>
         <source>Pick Average for Selected</source>
         <translation>Взяти середнє для обраного</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.ui" line="234"/>
+        <location filename="../src/calibrationmanager.ui" line="302"/>
         <source>Calibrate Selected</source>
         <translation>Калібрувати обране</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="401"/>
+        <location filename="../src/calibrationmanager.cpp" line="626"/>
         <source>Invalid Step</source>
         <translation>Некоректний крок</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="401"/>
+        <location filename="../src/calibrationmanager.cpp" line="626"/>
         <source>Frequency step must be greater than zero.</source>
         <translation>Крок частоти має бути більшим за 0.</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="406"/>
+        <location filename="../src/calibrationmanager.cpp" line="631"/>
         <source>Invalid Range</source>
         <translation>Некоректний діапазон</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="406"/>
+        <location filename="../src/calibrationmanager.cpp" line="631"/>
         <source>Start frequency must be less than end frequency.</source>
         <translation>Початкова частота має бути більшою за кінцеву.</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="430"/>
+        <location filename="../src/calibrationmanager.cpp" line="651"/>
+        <source>Invalid power axis</source>
+        <translation>Невалідна вісь потужності</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="652"/>
+        <source>Min must be less than Max.</source>
+        <translation>Мін має бути меншим за макс.</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="685"/>
+        <location filename="../src/calibrationmanager.cpp" line="716"/>
         <source>No Selection</source>
         <translation>Нічого не обрано</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="430"/>
+        <location filename="../src/calibrationmanager.cpp" line="686"/>
+        <source>Please pick a cell in the Advanced grid first.</source>
+        <translation>Будь ласка спочатку оберіть комірку в просунутій таблиці.</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="691"/>
+        <location filename="../src/calibrationmanager.cpp" line="725"/>
+        <location filename="../src/calibrationmanager.cpp" line="1305"/>
+        <source>TinySa not connected</source>
+        <translation>TinySa не з&apos;єднаний</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="692"/>
+        <location filename="../src/calibrationmanager.cpp" line="726"/>
+        <location filename="../src/calibrationmanager.cpp" line="1306"/>
+        <source>Please connect the TinySa first.</source>
+        <translation>Будь ласка спершу приєднайте TinySa.</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="716"/>
         <source>Please select a frequency in the table first.</source>
         <translation>Будь ласка спочатку оберіть частоту з таблиці.</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="490"/>
+        <location filename="../src/calibrationmanager.cpp" line="795"/>
         <source>Invalid Name</source>
         <translation>Некоректне ім&apos;я</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="490"/>
+        <location filename="../src/calibrationmanager.cpp" line="795"/>
         <source>Please enter a profile name.</source>
         <translation>Будь ласка введіть ім&apos;я профілю.</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="499"/>
-        <location filename="../src/calibrationmanager.cpp" line="542"/>
+        <location filename="../src/calibrationmanager.cpp" line="804"/>
+        <location filename="../src/calibrationmanager.cpp" line="854"/>
         <source>Success</source>
         <translation>Успішно</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="499"/>
+        <location filename="../src/calibrationmanager.cpp" line="804"/>
         <source>Profile &apos;%1&apos; saved.</source>
         <translation>Профіль &apos;%1&apos; збережено.</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="548"/>
+        <location filename="../src/calibrationmanager.cpp" line="860"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="537"/>
+        <location filename="../src/calibrationmanager.cpp" line="999"/>
+        <source>ConceptRF applies factory calibration internally; user calibration off.</source>
+        <translation>ConceptRF використовує внтрішнє заводське калібрування; користувацьке калібрування вимкнене.</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1182"/>
+        <source>Pick a port first.</source>
+        <translation>Оберіть спочатку порт.</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1185"/>
+        <source>Connecting to %1...</source>
+        <translation>З&apos;єднання з %1...</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1192"/>
+        <source>Disconnect</source>
+        <translation>Від&apos;єднати</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1194"/>
+        <source>connected: %1 -- connect TinySa RF OUT to the power meter input via coax</source>
+        <translation>З&apos;єднано: %1 -- з&apos;єднайте TinySa RF OUT до входу вимірювача потужності коаксіальним кабелем</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1219"/>
+        <source>error: %1</source>
+        <translation>помилка: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1264"/>
+        <source>cell %1/%2: no signal (skipped)</source>
+        <translation>комірка %1/%2: сигнал відсутній (пропущено)</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1267"/>
+        <source>row %1: no signal (skipped)</source>
+        <translation>рядок %1: сигнал відсутній (пропущено)</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1286"/>
+        <source>clamp at %1 Hz: asked %2 dBm -&gt; %3 dBm</source>
+        <translation>фіксування на %1 Hz: запит %2 dBm -&gt; %3 dBm</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1317"/>
+        <location filename="../src/calibrationmanager.cpp" line="1338"/>
+        <source>nothing to calibrate</source>
+        <translation>нічого калібрувати</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="126"/>
+        <source>Cancel calibration</source>
+        <translation>Скасувати калібрування</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1362"/>
+        <source>calibration cancelled</source>
+        <translation>калібрування скасовано</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1444"/>
+        <source>calibration sweep done</source>
+        <translation>пробіг калібрування закінчено</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1495"/>
+        <source> (cell %1/%2)</source>
+        <translation> (комірка %1/%2)</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1499"/>
+        <source>setting %1 MHz / %2 dBm%3</source>
+        <translation>встановлення %1 MHz / %2 dBm%3</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1503"/>
+        <source>setting %1 MHz / %2 dBm (asked %3, clamped to band)%4</source>
+        <translation>встановлення %1 MHz / %2 dBm (запит %3, фіксування на смузі)%4</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1559"/>
+        <source>setting %1 MHz / %2 dBm</source>
+        <translation>встановлення %1 MHz / %2 dBm</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1562"/>
+        <source>setting %1 MHz / %2 dBm (asked %3, clamped to band)</source>
+        <translation>встановлення %1 MHz / %2 dBm (запит %3, фіксування на смузі)</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1644"/>
+        <source>Correction at %1 dBm (dB)</source>
+        <translation>Корекція на %1 dBm (dB)</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="1646"/>
+        <source>Correction (dB)</source>
+        <translation>Корекція (dB)</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="849"/>
         <source>Confirm Delete</source>
         <translation>Підтвердіть видалення</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="537"/>
+        <location filename="../src/calibrationmanager.cpp" line="151"/>
+        <source>Power axis (dBm):</source>
+        <translation>Вісь потужності (dBm):</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="152"/>
+        <source>Min</source>
+        <translation>Мін</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="158"/>
+        <source>Max</source>
+        <translation>Макс</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="164"/>
+        <source>Step</source>
+        <translation>Крок</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="173"/>
+        <source>Apply axis</source>
+        <translation>Застосувати вісь</translation>
+    </message>
+    <message>
+        <location filename="../src/calibrationmanager.cpp" line="849"/>
         <source>Are you sure you want to delete the profile &apos;%1&apos;?</source>
         <translation>Ви впевнені, що бжаєте видалити профіль &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="542"/>
+        <location filename="../src/calibrationmanager.cpp" line="854"/>
         <source>Profile &apos;%1&apos; deleted.</source>
         <translation>Профіль &apos;%1&apos; видалено.</translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="548"/>
+        <location filename="../src/calibrationmanager.cpp" line="860"/>
         <source>Could not delete profile &apos;%1&apos;.</source>
         <translation>Неможливо видалити  профіль&apos;%1&apos;.</translation>
     </message>
@@ -376,12 +596,12 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
 <context>
     <name>CalibrationModel</name>
     <message>
-        <location filename="../src/calibrationmodel.cpp" line="82"/>
+        <location filename="../src/calibrationmodel.cpp" line="86"/>
         <source>Frequency (MHz)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmodel.cpp" line="84"/>
+        <location filename="../src/calibrationmodel.cpp" line="88"/>
         <source>Correction (dB)</source>
         <translation></translation>
     </message>
@@ -417,6 +637,128 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
         <location filename="../src/conceptrfrpmdevice.cpp" line="371"/>
         <source>Device failed to respond in time.</source>
         <translation>Пристрій не відповів вчасно.</translation>
+    </message>
+</context>
+<context>
+    <name>DeviceCalibrationViewerWidget</name>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="35"/>
+        <source>Device</source>
+        <translation>Пристрій</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="44"/>
+        <source>Model:</source>
+        <translation>Модель:</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="51"/>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="68"/>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="85"/>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="115"/>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="132"/>
+        <source>-</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="61"/>
+        <source>Firmware:</source>
+        <translation>Прошивка:</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="78"/>
+        <source>S/N:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="108"/>
+        <source>Dimensions:</source>
+        <translation>Розміри:</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="125"/>
+        <source>Status:</source>
+        <translation>Статус:</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="149"/>
+        <source>Voltage table (mV), rows = frequency, columns = power (dBm)</source>
+        <translation>Таблиця напруги (mV), рядки = частота, колонки = потужність (dBm)</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="169"/>
+        <source>Voltage vs power, selected frequency</source>
+        <translation>Напруга - потужність; обрана частота</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.ui" line="204"/>
+        <source>Export CSV...</source>
+        <translation>Експорт CSV...</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="57"/>
+        <source>No calibration table available.</source>
+        <translation>Відсутня таблиця калібрування.</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="85"/>
+        <source>(unknown)</source>
+        <translation>(невідомий)</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="88"/>
+        <source>%1 frequencies x %2 power levels</source>
+        <translation>%1 частоти x %2 рівні потужності</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="97"/>
+        <source>All %1 rows filled.</source>
+        <translation>Всі %1 рядки заповнено.</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="99"/>
+        <source>%1 of %2 rows filled (partial).</source>
+        <translation>%1 з %2 рядків заповнено (частково).</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="190"/>
+        <source>Power (dBm)</source>
+        <translation>Потужність (dBm)</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="191"/>
+        <source>Voltage (mV)</source>
+        <translation>Напруга (mV)</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="212"/>
+        <source>Voltage vs power at %1</source>
+        <translation>Напруга потуужність при %1</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="237"/>
+        <source>Export device calibration</source>
+        <translation>Експортувати калібрування пристрою</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="239"/>
+        <source>CSV files (*.csv)</source>
+        <translation>CSV файли (*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="244"/>
+        <source>Export failed</source>
+        <translation>Помилка експорту</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="245"/>
+        <source>Could not open %1 for writing.</source>
+        <translation>Неможливо відкрити %1 для запису.</translation>
+    </message>
+    <message>
+        <location filename="../src/devicecalibrationviewerwidget.cpp" line="275"/>
+        <source>Saved %1</source>
+        <translation>Збережено %1</translation>
     </message>
 </context>
 <context>
@@ -725,7 +1067,7 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="70"/>
-        <location filename="../src/mainwindow.cpp" line="245"/>
+        <location filename="../src/mainwindow.cpp" line="248"/>
         <source>Refresh</source>
         <translation>Оновити</translation>
     </message>
@@ -787,32 +1129,32 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="316"/>
-        <location filename="../src/mainwindow.cpp" line="189"/>
-        <location filename="../src/mainwindow.cpp" line="1391"/>
+        <location filename="../src/mainwindow.cpp" line="192"/>
+        <location filename="../src/mainwindow.cpp" line="1474"/>
         <source>Attenuation:</source>
         <translation>Послаблення:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="336"/>
-        <location filename="../src/mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="351"/>
         <source>Current</source>
         <translation>Поточні</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="344"/>
-        <location filename="../src/mainwindow.cpp" line="79"/>
+        <location filename="../src/mainwindow.cpp" line="82"/>
         <source>dBm</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="372"/>
-        <location filename="../src/mainwindow.cpp" line="81"/>
+        <location filename="../src/mainwindow.cpp" line="84"/>
         <source>mW</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="388"/>
-        <location filename="../src/mainwindow.cpp" line="80"/>
+        <location filename="../src/mainwindow.cpp" line="83"/>
         <source>mVpp</source>
         <translation></translation>
     </message>
@@ -890,7 +1232,7 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="537"/>
-        <location filename="../src/mainwindow.cpp" line="236"/>
+        <location filename="../src/mainwindow.cpp" line="239"/>
         <source>Flow</source>
         <translation>Проточний</translation>
     </message>
@@ -901,188 +1243,188 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="585"/>
-        <location filename="../src/mainwindow.cpp" line="273"/>
+        <location filename="../src/mainwindow.cpp" line="276"/>
         <source>csv</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="63"/>
+        <location filename="../src/mainwindow.cpp" line="66"/>
         <source>Reset max values</source>
         <translation>Скинути максимальні значення</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="67"/>
+        <location filename="../src/mainwindow.cpp" line="70"/>
         <source>Browse saved data directory</source>
         <translation>Відкрити теку збережених даних</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="74"/>
+        <location filename="../src/mainwindow.cpp" line="77"/>
         <source>Session data not saved yet</source>
         <translation>Ще немає збережених даних</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="78"/>
+        <location filename="../src/mainwindow.cpp" line="81"/>
         <source>Time</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="82"/>
+        <location filename="../src/mainwindow.cpp" line="85"/>
         <source>Frequency MHz</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="83"/>
+        <location filename="../src/mainwindow.cpp" line="86"/>
         <source>Correction dB</source>
         <translation>Offset dB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="84"/>
+        <location filename="../src/mainwindow.cpp" line="87"/>
         <source>Attenuation dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="85"/>
+        <location filename="../src/mainwindow.cpp" line="88"/>
         <source>Total dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="86"/>
+        <location filename="../src/mainwindow.cpp" line="89"/>
         <source>Total mW</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="237"/>
+        <location filename="../src/mainwindow.cpp" line="240"/>
         <source>After this time data on chart will move out so it will look like a flow</source>
         <translation>Після цього часу дані будуть рухатись далі поза графік, тому буде виглядати як проточний</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="239"/>
-        <location filename="../src/mainwindow.cpp" line="240"/>
+        <location filename="../src/mainwindow.cpp" line="242"/>
+        <location filename="../src/mainwindow.cpp" line="243"/>
         <source>Device Info</source>
         <translation>Інформація про пристрій</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="244"/>
+        <location filename="../src/mainwindow.cpp" line="247"/>
         <source>Refresh Devices</source>
         <translation>Оновити пристрої</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="253"/>
+        <location filename="../src/mainwindow.cpp" line="256"/>
         <source>Save charts</source>
         <translation>Зберегти графіки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="254"/>
+        <location filename="../src/mainwindow.cpp" line="257"/>
         <source>Save charts as images to the log folder</source>
         <translation>Зберегти графіки до теки логування</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="257"/>
+        <location filename="../src/mainwindow.cpp" line="260"/>
         <source>Choose output format</source>
         <translation>Обрати формат збереження</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="261"/>
+        <location filename="../src/mainwindow.cpp" line="264"/>
         <source>Set image width</source>
         <translation>Втановити ширину картинки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="267"/>
+        <location filename="../src/mainwindow.cpp" line="270"/>
         <source>Set image height</source>
         <translation>Втановити висоту картинки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="274"/>
+        <location filename="../src/mainwindow.cpp" line="277"/>
         <source>Write on fly data to csv file into log folder</source>
         <translation>Записувати отриманні дані в CSV в теку логування</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="312"/>
+        <location filename="../src/mainwindow.cpp" line="315"/>
         <source>&amp;Tools</source>
         <translation>&amp;Інструменти</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="313"/>
+        <location filename="../src/mainwindow.cpp" line="316"/>
         <source>Cable Loss Calculator</source>
         <translation>Калькулятор втрат коаксіального кабелю</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1204"/>
+        <location filename="../src/mainwindow.cpp" line="1287"/>
         <source>Connected to %1 on %2</source>
         <translation>З&apos;єднано з %1 по %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1479"/>
+        <location filename="../src/mainwindow.cpp" line="1562"/>
         <source>No Device Selected</source>
         <translation>Пристрій не обрано</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1479"/>
+        <location filename="../src/mainwindow.cpp" line="1562"/>
         <source>Please select a device type first.</source>
         <translation>Будь ласка спочатку оберіть тип пристрою.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1210"/>
+        <location filename="../src/mainwindow.cpp" line="1293"/>
         <source>Error: %1</source>
         <translation>Помилка: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="44"/>
+        <location filename="../src/mainwindow.cpp" line="46"/>
         <source>Sampling:</source>
         <translation>Дискретизація:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="55"/>
+        <location filename="../src/mainwindow.cpp" line="57"/>
         <source>Fast view...</source>
         <translation>Швидкий перегляд...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="345"/>
+        <location filename="../src/mainwindow.cpp" line="348"/>
         <source>&amp;Settings</source>
         <translation>&amp;Налаштування</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="350"/>
+        <location filename="../src/mainwindow.cpp" line="353"/>
         <source>Show dBm Panel</source>
         <translation>Показувати табло dBm</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="354"/>
+        <location filename="../src/mainwindow.cpp" line="357"/>
         <source>Show Wattage Panel</source>
         <translation>Показувати табло ватажу</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="358"/>
+        <location filename="../src/mainwindow.cpp" line="361"/>
         <source>Show mVpp Panel</source>
         <translation>Показувати табло mVpp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="365"/>
+        <location filename="../src/mainwindow.cpp" line="368"/>
         <source>Show Log Tab</source>
         <translation>Показувати вкладку логування</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="372"/>
+        <location filename="../src/mainwindow.cpp" line="375"/>
         <source>Simulate Device</source>
         <translation>Симульований пристрій</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="733"/>
+        <location filename="../src/mainwindow.cpp" line="778"/>
         <source>Save failed: could not create %1</source>
         <translation>Помилка збереження: неможливо створити %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="739"/>
+        <location filename="../src/mainwindow.cpp" line="784"/>
         <source>Saved charts → %1</source>
         <translation>Графік збережено → %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1214"/>
+        <location filename="../src/mainwindow.cpp" line="1297"/>
         <source>Disconnected</source>
         <translation>Від&apos;єднано</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1037"/>
+        <location filename="../src/mainwindow.cpp" line="1099"/>
         <source> [Busy]</source>
         <translation> [використовується]</translation>
     </message>
@@ -1304,12 +1646,12 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
 <context>
     <name>RfpmV5Device</name>
     <message>
-        <location filename="../src/rfpmv5device.cpp" line="109"/>
+        <location filename="../src/rfpmv5device.cpp" line="110"/>
         <source>Sample rate must be between 1 and 18.</source>
         <translation>Дискретизація має бути між 1 та 18.</translation>
     </message>
     <message>
-        <location filename="../src/rfpmv5device.cpp" line="228"/>
+        <location filename="../src/rfpmv5device.cpp" line="249"/>
         <source>Device did not respond or is not a compatible RF-PM V5 device.</source>
         <translation>Пристрій не відповідає або це не сумісний RF-PM V5 пристрій.</translation>
     </message>

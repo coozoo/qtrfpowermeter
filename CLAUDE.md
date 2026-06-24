@@ -68,6 +68,12 @@ RF8000 family and ConceptRF share the CH340 USB ID. `performSmartSelection()`:
 
 `m_inProgrammaticDeviceTypeChange` is the flag that prevents the smart-selection's `setCurrentIndex()` from looking like a user pick and being persisted. Don't drop it.
 
+## Device-calibration viewer (ConceptRF only)
+
+`DeviceCalibrationViewerWidget` does the rendering (table + per-row plot + Export CSV). It's embedded directly in the `CalibrationManager` panel. When the active device is ConceptRF and Ready, `MainWindow::onDeviceConnected` calls `m_calibrationManager->setActiveConceptRfDevice(cdev)`. The manager hides its user-calibration body, locks the mode radios to Disabled (greyed out), and shows the factory widget inline. `onDeviceDisconnected` and `createDevice` call `setActiveConceptRfDevice(nullptr)` to release the lock and restore the persisted mode for the new device id.
+
+The widget snapshots `freqAxisHz / powerAxisDb / voltageTableMv` synchronously in `setDevice()`. Safe because nothing writes to the lookup table after Ready. If you ever start mutating it after Ready, switch to a `Q_INVOKABLE` snapshot copied across threads with `Qt::BlockingQueuedConnection`.
+
 ## UI conventions established here
 
 - Status-bar permanent widgets: identity label (model/fw/sn), sampling combobox (visible only when device supports it), "Fast view…" button. Add new persistent affordances there before adding to the menu bar.

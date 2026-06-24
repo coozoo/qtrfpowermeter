@@ -29,6 +29,7 @@
 #include "cablelosscalculatorwindow.h"
 #include <QThread>
 #include "helpdialog.h"
+#include <QPushButton>
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
@@ -237,6 +238,7 @@ private:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void ondevice_comboBox_currentIndexChanged();
@@ -263,6 +265,10 @@ private slots:
                                  const QString &serialNumber);
     void onSamplingRateComboChanged(int index);
     void openFastView();
+    // Pass-through for devices that emit rawSampleReady (RF-PM V5).
+    // Feeds the Fast View dialog without going through the averaged
+    // measurementReady path.
+    void onRawSampleFromDevice(double dbm);
     void onDeviceError(const QString &error);
     void onNewDeviceMeasurement(QDateTime timestamp, double dbm, double vpp_raw);
     void onNewDeviceLogMessage(const QString &message);
