@@ -91,7 +91,6 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
 
     ui->calibrateSelected_progressBar->setVisible(false);
     ui->calibrateSelected_progressBar->setTextVisible(false);
-    ui->pickAverageButton->setEnabled(false);
 
     setupPlot();
     onStartFreqChanged(ui->startFreqSpinBox->value());
@@ -109,6 +108,23 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
             this, &CalibrationManager::onTinySaConnectClicked);
     connect(ui->calibrateAllButton,  &QPushButton::clicked,
             this, &CalibrationManager::onCalibrateAllClicked);
+    // Both calibrate buttons are checkable: their OR-ed checked state is
+    // "calibration in flight", and that drives the table grey-out via the
+    // refreshLock lambda below. Sweep-start/-end paths only toggle the
+    // appropriate button; the text + tables follow automatically.
+    ui->calibrateAllButton->setCheckable(true);
+    ui->pickAverageButton->setCheckable(true);
+    auto refreshLock = [this](bool) {
+        const bool busy = ui->calibrateAllButton->isChecked()
+                       || ui->pickAverageButton->isChecked();
+        ui->tableView->setDisabled(busy);
+        if (m_advancedTableView) m_advancedTableView->setDisabled(busy);
+    };
+    connect(ui->calibrateAllButton, &QPushButton::toggled, this, refreshLock);
+    connect(ui->pickAverageButton,  &QPushButton::toggled, this, refreshLock);
+    connect(ui->calibrateAllButton, &QPushButton::toggled, this, [this](bool busy) {
+        ui->calibrateAllButton->setText(busy ? tr("Cancel calibration") : tr("Calibrate All"));
+    });
 
     // Default UI shape: Simple, Auto off, TinySa subgroup hidden.
     applyModeUi(CalibrationModel::Mode::Simple);
@@ -219,10 +235,15 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
                     if (current.column() >= 0 && current.column() < axis.size()) {
                         mirrorRefSpinbox(axis[current.column()]);
                     }
-                    ui->pickAverageButton->setEnabled(true);
                 }
+                refreshButtonEnabledState();
                 updateAdvancedColumnChart();
             });
+
+    // Set the initial enabled state once everything is wired up.
+    // m_pmConnected = false, m_tinySaConnected = false, no selection yet,
+    // so both calibrate buttons start disabled.
+    refreshButtonEnabledState();
 }
 
 CalibrationManager::~CalibrationManager()
@@ -528,11 +549,15 @@ void CalibrationManager::onStepUnitChanged(const QString &newUnit)
 void CalibrationManager::onDeviceConnectionStateChanged(bool connected)
 {
     qDebug() << Q_FUNC_INFO << "Connected:" << connected;
+    m_pmConnected = connected;
     if (!connected) {
         m_samplesToTake = 0;
         m_measurements.clear();
         ui->calibrateSelected_progressBar->setVisible(false);
+        ui->pickAverageButton->setChecked(false);
+        ui->calibrateAllButton->setChecked(false);
     }
+    refreshButtonEnabledState();
 }
 
 void CalibrationManager::onNewMeasurement(double dbmValue)
@@ -579,6 +604,7 @@ void CalibrationManager::onNewMeasurement(double dbmValue)
             m_samplesToTake = 0;
 
             ui->calibrateSelected_progressBar->setVisible(false);
+            ui->pickAverageButton->setChecked(false);
         }
 }
 
@@ -636,7 +662,7 @@ void CalibrationManager::ontable_clicked(const QModelIndex &index)
 
     m_selectedIndex = index;
     double freq = m_model->data(m_model->index(index.row(), CalibrationModel::Frequency)).toDouble();
-    ui->pickAverageButton->setEnabled(true);
+    refreshButtonEnabledState();
     highlightPoint(index);
     emit frequencySelected(freq);
 }
@@ -644,6 +670,13 @@ void CalibrationManager::ontable_clicked(const QModelIndex &index)
 void CalibrationManager::onpickAverageButton_clicked()
 {
     qDebug()<<Q_FUNC_INFO;
+    // Re-click guard. The button is checkable so Qt auto-toggles its
+    // checked state on each click. If a calibration is already running,
+    // ignore the click and force the "running" indicator back on.
+    if (m_samplesToTake > 0 || m_autoCurrentRow >= 0) {
+        ui->pickAverageButton->setChecked(true);
+        return;
+    }
     if (m_model->mode() == CalibrationModel::Mode::Advanced) {
         const QModelIndex curr = m_advancedTableView
                                      ? m_advancedTableView->currentIndex()
@@ -651,11 +684,13 @@ void CalibrationManager::onpickAverageButton_clicked()
         if (!curr.isValid()) {
             QMessageBox::information(this, tr("No Selection"),
                                      tr("Please pick a cell in the Advanced grid first."));
+            ui->pickAverageButton->setChecked(false);
             return;
         }
         if (ui->autoCalibrationCheckBox->isChecked() && !m_tinySaConnected) {
             QMessageBox::information(this, tr("TinySa not connected"),
                                      tr("Please connect the TinySa first."));
+            ui->pickAverageButton->setChecked(false);
             return;
         }
         m_manualAdvancedRow = curr.row();
@@ -679,6 +714,7 @@ void CalibrationManager::onpickAverageButton_clicked()
         {
             qDebug() << Q_FUNC_INFO << "Aborting: No item selected in table.";
             QMessageBox::information(this, tr("No Selection"), tr("Please select a frequency in the table first."));
+            ui->pickAverageButton->setChecked(false);
             return;
         }
     // Auto path: drive TinySa to (selectedFreq, RefPower) and let the
@@ -688,6 +724,7 @@ void CalibrationManager::onpickAverageButton_clicked()
         if (!m_tinySaConnected) {
             QMessageBox::information(this, tr("TinySa not connected"),
                                      tr("Please connect the TinySa first."));
+            ui->pickAverageButton->setChecked(false);
             return;
         }
         startAutoCellForCurrentSelection();
@@ -1004,6 +1041,10 @@ void CalibrationManager::onModeChanged()
     m_model->setMode(mode);
     applyModeUi(mode);
     persistMode(mode);
+    // Selection semantics differ per mode (m_selectedIndex vs the
+    // advanced grid's currentIndex), so the calibrate buttons need a
+    // re-evaluation after a mode flip.
+    refreshButtonEnabledState();
 }
 
 void CalibrationManager::applyModeUi(CalibrationModel::Mode mode)
@@ -1081,8 +1122,7 @@ void CalibrationManager::onAutoCheckBoxToggled(bool checked)
     ui->tinySaSourceGroupBox->setVisible(checked
                                          && m_model->mode() != CalibrationModel::Mode::Disabled);
     persistAuto(checked);
-    // Calibrate All only makes sense once TinySa is connected.
-    ui->calibrateAllButton->setEnabled(checked && m_tinySaConnected);
+    refreshButtonEnabledState();
 }
 
 void CalibrationManager::persistAuto(bool autoOn)
@@ -1153,7 +1193,7 @@ void CalibrationManager::onTinySaConnected()
     ui->tinySaStatusLabel->setText(
         tr("connected: %1 -- connect TinySa RF OUT to the power meter input via coax")
             .arg(m_tinySa->portName()));
-    ui->calibrateAllButton->setEnabled(true);
+    refreshButtonEnabledState();
 }
 
 void CalibrationManager::onTinySaDisconnected()
@@ -1161,7 +1201,7 @@ void CalibrationManager::onTinySaDisconnected()
     m_tinySaConnected = false;
     ui->tinySaConnectButton->setText(tr("Connect"));
     ui->tinySaStatusLabel->setText(tr("not connected"));
-    ui->calibrateAllButton->setEnabled(false);
+    refreshButtonEnabledState();
     // If a Calibrate All loop is in flight, abort cleanly.
     const bool wasAuto = (m_autoCurrentRow >= 0) || m_autoSequence;
     m_autoQueue.clear();
@@ -1170,7 +1210,8 @@ void CalibrationManager::onTinySaDisconnected()
     m_autoSequence = false;
     if (m_autoWatchdog) m_autoWatchdog->stop();
     if (wasAuto) mirrorRefSpinbox(m_autoAskedRefDbm);
-    ui->calibrateAllButton->setText(tr("Calibrate All"));
+    ui->calibrateAllButton->setChecked(false);
+    ui->pickAverageButton->setChecked(false);
 }
 
 void CalibrationManager::onTinySaError(const QString &msg)
@@ -1231,6 +1272,7 @@ void CalibrationManager::onAutoCellTimeout()
         dispatchNextAutoCell();
     } else {
         mirrorRefSpinbox(m_autoAskedRefDbm);
+        ui->pickAverageButton->setChecked(false);
     }
 }
 
@@ -1262,6 +1304,7 @@ void CalibrationManager::onCalibrateAllClicked()
     if (!m_tinySaConnected) {
         QMessageBox::information(this, tr("TinySa not connected"),
                                  tr("Please connect the TinySa first."));
+        ui->calibrateAllButton->setChecked(false);
         return;
     }
     m_autoQueue.clear();
@@ -1272,10 +1315,11 @@ void CalibrationManager::onCalibrateAllClicked()
         enqueueAdvancedSweep();
         if (m_autoQueue.isEmpty()) {
             ui->tinySaStatusLabel->setText(tr("nothing to calibrate"));
+            ui->calibrateAllButton->setChecked(false);
             return;
         }
         m_autoSequence = true;
-        ui->calibrateAllButton->setText(tr("Cancel calibration"));
+        ui->calibrateAllButton->setChecked(true);
         dispatchNextAutoCell();
         return;
     }
@@ -1292,10 +1336,11 @@ void CalibrationManager::onCalibrateAllClicked()
     }
     if (m_autoQueue.isEmpty()) {
         ui->tinySaStatusLabel->setText(tr("nothing to calibrate"));
+        ui->calibrateAllButton->setChecked(false);
         return;
     }
     m_autoSequence = true;
-    ui->calibrateAllButton->setText(tr("Cancel calibration"));
+    ui->calibrateAllButton->setChecked(true);
     dispatchNextAutoCell();
 }
 
@@ -1313,7 +1358,7 @@ void CalibrationManager::cancelAutoSweep()
     // Turn the TinySa output off so the user isn't left with a live
     // signal at the last clamped freq/level after cancelling.
     if (m_tinySa && m_tinySaConnected) m_tinySa->pauseOutput();
-    ui->calibrateAllButton->setText(tr("Calibrate All"));
+    ui->calibrateAllButton->setChecked(false);
     ui->tinySaStatusLabel->setText(tr("calibration cancelled"));
 }
 
@@ -1351,6 +1396,39 @@ void CalibrationManager::mirrorRefSpinbox(double dbm)
     ui->referencePowerSpinBox->setValue(dbm);
 }
 
+void CalibrationManager::refreshButtonEnabledState()
+{
+    const bool autoOn = ui->autoCalibrationCheckBox->isChecked();
+    const bool hasSelection =
+        (m_model->mode() == CalibrationModel::Mode::Advanced)
+            ? (m_advancedTableView && m_advancedTableView->currentIndex().isValid())
+            : m_selectedIndex.isValid();
+    // Calibrate Selected needs the power meter (for samples) and a target
+    // row/cell. Auto mode also needs the TinySa source.
+    ui->pickAverageButton->setEnabled(
+        m_pmConnected && hasSelection && (!autoOn || m_tinySaConnected));
+    // Calibrate All always uses the auto sweep path: needs PM + TinySa,
+    // plus the Auto checkbox (legacy gate kept for parity).
+    ui->calibrateAllButton->setEnabled(
+        m_pmConnected && m_tinySaConnected && autoOn);
+}
+
+void CalibrationManager::scrollToCurrentAutoCell()
+{
+    if (m_autoCurrentRow < 0) return;
+    if (m_autoMode == CalibrationModel::Mode::Advanced
+        && m_advancedTableView && m_advancedAdapter) {
+        const QModelIndex idx = m_advancedAdapter->index(
+            m_autoCurrentRow, qMax(0, m_autoCurrentCol));
+        m_advancedTableView->setCurrentIndex(idx);
+        m_advancedTableView->scrollTo(idx, QAbstractItemView::PositionAtCenter);
+    } else {
+        ui->tableView->selectRow(m_autoCurrentRow);
+        ui->tableView->scrollTo(m_model->index(m_autoCurrentRow, 0),
+                                QAbstractItemView::PositionAtCenter);
+    }
+}
+
 void CalibrationManager::dispatchNextAutoCell()
 {
     if (m_autoQueue.isEmpty()) {
@@ -1362,7 +1440,7 @@ void CalibrationManager::dispatchNextAutoCell()
         // from the value they typed, not from whatever the last cell
         // clamped to.
         mirrorRefSpinbox(m_autoAskedRefDbm);
-        ui->calibrateAllButton->setText(tr("Calibrate All"));
+        ui->calibrateAllButton->setChecked(false);
         ui->tinySaStatusLabel->setText(tr("calibration sweep done"));
         return;
     }
@@ -1389,6 +1467,11 @@ void CalibrationManager::dispatchNextAutoCell()
         freqMHz = m_model->getPoints()[m_autoCurrentRow].frequencyMHz;
     }
     const double freqHz = freqMHz * 1e6;
+
+    // Scroll the cell being calibrated into view so the user can watch
+    // sweep progress; the tables are already greyed out via the
+    // calibrateAllButton.toggled connection set up in the ctor.
+    scrollToCurrentAutoCell();
 
     // Tune the DUT to this row's freq -- same signal Calibrate Selected
     // emits when the user clicks a row in the table.
@@ -1457,6 +1540,7 @@ void CalibrationManager::startAutoCellForCurrentSelection()
     m_autoCurrentRow = m_selectedIndex.row();
     m_autoCurrentCol = -1;
     m_autoMode = CalibrationModel::Mode::Simple;
+    scrollToCurrentAutoCell();
     const double freqMHz = m_model->getPoints()[m_autoCurrentRow].frequencyMHz;
     const double freqHz  = freqMHz * 1e6;
     // Tune the DUT to the row's freq (same signal the table click sends
@@ -1521,6 +1605,7 @@ void CalibrationManager::onAutoSampleArrived(double dbmValue)
         // Single-cell run done: put the user-asked refPower back in the
         // spinbox.
         mirrorRefSpinbox(m_autoAskedRefDbm);
+        ui->pickAverageButton->setChecked(false);
     }
 }
 
