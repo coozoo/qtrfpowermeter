@@ -1145,6 +1145,7 @@ void MainWindow::onDeviceConnected()
     // table inline; the lookup table is stable now that we're Ready.
     if (m_calibrationManager) {
         m_calibrationManager->setActiveConceptRfDevice(cdev);
+        m_calibrationManager->onDeviceConnectionStateChanged(true);
     }
     updateDeviceList();
     on_set_pushButton_clicked();
@@ -1162,6 +1163,7 @@ void MainWindow::onDeviceDisconnected()
     // for the next device (or via the persisted mode if reconnected).
     if (m_calibrationManager) {
         m_calibrationManager->setActiveConceptRfDevice(nullptr);
+        m_calibrationManager->onDeviceConnectionStateChanged(false);
     }
     updateDeviceList();
 }

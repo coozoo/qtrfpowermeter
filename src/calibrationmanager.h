@@ -120,6 +120,12 @@ private:
     void dispatchNextAutoCell();
     void onAutoSampleArrived(double dbmValue);
 
+    // Programmatically selects + scrolls the currently-dispatching auto
+    // cell into view so the user can watch sweep progress. The tables'
+    // greyed-out state is wired in the ctor via calibrateAllButton.toggled,
+    // not via a helper called from each state-change site.
+    void scrollToCurrentAutoCell();
+
     Ui::CalibrationManager *ui;
     CalibrationModel *m_model;
     QVector<double> m_measurements;
@@ -135,6 +141,12 @@ private:
     // lazily on first Connect click.
     TinySaSourceController *m_tinySa = nullptr;
     bool m_tinySaConnected = false;
+    // Mirror of the power-meter device's connected state, fed by
+    // onDeviceConnectionStateChanged. Both calibrate buttons are gated
+    // on this via refreshButtonEnabledState() -- without a meter there
+    // are no samples to average, so calibration must not start.
+    bool m_pmConnected = false;
+    void refreshButtonEnabledState();
 
     // Per-device persistence anchor; empty string means "global default".
     QString m_activeDeviceId;
