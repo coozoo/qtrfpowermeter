@@ -79,6 +79,12 @@ There are three calibration modes plus a built-in viewer for devices that ship t
 
 <img width="1910" height="1047" alt="image" src="https://github.com/user-attachments/assets/e18f8692-6edf-4691-92e1-07a8dd4675c4" />
 
+<img width="1916" height="1054" alt="2026-06-21_05-08" src="https://github.com/user-attachments/assets/14eaf50d-dd13-4266-aeab-cc6431516562" />
+
+<img width="1919" height="1056" alt="2026-06-29_14-01" src="https://github.com/user-attachments/assets/ed90837b-c411-41ed-891e-a6b421474a9d" />
+
+
+
 
 
 ## Installation
