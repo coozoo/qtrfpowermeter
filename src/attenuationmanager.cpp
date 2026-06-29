@@ -1,11 +1,22 @@
 #include "attenuationmanager.h"
 #include "attenuatorwidget.h"
+#include <cmath>
 
 
 AttenuationManager::AttenuationManager(QWidget *parent)
     : QWidget(parent)
+    , m_currentFreqHz(std::numeric_limits<double>::quiet_NaN())
 {
     setupUi();
+}
+
+void AttenuationManager::setCurrentFrequencyMHz(double freqMHz)
+{
+    const double hz = freqMHz * 1.0e6;
+    if (qFuzzyCompare(m_currentFreqHz + 1.0, hz + 1.0)) return;
+    m_currentFreqHz = hz;
+    for (AttenuatorWidget *w : m_attenuatorWidgets)
+        w->setCurrentFrequencyHz(m_currentFreqHz);
 }
 
 AttenuationManager::~AttenuationManager()
@@ -90,6 +101,9 @@ void AttenuationManager::addAttenuator()
 
     // Add to the visual layout (insert before the stretch)
     m_listLayout->insertWidget(m_listLayout->count() - 1, newWidget);
+
+    if (!std::isnan(m_currentFreqHz))
+        newWidget->setCurrentFrequencyHz(m_currentFreqHz);
 
     qDebug()<<"Added new attenuator. Total count:"<<m_attenuatorWidgets.count();
 

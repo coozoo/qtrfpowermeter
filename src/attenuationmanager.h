@@ -11,6 +11,7 @@
 #include <QScrollArea>
 #include <QLabel>
 #include <QDebug>
+#include <limits>
 
 class QVBoxLayout;
 class QComboBox;
@@ -41,12 +42,20 @@ private slots:
 
 public slots:
     void setInternalAttenuation(double value);
+    // Fed by MainWindow when the operating frequency changes. Fans out to
+    // every AttenuatorWidget (digital sub-controls use it to pick the right
+    // insertion-loss band).
+    void setCurrentFrequencyMHz(double freqMHz);
 
 private:
     void setupUi();
 
     QList<AttenuatorWidget*> m_attenuatorWidgets;
     AttenuatorWidget* m_internalAttenuatorWidget = nullptr;
+
+    // Cached so newly-added widgets get the current frequency at construction.
+    // NaN until MainWindow first publishes a value.
+    double m_currentFreqHz;
 
     // UI elements
     QVBoxLayout *m_listLayout;

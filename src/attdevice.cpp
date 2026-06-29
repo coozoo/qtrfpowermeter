@@ -18,6 +18,16 @@ AttDevice::AttDevice(QObject *parent)
     connect(m_pollingTimer, &QTimer::timeout, this, &AttDevice::readValue);
 }
 
+double AttDevice::insertionLossAt(double freqHz) const
+{
+    for (const InsertionLossBand &b : m_currentIlBands)
+        {
+            if (freqHz >= b.freqLowHz && freqHz < b.freqHighHz)
+                return b.ilDb;
+        }
+    return 0.0;
+}
+
 void AttDevice::setPollingEnabled(bool enabled)
 {
     if (enabled) {
@@ -105,8 +115,9 @@ void AttDevice::tryUnknownFormat()
             // All unknown formats failed
             m_unknownFormatTimer.stop();
             m_isProbingUnknownFormats = false;
-            m_maxInputDbm = std::numeric_limits<double>::quiet_NaN();
+            m_maxInputDbm = kFallbackMaxInputDbm;
             m_chip.clear();
+            m_currentIlBands = fallbackIlBands();
             emit detectedDevice("Unsupported Device", step(), max(), format(),
                                 m_maxInputDbm, m_chip);
         }
@@ -116,12 +127,13 @@ void AttDevice::tryCurrentProbe()
 {
     qDebug()<<Q_FUNC_INFO<<m_probeTypeIdx;
     m_probeTimer.stop();
-    if (m_probeTypeIdx >= int(sizeof(deviceTypes) / sizeof(DeviceType)))
+    const auto &table = deviceTypesTable();
+    if (m_probeTypeIdx >= table.size())
         {
             finishProbe(false);
             return;
         }
-    const DeviceType &dev = deviceTypes[m_probeTypeIdx];
+    const DeviceType &dev = table.at(m_probeTypeIdx);
     setFormat(formatToString(dev.format));
     m_probeValue = dev.max;
     writeValue(m_probeValue);
@@ -144,7 +156,7 @@ void AttDevice::finishProbe(bool found)
     m_inProbe = false;
     if (found)
         {
-            const DeviceType &dev = deviceTypes[m_probeTypeIdx];
+            const DeviceType &dev = deviceTypesTable().at(m_probeTypeIdx);
             qDebug()<<"finishProbe: model="<<dev.model<<"format="<<formatToString(dev.format);
             setModel(dev.model);
             setStep(dev.step);
@@ -153,6 +165,7 @@ void AttDevice::finishProbe(bool found)
             setFormat(formatToString(dev.format));
             m_maxInputDbm = dev.maxInputDbm;
             m_chip = dev.chip;
+            m_currentIlBands = dev.ilBands;
             emit detectedDevice(m_model, m_step, m_max, formatToString(m_format),
                                 m_maxInputDbm, m_chip);
             emit valueSetStatus(true);
@@ -227,8 +240,9 @@ void AttDevice::onSerialPortNewData(const QString &line)
                                             m_isProbingUnknownFormats = false; // Stop the probe loop
                                             m_probeState = ProbeIdle;
                                             // Report the device as "Unknown" but with the working format
-                                            m_maxInputDbm = std::numeric_limits<double>::quiet_NaN();
+                                            m_maxInputDbm = kFallbackMaxInputDbm;
                                             m_chip.clear();
+                                            m_currentIlBands = fallbackIlBands();
                                             emit detectedDevice(model() + " " + QString::asprintf(formatToString(m_format).toStdString().c_str(), 0),
                                                                 step(), max(), format(),
                                                                 m_maxInputDbm, m_chip);

@@ -61,6 +61,7 @@
 #include <QTimer>
 #include <QRegularExpression>
 #include <QDebug>
+#include <QList>
 #include <limits>
 
 constexpr int hardwareReadIntervalMs = 5000;
@@ -90,6 +91,16 @@ inline AttFormat stringToFormat(const QString &fmt)
     return AttFormat::Unknown;
 }
 
+// Frequency-banded insertion loss for a digital attenuator. Values are
+// already multiplied for cascaded designs (e.g. PE43712 x3 lists 3x the
+// single-chip IL). Bands are non-overlapping and ordered by frequency.
+struct InsertionLossBand
+{
+    double freqLowHz;
+    double freqHighHz;
+    double ilDb;
+};
+
 struct DeviceType
 {
     QString model;
@@ -101,19 +112,48 @@ struct DeviceType
     // typical chip behind each variant. Better to warn unnecessarily than fry.
     double maxInputDbm;
     QString chip;
+    QList<InsertionLossBand> ilBands;
 };
+
+// PE43712 single-chip IL (datasheet typicals, rounded up). Multiplied
+// in-place for cascaded models below.
+inline QList<InsertionLossBand> pe43712Bands(int cascadeCount)
+{
+    return {
+        { 9.0e3,   1.0e9, 1.0 * cascadeCount },
+        { 1.0e9,   2.2e9, 1.2 * cascadeCount },
+        { 2.2e9,   4.0e9, 1.4 * cascadeCount },
+        { 4.0e9,   6.0e9, 2.0 * cascadeCount }
+    };
+}
 
 // the key for device identification is max value
 // the order is important
 // so they probed from the max until succefull read
-static const DeviceType deviceTypes[] =
+inline const QList<DeviceType> &deviceTypesTable()
 {
-    { "DC-6GHZ-120DB",       0.25, 124.75,  AttFormat::Format000_00, 20.0, "PE43712 x4" },
-    { "DC-6GHZ-90DB-V3",     0.25, 95.25,   AttFormat::Format000_00, 20.0, "PE43712 x3" },
-    { "DC-3G-90DB-V2",       0.5,  94.5,    AttFormat::Format000_00, 20.0, "HMC624 / DAT-31R5A" },
-    { "DC-6GHZ-30DB",        0.25, 31.75,   AttFormat::Format00_00,  20.0, "PE43712" },
-    { "DC-8GHZ-30DB-0.1DB",  0.1,  30.0,    AttFormat::Format00_00,  25.0, "PE43508 / HMC1019" }
-};
+    static const QList<DeviceType> table = {
+        { "DC-6GHZ-120DB",       0.25, 124.75,  AttFormat::Format000_00, 20.0, "PE43712 x4",
+          pe43712Bands(4) },
+        { "DC-6GHZ-90DB-V3",     0.25, 95.25,   AttFormat::Format000_00, 20.0, "PE43712 x3",
+          pe43712Bands(3) },
+        { "DC-3G-90DB-V2",       0.5,  94.5,    AttFormat::Format000_00, 20.0, "HMC624 / DAT-31R5A",
+          { { 9.0e3, 3.0e9, 4.8 } } },
+        { "DC-6GHZ-30DB",        0.25, 31.75,   AttFormat::Format00_00,  20.0, "PE43712",
+          pe43712Bands(1) },
+        { "DC-8GHZ-30DB-0.1DB",  0.1,  30.0,    AttFormat::Format00_00,  25.0, "PE43508 / HMC1019",
+          { { 9.0e3, 1.0e9, 1.5 },
+            { 1.0e9, 3.0e9, 1.7 },
+            { 3.0e9, 6.0e9, 2.0 },
+            { 6.0e9, 8.0e9, 2.5 } } }
+    };
+    return table;
+}
+
+// Fallback for boards that fail identification: assume "most common 6 GHz
+// board" IL plus 1 W rating, per phase 6 plan.
+inline QList<InsertionLossBand> fallbackIlBands() { return pe43712Bands(1); }
+constexpr double kFallbackMaxInputDbm = 30.0; // 1 W
 
 class AttDevice : public SerialPortInterface
 {
@@ -183,6 +223,11 @@ public:
 
     double maxInputDbm() const { return m_maxInputDbm; }
     const QString &chip() const { return m_chip; }
+    const QList<InsertionLossBand> &ilBands() const { return m_currentIlBands; }
+
+    // Returns the IL for the band that contains freqHz, or 0.0 if freqHz is
+    // outside every band (the caller decides how to render "out of band").
+    double insertionLossAt(double freqHz) const;
 
     Q_INVOKABLE void probeDeviceType();
     Q_INVOKABLE void readValue();
@@ -231,6 +276,7 @@ private:
     double  m_expectedValue = 0.0;
     double  m_maxInputDbm = std::numeric_limits<double>::quiet_NaN();
     QString m_chip;
+    QList<InsertionLossBand> m_currentIlBands;
 
     int     m_probeTypeIdx = 0;
     double  m_probeValue   = 0.0;

@@ -189,6 +189,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(attenuationMgr, &AttenuationManager::totalAttenuationChanged, this, &MainWindow::onTotalAttenuationChanged);
     connect(attenuationMgr, &AttenuationManager::cableManagerAdded, this, &MainWindow::onCableManagerAdded);
     connect(attenuationMgr, &AttenuationManager::cableManagerRemoved, this, &MainWindow::onCableManagerRemoved);
+    connect(this, &MainWindow::currentFrequencyChanged, attenuationMgr, &AttenuationManager::setCurrentFrequencyMHz);
+    attenuationMgr->setCurrentFrequencyMHz(ui->frequency_spinBox->value());
     ui->att_pushButton->setText(tr("Attenuation:") + " " + QString::number(m_current_atteuation,'f',2) + " dB");
 
     m_attenuatorCalculator = new TargetPowerCalculator(this);

@@ -31,6 +31,9 @@ public:
     explicit AttenuatorWidget(AttenuatorType type, QWidget *parent = nullptr);
     ~AttenuatorWidget();
 
+    // Effective attenuation: nominal + insertion loss for the current
+    // operating frequency (digital only; equals nominal for fixed, cable,
+    // internal). This is what AttenuationManager sums into the total.
     double getAttenuation() const;
 
     // Chip / model max CW input rating for this stage. NaN means unknown
@@ -50,9 +53,13 @@ signals:
 
 public slots:
     void setValue(double value);
+    // Fed by AttenuationManager. Forwarded to the digital sub-control so its
+    // insertion-loss table picks the right band.
+    void setCurrentFrequencyHz(double freqHz);
 
 private slots:
     void onValueChanged(double value);
+    void onEffectiveChanged(double nominalDb, double ilDb, double effectiveDb);
     void openEditor();
 
     void onCheckBoxToggled(bool checked);
@@ -66,7 +73,12 @@ private:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
     AttenuatorType m_type;
+    // For digital this tracks the device's nominal value (what the LCD
+    // shows); for everything else it equals the effective value.
     double m_attenuationValue;
+    // Sum of nominal + IL. Equal to m_attenuationValue for non-digital
+    // widgets. This is what getAttenuation() returns.
+    double m_effectiveValue;
     QString m_description = "";
     bool m_markedForRemoval;
     bool m_editorHasBeenShown;

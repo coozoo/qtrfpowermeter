@@ -3,7 +3,8 @@
 #include <limits>
 
 AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidget *parent)
-    : QGroupBox(parent), m_type(type), m_attenuationValue(0.0), m_markedForRemoval(false),
+    : QGroupBox(parent), m_type(type), m_attenuationValue(0.0), m_effectiveValue(0.0),
+    m_markedForRemoval(false),
     m_editorHasBeenShown(false), // Initialize the flag to false
     m_digitalControl(nullptr), m_fixedControl(nullptr),
     m_internalControl(nullptr), m_cableManager(nullptr)
@@ -14,7 +15,11 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
     if (m_type == Digital)
     {
         m_digitalControl = new QtDigitalAttenuator();
-        connect(m_digitalControl, &QtDigitalAttenuator::currentValueChanged, this, &AttenuatorWidget::onValueChanged);
+        // Digital widget uses effectiveAttenuationChanged as the canonical
+        // source: it carries nominal (for the LCD) and effective (for the
+        // chain total) together so they cannot drift apart.
+        connect(m_digitalControl, &QtDigitalAttenuator::effectiveAttenuationChanged,
+                this, &AttenuatorWidget::onEffectiveChanged);
         connect(m_digitalControl, &QtDigitalAttenuator::valueSetStatus, this, &AttenuatorWidget::onStatusChanged);
         connect(m_digitalControl, &QtDigitalAttenuator::modelChanged, this, &AttenuatorWidget::onDescriptionChanged);
         connect(m_digitalControl, &QtDigitalAttenuator::maxInputDbmChanged, this,
@@ -124,7 +129,7 @@ void AttenuatorWidget::onStatusChanged(bool status)
 
 double AttenuatorWidget::getAttenuation() const
 {
-    return m_attenuationValue;
+    return m_effectiveValue;
 }
 
 double AttenuatorWidget::maxInputDbm() const
@@ -149,9 +154,28 @@ void AttenuatorWidget::setValue(double value)
 void AttenuatorWidget::onValueChanged(double value)
 {
     qDebug()<<Q_FUNC_INFO<<value;
+    // Non-digital path: nominal and effective are the same number. Digital
+    // updates take onEffectiveChanged so the LCD stays on nominal while the
+    // chain total picks up nominal + IL.
     m_attenuationValue = value;
+    m_effectiveValue = value;
     m_valueLcd->display(m_attenuationValue);
-    emit valueChanged(m_attenuationValue);
+    emit valueChanged(m_effectiveValue);
+}
+
+void AttenuatorWidget::onEffectiveChanged(double nominalDb, double ilDb, double effectiveDb)
+{
+    Q_UNUSED(ilDb);
+    qDebug()<<Q_FUNC_INFO<<nominalDb<<ilDb<<effectiveDb;
+    m_attenuationValue = nominalDb;
+    m_effectiveValue = effectiveDb;
+    m_valueLcd->display(m_attenuationValue);
+    emit valueChanged(m_effectiveValue);
+}
+
+void AttenuatorWidget::setCurrentFrequencyHz(double freqHz)
+{
+    if (m_digitalControl) m_digitalControl->setCurrentFrequencyHz(freqHz);
 }
 
 void AttenuatorWidget::openEditor()
