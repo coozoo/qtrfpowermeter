@@ -287,6 +287,13 @@ private:
     QTimer m_unknownFormatTimer;
     bool    m_isProbingUnknownFormats = false;
     QTimer* m_pollingTimer;
+    // Per-instance accumulator for partial serial frames. Was a function-
+    // static QString in onSerialPortNewData() which silently shared state
+    // across every AttDevice instance and survived disconnect/reconnect,
+    // mirroring the bug previously fixed in RfpmV7Device. The regression
+    // test bufferIsPerInstance_noCrossInstanceLeak in tests/attenuator_chain
+    // (or its sibling) pins this.
+    QString m_buffer;
 };
 
 #endif // ATTDEVICE_H

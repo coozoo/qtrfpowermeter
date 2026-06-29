@@ -71,6 +71,10 @@ void AttDevice::onPortClosed()
 {
     qDebug() << Q_FUNC_INFO;
     m_pollingTimer->stop();
+    // Drop any half-frame left in the parse buffer; the next session must
+    // start clean so a stale "Power: 1.0m"-style tail can't fuse with the
+    // new device's first chunk.
+    m_buffer.clear();
 }
 
 void AttDevice::probeDeviceType()
@@ -86,6 +90,9 @@ void AttDevice::startProbe()
     m_probeTypeIdx = 0;
     m_inProbe = true;
     m_isProbingUnknownFormats = false; // Ensure this is false for known probe
+    // Discard any leftover bytes from a previous session before we start
+    // emitting our own probe queries and waiting on the responses.
+    m_buffer.clear();
     tryCurrentProbe();
 }
 
@@ -180,11 +187,16 @@ void AttDevice::finishProbe(bool found)
 
 void AttDevice::onSerialPortNewData(const QString &line)
 {
-    static QString buffer;
-    buffer += line;
+    m_buffer += line;
 
-    QRegularExpression re(R"(attOK|ATT\s*=\s*-?\d+\.\d+)", QRegularExpression::CaseInsensitiveOption);
-    QRegularExpressionMatchIterator it = re.globalMatch(buffer);
+    // Compiled once: pattern is a string literal and this slot runs on
+    // every serial chunk (polling + probe bursts). Hoisting saves the
+    // pattern-compile cost per call.
+    static const QRegularExpression kFrameRe(R"(attOK|ATT\s*=\s*-?\d+\.\d+)",
+                                             QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression kValueRe("ATT\\s*=\\s*-?([0-9]+\\.[0-9]+)",
+                                             QRegularExpression::CaseInsensitiveOption);
+    QRegularExpressionMatchIterator it = kFrameRe.globalMatch(m_buffer);
 
     int lastEnd = 0;
     while (it.hasNext())
@@ -195,8 +207,7 @@ void AttDevice::onSerialPortNewData(const QString &line)
 
             qDebug()<<Q_FUNC_INFO<<message;
             QString trimmed = message.trimmed();
-            QRegularExpression valueRe("ATT\\s*=\\s*-?([0-9]+\\.[0-9]+)", QRegularExpression::CaseInsensitiveOption);
-            auto match = valueRe.match(trimmed);
+            auto match = kValueRe.match(trimmed);
 
             if (m_probeState == ProbeWaitingSetOK && trimmed.compare("attOK", Qt::CaseInsensitive) == 0)
                 {
@@ -287,8 +298,8 @@ void AttDevice::onSerialPortNewData(const QString &line)
                 }
         }
 
-    buffer = buffer.mid(lastEnd);
+    m_buffer = m_buffer.mid(lastEnd);
 
-    if (buffer.length() > 4096)
-        buffer.clear();
+    if (m_buffer.length() > 4096)
+        m_buffer.clear();
 }

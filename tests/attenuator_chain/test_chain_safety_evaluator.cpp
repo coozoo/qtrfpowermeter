@@ -21,6 +21,7 @@ private slots:
     void nanRatedStage_isAlwaysUnknown_neverTrips();
     void cascade_onlyDownstreamStageOverloaded();
     void cascade_orderSwap_changesOutcome();
+    void nanEffectiveUpstream_doesNotMaskDownstreamOverload();
 };
 
 void TestChainSafetyEvaluator::emptyChain_returnsInputAtMeter_noOverload()
@@ -116,6 +117,27 @@ void TestChainSafetyEvaluator::cascade_orderSwap_changesOutcome()
         QCOMPARE(report.firstOverloadIdx, 0);
         QCOMPARE(report.perStage.at(0).headroomDb, -5.0);
     }
+}
+
+void TestChainSafetyEvaluator::nanEffectiveUpstream_doesNotMaskDownstreamOverload()
+{
+    // A stage with NaN effectiveDb (e.g. cable manager not yet computed at
+    // this frequency) poisons every downstream incidentDbm into NaN. Naive
+    // code lets `NaN > finite` evaluate false and silently marks the
+    // downstream over-rated stage as Ok. The contract: once incident is
+    // indeterminate the downstream status must be Unknown, never Ok.
+    QList<StageInfo> stages {
+        { QStringLiteral("Cable (no freq)"), kNaN, kNaN, false },
+        { QStringLiteral("Digital +20dBm"), 6.0, 20.0, false }
+    };
+    const auto report = ChainSafetyEvaluator::evaluate(25.0, stages);
+    QCOMPARE(report.perStage.size(), 2);
+    QVERIFY(report.perStage.at(0).status == StageStatus::Unknown);
+    // Crucial assertion: the downstream stage must NOT be Ok.
+    QVERIFY2(report.perStage.at(1).status != StageStatus::Ok,
+             "NaN incident downstream was masked as Ok -- silent danger");
+    QVERIFY(report.perStage.at(1).status == StageStatus::Unknown);
+    QCOMPARE(report.firstOverloadIdx, -1); // overload count, not a falsely-clean chain
 }
 
 QTEST_APPLESS_MAIN(TestChainSafetyEvaluator)

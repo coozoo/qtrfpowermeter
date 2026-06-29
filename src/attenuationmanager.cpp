@@ -181,16 +181,25 @@ void AttenuationManager::addAttenuator()
         emit cableManagerAdded(newWidget->cableManager());
     }
 
-    // Add to our list of pointers
-    m_attenuatorWidgets.append(newWidget);
-
-    // Add to the visual layout (insert before the stretch)
-    m_listLayout->insertWidget(m_listLayout->count() - 1, newWidget);
+    // Pin invariant: nothing lands at or below the device's own front-end
+    // stage. Drag-and-drop already enforces this via clampForInternal; new
+    // widgets created from the Add button must respect it too, otherwise
+    // chain-safety math treats the external plate as downstream of internal.
+    int listInsertIdx = m_attenuatorWidgets.size();
+    int layoutInsertIdx = m_listLayout->count() - 1; // slot just before the stretch
+    if (m_internalAttenuatorWidget) {
+        const int internalListIdx = m_attenuatorWidgets.indexOf(m_internalAttenuatorWidget);
+        const int internalLayoutIdx = m_listLayout->indexOf(m_internalAttenuatorWidget);
+        if (internalListIdx >= 0) listInsertIdx = internalListIdx;
+        if (internalLayoutIdx >= 0) layoutInsertIdx = internalLayoutIdx;
+    }
+    m_attenuatorWidgets.insert(listInsertIdx, newWidget);
+    m_listLayout->insertWidget(layoutInsertIdx, newWidget);
 
     if (!std::isnan(m_currentFreqHz))
         newWidget->setCurrentFrequencyHz(m_currentFreqHz);
 
-    qDebug()<<"Added new attenuator. Total count:"<<m_attenuatorWidgets.count();
+    qDebug()<<"Added new attenuator. Total count:"<<m_attenuatorWidgets.size();
 
     updateTotalAttenuation();
 }
@@ -317,8 +326,17 @@ void AttenuationManager::dragMoveEvent(QDragMoveEvent *event)
     // content lives one parent down. Map through global to stay correct
     // regardless of any future intermediate layout we might add.
     const QPoint posInContent = m_scrollContent->mapFromGlobal(mapToGlobal(event->position().toPoint()));
-    int slot = clampForInternal(dropIndexAt(posInContent));
-    showInsertIndicatorAt(slot);
+    const int gap = clampForInternal(dropIndexAt(posInContent));
+
+    // Hide the indicator when the drop would be a no-op (back into the
+    // source's own slot). Avoids the "ghost line clinging to the source"
+    // feeling while the user is still deciding.
+    AttenuatorWidget *src = qobject_cast<AttenuatorWidget*>(event->source());
+    const int srcIdx = src ? m_attenuatorWidgets.indexOf(src) : -1;
+    if (srcIdx >= 0 && (gap == srcIdx || gap == srcIdx + 1))
+        hideInsertIndicator();
+    else
+        showInsertIndicatorAt(gap);
     event->acceptProposedAction();
 }
 
@@ -340,35 +358,32 @@ void AttenuationManager::dropEvent(QDropEvent *event)
         event->ignore();
         return;
     }
-    const int srcLayoutIdx = m_listLayout->indexOf(src);
-    if (srcLayoutIdx < 0) {
+    const int srcIdx = m_attenuatorWidgets.indexOf(src);
+    if (srcIdx < 0) {
         event->ignore();
         return;
     }
     const QPoint posInContent = m_scrollContent->mapFromGlobal(mapToGlobal(event->position().toPoint()));
-    int dstLayoutIdx = clampForInternal(dropIndexAt(posInContent));
+    const int dstGap = clampForInternal(dropIndexAt(posInContent));
 
-    // No-op cases: dropping at the slot the widget already occupies or the
-    // slot immediately after it both leave the order unchanged.
-    if (dstLayoutIdx == srcLayoutIdx || dstLayoutIdx == srcLayoutIdx + 1) {
+    // No-op: dropping at the source's own slot or just past it.
+    if (dstGap == srcIdx || dstGap == srcIdx + 1) {
         event->acceptProposedAction();
         return;
     }
 
-    m_listLayout->removeWidget(src);
-    // Removing shifts every later slot down by one, so an insert position
-    // that was after the source is now one less.
-    if (dstLayoutIdx > srcLayoutIdx) --dstLayoutIdx;
-    m_listLayout->insertWidget(dstLayoutIdx, src);
+    // Reorder m_attenuatorWidgets (canonical chain order). When the
+    // destination gap was below the source's old position, removing the
+    // source shifts everything below it up by one so the target index
+    // drops by one too.
+    m_attenuatorWidgets.removeAt(srcIdx);
+    const int adjGap = (dstGap > srcIdx) ? dstGap - 1 : dstGap;
+    m_attenuatorWidgets.insert(adjGap, src);
 
-    // Mirror order in m_attenuatorWidgets so the chain (used by 6f) and
-    // the running total reflect physical order.
-    const int srcListIdx = m_attenuatorWidgets.indexOf(src);
-    int dstListIdx = dstLayoutIdx; // layout has only widgets and one trailing stretch
-    if (dstListIdx > m_attenuatorWidgets.size()) dstListIdx = m_attenuatorWidgets.size();
-    m_attenuatorWidgets.removeAt(srcListIdx);
-    if (dstListIdx > srcListIdx) --dstListIdx;
-    m_attenuatorWidgets.insert(dstListIdx, src);
+    // Mirror in m_listLayout. The indicator is no longer a layout child,
+    // so layout indices match m_attenuatorWidgets indices directly.
+    m_listLayout->removeWidget(src);
+    m_listLayout->insertWidget(adjGap, src);
 
     event->acceptProposedAction();
     updateTotalAttenuation();
@@ -376,30 +391,29 @@ void AttenuationManager::dropEvent(QDropEvent *event)
 
 int AttenuationManager::dropIndexAt(const QPoint &posInScrollContent) const
 {
-    // Walk widgets top-to-bottom; the first widget whose vertical centre
-    // sits below the cursor wins. If the cursor is below all of them the
-    // drop lands at the slot before the trailing stretch.
-    int slot = m_listLayout->count() - 1; // one trailing stretch
+    // Gap semantics: 0 = above first widget, k = between widgets k-1 and k,
+    // N = below the last widget. Snap boundary is each widget's vertical
+    // centre, which feels natural in practice.
+    int gap = m_attenuatorWidgets.size();
     for (int i = 0; i < m_attenuatorWidgets.size(); ++i) {
         AttenuatorWidget *w = m_attenuatorWidgets.at(i);
-        const int centerY = w->geometry().center().y();
-        if (posInScrollContent.y() < centerY) {
-            slot = m_listLayout->indexOf(w);
+        if (posInScrollContent.y() < w->geometry().center().y()) {
+            gap = i;
             break;
         }
     }
-    return slot;
+    return gap;
 }
 
-int AttenuationManager::clampForInternal(int layoutIndex) const
+int AttenuationManager::clampForInternal(int gapIndex) const
 {
-    if (!m_internalAttenuatorWidget) return layoutIndex;
-    const int internalIdx = m_listLayout->indexOf(m_internalAttenuatorWidget);
-    if (internalIdx < 0) return layoutIndex;
-    return std::min(layoutIndex, internalIdx);
+    if (!m_internalAttenuatorWidget) return gapIndex;
+    const int internalIdx = m_attenuatorWidgets.indexOf(m_internalAttenuatorWidget);
+    if (internalIdx < 0) return gapIndex;
+    return std::min(gapIndex, internalIdx);
 }
 
-void AttenuationManager::showInsertIndicatorAt(int layoutIndex)
+void AttenuationManager::showInsertIndicatorAt(int gapIndex)
 {
     if (!m_insertIndicator) {
         m_insertIndicator = new QFrame(m_scrollContent);
@@ -408,22 +422,23 @@ void AttenuationManager::showInsertIndicatorAt(int layoutIndex)
         m_insertIndicator->setStyleSheet("color: #0078d7; background: #0078d7;");
         m_insertIndicator->setFixedHeight(2);
     }
-    // Re-parent into the layout at the requested slot. If it was already
-    // in the layout we have to remove first to avoid duplicate ownership.
-    const int existing = m_listLayout->indexOf(m_insertIndicator);
-    if (existing == layoutIndex) {
-        m_insertIndicator->show();
-        return;
+    // Position the indicator as a free-floating child rather than a layout
+    // item; otherwise its insertion/removal reflows every plate below it
+    // and we get a jitter loop near gap boundaries.
+    int y = 0;
+    if (m_attenuatorWidgets.isEmpty()) {
+        y = 0;
+    } else if (gapIndex < m_attenuatorWidgets.size()) {
+        y = m_attenuatorWidgets.at(gapIndex)->geometry().top() - 2;
+    } else {
+        y = m_attenuatorWidgets.last()->geometry().bottom();
     }
-    if (existing >= 0) m_listLayout->removeWidget(m_insertIndicator);
-    m_listLayout->insertWidget(layoutIndex, m_insertIndicator);
+    m_insertIndicator->setGeometry(0, y, m_scrollContent->width(), 2);
     m_insertIndicator->show();
+    m_insertIndicator->raise();
 }
 
 void AttenuationManager::hideInsertIndicator()
 {
-    if (!m_insertIndicator) return;
-    const int existing = m_listLayout->indexOf(m_insertIndicator);
-    if (existing >= 0) m_listLayout->removeWidget(m_insertIndicator);
-    m_insertIndicator->hide();
+    if (m_insertIndicator) m_insertIndicator->hide();
 }

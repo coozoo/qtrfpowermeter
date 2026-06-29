@@ -15,4 +15,5 @@ SUBDIRS = \
     rfpmv7_parser \
     properties_validation \
     conceptrfrpm_parser \
-    attenuator_chain
+    attenuator_chain \
+    attdevice_parser
