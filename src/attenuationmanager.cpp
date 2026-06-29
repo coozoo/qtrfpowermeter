@@ -77,8 +77,37 @@ void AttenuationManager::setupUi()
     totalLayout->addWidget(m_totalLcd);
     totalLayout->addWidget(new QLabel("dB"));
 
+    // Section break helpers: thin horizontal rule + bold centred label so
+    // the chain reads top-to-bottom in physical signal order.
+    auto makeSection = [this](const QString &text) -> QVBoxLayout * {
+        QVBoxLayout *box = new QVBoxLayout();
+        box->setSpacing(2);
+        box->setContentsMargins(0, 4, 0, 4);
+
+        QFrame *ruleTop = new QFrame(this);
+        ruleTop->setFrameShape(QFrame::HLine);
+        ruleTop->setFrameShadow(QFrame::Sunken);
+
+        QLabel *label = new QLabel(text, this);
+        label->setAlignment(Qt::AlignCenter);
+        QFont f = label->font();
+        f.setBold(true);
+        label->setFont(f);
+
+        QFrame *ruleBottom = new QFrame(this);
+        ruleBottom->setFrameShape(QFrame::HLine);
+        ruleBottom->setFrameShadow(QFrame::Sunken);
+
+        box->addWidget(ruleTop);
+        box->addWidget(label);
+        box->addWidget(ruleBottom);
+        return box;
+    };
+
     mainLayout->addLayout(controlLayout);
+    mainLayout->addLayout(makeSection(tr("▼ INPUT (from source)")));
     mainLayout->addWidget(scrollArea);
+    mainLayout->addLayout(makeSection(tr("▼ OUTPUT (to meter)")));
     mainLayout->addLayout(totalLayout);
 
     connect(addButton, &QPushButton::clicked, this, &AttenuationManager::addAttenuator);
