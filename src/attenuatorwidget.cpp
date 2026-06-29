@@ -1,4 +1,6 @@
 #include "attenuatorwidget.h"
+#include <cmath>
+#include <limits>
 
 AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidget *parent)
     : QGroupBox(parent), m_type(type), m_attenuationValue(0.0), m_markedForRemoval(false),
@@ -15,6 +17,8 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
         connect(m_digitalControl, &QtDigitalAttenuator::currentValueChanged, this, &AttenuatorWidget::onValueChanged);
         connect(m_digitalControl, &QtDigitalAttenuator::valueSetStatus, this, &AttenuatorWidget::onStatusChanged);
         connect(m_digitalControl, &QtDigitalAttenuator::modelChanged, this, &AttenuatorWidget::onDescriptionChanged);
+        connect(m_digitalControl, &QtDigitalAttenuator::maxInputDbmChanged, this,
+                [this](double v, const QString &) { emit maxInputDbmChanged(v); });
         onDescriptionChanged(tr("Digital"));
     }
     else if (m_type == Fixed)
@@ -121,6 +125,15 @@ void AttenuatorWidget::onStatusChanged(bool status)
 double AttenuatorWidget::getAttenuation() const
 {
     return m_attenuationValue;
+}
+
+double AttenuatorWidget::maxInputDbm() const
+{
+    if (m_digitalControl) return m_digitalControl->maxInputDbm();
+    // Fixed: user-settable rating arrives in step 6g; cables and the
+    // device-internal stage stay NaN here (the meter's own max-dbm window
+    // covers the internal case from a different path in the calculator).
+    return std::numeric_limits<double>::quiet_NaN();
 }
 
 void AttenuatorWidget::onCheckBoxToggled(bool checked)

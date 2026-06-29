@@ -6,6 +6,7 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QDateTime>
+#include <limits>
 #include "serialportinterface.h"
 #include "attdevice.h"
 #include "unitconverter.h"
@@ -82,6 +83,12 @@ public:
         emit deviceErrorChanged();
     }
 
+public:
+    // Chip-level absolute-max CW input rating for the detected model. NaN
+    // before a known device is detected (e.g. unsupported boards).
+    double maxInputDbm() const { return m_maxInputDbm; }
+    const QString &chipName() const { return m_chip; }
+
 private:
     Ui::QtDigitalAttenuator *ui;
     void updateDeviceList();
@@ -90,6 +97,8 @@ private:
     QString m_currentDevice;
     bool m_isConnected = false;
     QString m_deviceError;
+    double m_maxInputDbm = std::numeric_limits<double>::quiet_NaN();
+    QString m_chip;
 
 private slots:
     void onPortOpened();
@@ -105,7 +114,8 @@ private slots:
     void on_set_pushButton_clicked();
     void on_send_pushButton_clicked();
     void on_currentAttenuation_changed(double value);
-    void ondetectedDevice(const QString &model, double step, double max, const QString &format);
+    void ondetectedDevice(const QString &model, double step, double max, const QString &format,
+                          double maxInputDbm, const QString &chip);
     void ondeviceConsole_pushButton_clicked();
     void ondeviceSetStatus(bool status);
     void on_useHardButtons_checkBox_stateChanged(int state);
@@ -114,6 +124,9 @@ signals:
     void currentValueChanged(double value);
     void valueSetStatus(bool status);
     void modelChanged(const QString &model);
+    // Emitted when a known model is detected, carrying its chip-level
+    // CW input rating. NaN means unknown / unsupported board.
+    void maxInputDbmChanged(double maxInputDbm, const QString &chip);
     void currentDeviceChanged();
     void isConnectedChanged(bool connected);
     void deviceErrorChanged();

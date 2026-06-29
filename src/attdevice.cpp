@@ -105,7 +105,10 @@ void AttDevice::tryUnknownFormat()
             // All unknown formats failed
             m_unknownFormatTimer.stop();
             m_isProbingUnknownFormats = false;
-            emit detectedDevice("Unsupported Device", step(), max(), format());
+            m_maxInputDbm = std::numeric_limits<double>::quiet_NaN();
+            m_chip.clear();
+            emit detectedDevice("Unsupported Device", step(), max(), format(),
+                                m_maxInputDbm, m_chip);
         }
 }
 
@@ -148,7 +151,10 @@ void AttDevice::finishProbe(bool found)
             setMax(dev.max);
             setCurrentValue(dev.max);
             setFormat(formatToString(dev.format));
-            emit detectedDevice(m_model, m_step, m_max, formatToString(m_format));
+            m_maxInputDbm = dev.maxInputDbm;
+            m_chip = dev.chip;
+            emit detectedDevice(m_model, m_step, m_max, formatToString(m_format),
+                                m_maxInputDbm, m_chip);
             emit valueSetStatus(true);
         }
     else
@@ -221,7 +227,11 @@ void AttDevice::onSerialPortNewData(const QString &line)
                                             m_isProbingUnknownFormats = false; // Stop the probe loop
                                             m_probeState = ProbeIdle;
                                             // Report the device as "Unknown" but with the working format
-                                            emit detectedDevice(model() + " " + QString::asprintf(formatToString(m_format).toStdString().c_str(), 0), step(), max(), format());
+                                            m_maxInputDbm = std::numeric_limits<double>::quiet_NaN();
+                                            m_chip.clear();
+                                            emit detectedDevice(model() + " " + QString::asprintf(formatToString(m_format).toStdString().c_str(), 0),
+                                                                step(), max(), format(),
+                                                                m_maxInputDbm, m_chip);
                                         }
                                 }
                             else

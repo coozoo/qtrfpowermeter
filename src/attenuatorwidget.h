@@ -33,6 +33,11 @@ public:
 
     double getAttenuation() const;
 
+    // Chip / model max CW input rating for this stage. NaN means unknown
+    // (fixed attenuators without a user-set rating, cables, unsupported
+    // digital boards). The chain evaluator treats NaN as "do not check".
+    double maxInputDbm() const;
+
     bool isMarkedForRemoval() const { return m_markedForRemoval; }
 
     void setInternalProperties(double min, double max, double step);
@@ -41,6 +46,7 @@ public:
 
 signals:
     void valueChanged(double newValue);
+    void maxInputDbmChanged(double maxInputDbm);
 
 public slots:
     void setValue(double value);

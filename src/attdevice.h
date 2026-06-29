@@ -61,6 +61,7 @@
 #include <QTimer>
 #include <QRegularExpression>
 #include <QDebug>
+#include <limits>
 
 constexpr int hardwareReadIntervalMs = 5000;
 
@@ -95,6 +96,11 @@ struct DeviceType
     double step;
     double max;
     AttFormat format;
+    // Conservative absolute-max CW input rating. Vendor markings are scratched
+    // and no datasheet ships with these boards, so values are derived from the
+    // typical chip behind each variant. Better to warn unnecessarily than fry.
+    double maxInputDbm;
+    QString chip;
 };
 
 // the key for device identification is max value
@@ -102,11 +108,11 @@ struct DeviceType
 // so they probed from the max until succefull read
 static const DeviceType deviceTypes[] =
 {
-    { "DC-6GHZ-120DB",       0.25, 124.75,  AttFormat::Format000_00 },
-    { "DC-6GHZ-90DB-V3",     0.25, 95.25,   AttFormat::Format000_00 },
-    { "DC-3G-90DB-V2",       0.5,  94.5,    AttFormat::Format000_00 },
-    { "DC-6GHZ-30DB",        0.25, 31.75,   AttFormat::Format00_00 },
-    { "DC-8GHZ-30DB-0.1DB",  0.1,  30.0,    AttFormat::Format00_00 }
+    { "DC-6GHZ-120DB",       0.25, 124.75,  AttFormat::Format000_00, 20.0, "PE43712 x4" },
+    { "DC-6GHZ-90DB-V3",     0.25, 95.25,   AttFormat::Format000_00, 20.0, "PE43712 x3" },
+    { "DC-3G-90DB-V2",       0.5,  94.5,    AttFormat::Format000_00, 20.0, "HMC624 / DAT-31R5A" },
+    { "DC-6GHZ-30DB",        0.25, 31.75,   AttFormat::Format00_00,  20.0, "PE43712" },
+    { "DC-8GHZ-30DB-0.1DB",  0.1,  30.0,    AttFormat::Format00_00,  25.0, "PE43508 / HMC1019" }
 };
 
 class AttDevice : public SerialPortInterface
@@ -175,6 +181,9 @@ public:
         emit expectedValueChanged(value);
     }
 
+    double maxInputDbm() const { return m_maxInputDbm; }
+    const QString &chip() const { return m_chip; }
+
     Q_INVOKABLE void probeDeviceType();
     Q_INVOKABLE void readValue();
     Q_INVOKABLE void writeValue(double value);
@@ -190,7 +199,8 @@ signals:
     void valueMatched();
     void valueMismatched(double expected, double actual);
     void valueSetStatus(bool status);
-    void detectedDevice(const QString &model, double step, double max, const QString &format);
+    void detectedDevice(const QString &model, double step, double max, const QString &format,
+                        double maxInputDbm, const QString &chip);
     void unknownDevice();
 
 private slots:
@@ -219,6 +229,8 @@ private:
     AttFormat m_format = AttFormat::Format00_00;
     double  m_currentValue = 0.0;
     double  m_expectedValue = 0.0;
+    double  m_maxInputDbm = std::numeric_limits<double>::quiet_NaN();
+    QString m_chip;
 
     int     m_probeTypeIdx = 0;
     double  m_probeValue   = 0.0;

@@ -1,5 +1,6 @@
 #include "qtdigitalattenuator.h"
 #include "ui_qtdigitalattenuator.h"
+#include <cmath>
 
 QtDigitalAttenuator::QtDigitalAttenuator(QWidget *parent)
     : QWidget(parent)
@@ -126,6 +127,13 @@ void QtDigitalAttenuator::updateDeviceList()
     {
         if(info.hasVendorIdentifier() && QString::number(info.vendorIdentifier(),16)=="483")
         {
+            // TinySa shares the STM VID 0x0483 with the digital attenuator boards.
+            // Skip it here so it does not appear in the attenuator picker; the
+            // calibration panel's own picker handles TinySa. Mirrors the same
+            // guard in MainWindow::updateDeviceList for the power-meter combo.
+            if (info.description().contains(QStringLiteral("tinysa"), Qt::CaseInsensitive))
+                continue;
+
             qDebug()<<info.hasVendorIdentifier() <<QString::number(info.vendorIdentifier());
             bool isBusy = false;
             QString busyText;
@@ -216,11 +224,21 @@ void QtDigitalAttenuator::onattenuation_doubleSpinBox_valueChanged(double value)
     attenuation_doubleSpinBox_debounceTimer->start(400);
 }
 
-void QtDigitalAttenuator::ondetectedDevice(const QString &model, double step, double max, const QString &format)
+void QtDigitalAttenuator::ondetectedDevice(const QString &model, double step, double max, const QString &format,
+                                           double maxInputDbm, const QString &chip)
 {
-    qDebug()<<Q_FUNC_INFO<<model<<step<<max<<format;
+    qDebug()<<Q_FUNC_INFO<<model<<step<<max<<format<<maxInputDbm<<chip;
     ui->model_lineEdit->setText(model);
+    if (!chip.isEmpty() && !std::isnan(maxInputDbm)) {
+        ui->model_lineEdit->setToolTip(tr("Chip: %1\nMax CW input: %2 dBm (conservative)")
+                                       .arg(chip).arg(maxInputDbm, 0, 'f', 1));
+    } else {
+        ui->model_lineEdit->setToolTip(tr("Unknown board: no rating data."));
+    }
+    m_maxInputDbm = maxInputDbm;
+    m_chip = chip;
     emit modelChanged(model);
+    emit maxInputDbmChanged(maxInputDbm, chip);
     disconnect(ui->attenuation_doubleSpinBox,&QDoubleSpinBox::valueChanged,this,&QtDigitalAttenuator::onattenuation_doubleSpinBox_valueChanged);
     ui->attenuation_doubleSpinBox->setValue(serialAttenuator->currentValue());
     connect(ui->attenuation_doubleSpinBox,&QDoubleSpinBox::valueChanged,this,&QtDigitalAttenuator::onattenuation_doubleSpinBox_valueChanged);
