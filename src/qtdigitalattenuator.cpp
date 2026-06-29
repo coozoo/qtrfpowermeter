@@ -185,7 +185,11 @@ void QtDigitalAttenuator::emitEffective()
 
 QtDigitalAttenuator::~QtDigitalAttenuator()
 {
-    serialAttenuator->disconnect();
+    // Sever only AttDevice -> this connections. A bare disconnect() would
+    // also tear down AttDevice's ctor-time wiring (port-open/close, probe
+    // timers, polling) which still needs to run for the brief window
+    // between deleteLater() scheduling and actual destruction.
+    disconnect(serialAttenuator, nullptr, this, nullptr);
     serialAttenuator->deleteLater();
     delete ui;
 }

@@ -17,6 +17,8 @@
         <file>images/network-error.svg</file>
         <file>images/network-offline.svg</file>
         <file>images/list-add.svg</file>
+        <file>images/color-picker.svg</file>
+        <file>images/edit-delete.svg</file>
         <file>chart_rules.json</file>
         <file>cables.json</file>
         <file>help/device_help_template.html</file>

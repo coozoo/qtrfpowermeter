@@ -323,7 +323,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     // --- Tools Menu ---
     QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
-    QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
+    QAction *cableLossCalcAction = new QAction(
+        QIcon(QStringLiteral(":/images/coaxcable.svg")),
+        tr("Cable Loss Calculator"),
+        this);
     toolsMenu->addAction(cableLossCalcAction);
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
 

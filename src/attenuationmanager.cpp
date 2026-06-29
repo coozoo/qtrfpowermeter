@@ -72,7 +72,9 @@ void AttenuationManager::reevaluateChain()
 
 AttenuationManager::~AttenuationManager()
 {
-    qDeleteAll(m_attenuatorWidgets);
+    // Widgets are owned via Qt's parent chain (scrollArea -> m_scrollContent
+    // -> AttenuatorWidget); the base ~QWidget cascade disposes of them.
+    // No manual qDeleteAll needed.
 }
 
 void AttenuationManager::setupUi()
@@ -93,8 +95,12 @@ void AttenuationManager::setupUi()
 
     QPushButton *addButton = new QPushButton(tr("Add"));
     addButton->setToolTip(tr("Add Attenuator"));
+    addButton->setIcon(QIcon::fromTheme(QStringLiteral("list-add"),
+                                        QIcon(QStringLiteral(":/images/list-add.svg"))));
     QPushButton *removeButton = new QPushButton(tr("Remove"));
     removeButton->setToolTip(tr("Remove Selected"));
+    removeButton->setIcon(QIcon::fromTheme(QStringLiteral("process-stop"),
+                                           QIcon(QStringLiteral(":/images/process-stop.svg"))));
 
     controlLayout->addWidget(m_typeComboBox);
     controlLayout->addWidget(addButton);

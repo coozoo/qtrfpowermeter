@@ -92,6 +92,25 @@ CalibrationManager::CalibrationManager(QWidget *parent) :
     ui->calibrateSelected_progressBar->setVisible(false);
     ui->calibrateSelected_progressBar->setTextVisible(false);
 
+    // Themed icons with resource fallback so the buttons render the same
+    // way the platform's icon theme presents the rest of the chrome.
+    ui->loadProfileButton->setIcon(QIcon::fromTheme(QStringLiteral("document-open"),
+        QIcon(QStringLiteral(":/images/document-open.svg"))));
+    ui->saveProfileButton->setIcon(QIcon::fromTheme(QStringLiteral("document-save"),
+        QIcon(QStringLiteral(":/images/document-save.svg"))));
+    ui->deleteProfileButton->setIcon(QIcon::fromTheme(QStringLiteral("edit-delete"),
+        QIcon(QStringLiteral(":/images/edit-delete.svg"))));
+    // Sampling metaphor: the pipette icon reads as "pick the value here".
+    ui->pickAverageButton->setIcon(QIcon::fromTheme(QStringLiteral("color-picker"),
+        QIcon(QStringLiteral(":/images/color-picker.svg"))));
+    ui->calibrateAllButton->setIcon(QIcon::fromTheme(QStringLiteral("color-picker"),
+        QIcon(QStringLiteral(":/images/color-picker.svg"))));
+    ui->tinySaRefreshButton->setIcon(QIcon::fromTheme(QStringLiteral("view-refresh"),
+        QIcon(QStringLiteral(":/images/view-refresh.svg"))));
+    // Initial TinySa-connect icon reflects the disconnected state; the
+    // onTinySaConnected/onTinySaDisconnected slots swap it on transitions.
+    ui->tinySaConnectButton->setIcon(QIcon(QStringLiteral(":/images/network-offline.svg")));
+
     setupPlot();
     onStartFreqChanged(ui->startFreqSpinBox->value());
     onEndFreqChanged(ui->endFreqSpinBox->value());
@@ -1190,6 +1209,9 @@ void CalibrationManager::onTinySaConnected()
 {
     m_tinySaConnected = true;
     ui->tinySaConnectButton->setText(tr("Disconnect"));
+    // Icon reflects the *current* state, not the action: wired = "you are
+    // connected", offline = "you are disconnected".
+    ui->tinySaConnectButton->setIcon(QIcon(QStringLiteral(":/images/network-wired.svg")));
     ui->tinySaStatusLabel->setText(
         tr("connected: %1 -- connect TinySa RF OUT to the power meter input via coax")
             .arg(m_tinySa->portName()));
@@ -1200,6 +1222,9 @@ void CalibrationManager::onTinySaDisconnected()
 {
     m_tinySaConnected = false;
     ui->tinySaConnectButton->setText(tr("Connect"));
+    // Mirror the icon swap in onTinySaConnected: revert to the "offline"
+    // state-indicator icon when the port closes.
+    ui->tinySaConnectButton->setIcon(QIcon(QStringLiteral(":/images/network-offline.svg")));
     ui->tinySaStatusLabel->setText(tr("not connected"));
     refreshButtonEnabledState();
     // If a Calibrate All loop is in flight, abort cleanly.
