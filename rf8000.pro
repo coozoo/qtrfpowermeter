@@ -33,6 +33,7 @@ SOURCES += \
     src/calibrationpoint.cpp \
     src/chartmanager.cpp \
     src/chartrealtime.cpp \
+    src/chainsafetyevaluator.cpp \
     src/conceptrfrpmdevice.cpp \
     src/conceptrfrpmlookuptables.cpp \
     src/advancedcalibrationtablemodel.cpp \
@@ -71,6 +72,7 @@ HEADERS += \
     src/calibrationpoint.h \
     src/chartmanager.h \
     src/chartrealtime.h \
+    src/chainsafetyevaluator.h \
     src/conceptrfrpmdevice.h \
     src/conceptrfrpmlookuptables.h \
     src/advancedcalibrationtablemodel.h \

@@ -7,6 +7,8 @@
 AttenuationManager::AttenuationManager(QWidget *parent)
     : QWidget(parent)
     , m_currentFreqHz(std::numeric_limits<double>::quiet_NaN())
+    , m_probeInputDbm(std::numeric_limits<double>::quiet_NaN())
+    , m_deviceMaxInputDbm(std::numeric_limits<double>::quiet_NaN())
 {
     setupUi();
 }
@@ -18,6 +20,54 @@ void AttenuationManager::setCurrentFrequencyMHz(double freqMHz)
     m_currentFreqHz = hz;
     for (AttenuatorWidget *w : m_attenuatorWidgets)
         w->setCurrentFrequencyHz(m_currentFreqHz);
+    reevaluateChain();
+}
+
+void AttenuationManager::setProbeInputDbm(double inputDbm)
+{
+    if (qFuzzyCompare(m_probeInputDbm + 1.0, inputDbm + 1.0)) return;
+    m_probeInputDbm = inputDbm;
+    reevaluateChain();
+}
+
+void AttenuationManager::setDeviceMaxInputDbm(double deviceMaxInputDbm)
+{
+    // NaN-aware compare: both NaN means "unchanged".
+    const bool bothNan = std::isnan(m_deviceMaxInputDbm) && std::isnan(deviceMaxInputDbm);
+    if (bothNan) return;
+    if (!std::isnan(m_deviceMaxInputDbm) && !std::isnan(deviceMaxInputDbm)
+        && qFuzzyCompare(m_deviceMaxInputDbm + 1.0, deviceMaxInputDbm + 1.0))
+        return;
+    m_deviceMaxInputDbm = deviceMaxInputDbm;
+    reevaluateChain();
+}
+
+QList<StageInfo> AttenuationManager::currentStages() const
+{
+    QList<StageInfo> stages;
+    stages.reserve(m_attenuatorWidgets.size());
+    for (AttenuatorWidget *w : m_attenuatorWidgets)
+        {
+            const bool isInternal = (w == m_internalAttenuatorWidget);
+            const double rating = isInternal ? m_deviceMaxInputDbm : w->maxInputDbm();
+            stages.append(StageInfo{
+                w->descriptionText(),
+                w->getAttenuation(),
+                rating,
+                isInternal
+            });
+        }
+    return stages;
+}
+
+void AttenuationManager::reevaluateChain()
+{
+    if (std::isnan(m_probeInputDbm)) return; // no input known yet, nothing to flag
+    const ChainReport report = ChainSafetyEvaluator::evaluate(m_probeInputDbm, currentStages());
+    // Per-plate fan-out so each widget shows its own state.
+    for (int i = 0; i < report.perStage.size() && i < m_attenuatorWidgets.size(); ++i)
+        m_attenuatorWidgets.at(i)->setOverloadState(report.perStage.at(i));
+    emit safetyStateChanged(report);
 }
 
 AttenuationManager::~AttenuationManager()
@@ -122,6 +172,9 @@ void AttenuationManager::addAttenuator()
     // Connect the widget's valueChanged signal to our update slot
     connect(newWidget, &AttenuatorWidget::valueChanged, this, &AttenuationManager::updateTotalAttenuation);
     connect(newWidget, &QGroupBox::toggled, this, &AttenuationManager::updateTotalAttenuation); // Also update if enabled/disabled
+    // Rating changes (Fixed user edit, Digital re-detection) don't shift
+    // total attenuation but do change chain safety; re-evaluate explicitly.
+    connect(newWidget, &AttenuatorWidget::maxInputDbmChanged, this, [this](double){ reevaluateChain(); });
 
     // If it's a cable widget, emit it so MainWindow can connect frequency signals
     if (type == AttenuatorWidget::Cable) {
@@ -182,14 +235,22 @@ void AttenuationManager::updateTotalAttenuation()
 
     m_totalLcd->display(total);
     emit totalAttenuationChanged(total);
+    reevaluateChain();
 }
 
-void AttenuationManager::addInternalAttenuator(double min, double max, double step)
+void AttenuationManager::addInternalAttenuator(double min, double max, double step,
+                                               double deviceMaxInputDbm)
 {
     if (m_internalAttenuatorWidget) return;
 
+    // The internal-stage rating is also kept on the manager for the chain
+    // evaluator so it survives subsequent addInternalAttenuator/remove
+    // cycles even if the caller forgets to pass it again.
+    if (!std::isnan(deviceMaxInputDbm))
+        m_deviceMaxInputDbm = deviceMaxInputDbm;
+
     m_internalAttenuatorWidget = new AttenuatorWidget(AttenuatorWidget::InternalDigital);
-    m_internalAttenuatorWidget->setInternalProperties(min, max, step); // Pass properties down
+    m_internalAttenuatorWidget->setInternalProperties(min, max, step, m_deviceMaxInputDbm); // Pass properties down
 
     // This signal tells MainWindow when the value is changed *from within this widget's editor*
     connect(m_internalAttenuatorWidget, &AttenuatorWidget::valueChanged, this, &AttenuationManager::internalAttenuationChanged);

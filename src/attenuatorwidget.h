@@ -11,10 +11,12 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <QPoint>
+#include <limits>
 #include "qtdigitalattenuator.h"
 #include "fixedattenuatorcontrol.h"
 #include "internalattenuatorcontrol.h"
 #include "qtcoaxcablelosscalcmanager.h"
+#include "chainsafetyevaluator.h"
 
 class AttenuatorWidget : public QGroupBox
 {
@@ -42,9 +44,18 @@ public:
     // digital boards). The chain evaluator treats NaN as "do not check".
     double maxInputDbm() const;
 
+    // Human-readable label for this stage, used in safety warnings.
+    QString descriptionText() const { return m_description; }
+
+    // Driven by AttenuationManager after each chain re-evaluation. Updates
+    // the plate's border and LCD background plus a tooltip describing
+    // how much headroom is left (or by how much the stage is over).
+    void setOverloadState(const StageReport &report);
+
     bool isMarkedForRemoval() const { return m_markedForRemoval; }
 
-    void setInternalProperties(double min, double max, double step);
+    void setInternalProperties(double min, double max, double step,
+                               double deviceMaxInputDbm = std::numeric_limits<double>::quiet_NaN());
 
     QtCoaxCableLossCalcManager *cableManager() const { return m_cableManager; }
 
@@ -74,6 +85,12 @@ private:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
     AttenuatorType m_type;
+    // Device-front-panel rating for the pinned internal stage. NaN for
+    // every other type; the manager skips the check when NaN.
+    double m_internalDeviceMaxInputDbm = std::numeric_limits<double>::quiet_NaN();
+    // Last overload status applied; tracked so we can restore the LCD's
+    // value-set colour once the overload clears.
+    StageStatus m_overloadStatus = StageStatus::Ok;
     // Drag-source tracking. Negative position means "no press in progress"
     // (we ignore the press if it landed on the checkbox or on an
     // InternalDigital plate, both of which never start a drag).

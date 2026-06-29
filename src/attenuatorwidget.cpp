@@ -35,6 +35,8 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
         m_fixedControl = new FixedAttenuatorControl();
         connect(m_fixedControl, &FixedAttenuatorControl::valueChanged, this, &AttenuatorWidget::onValueChanged);
         connect(m_fixedControl, &FixedAttenuatorControl::descriptionChanged, this, &AttenuatorWidget::onDescriptionChanged);
+        connect(m_fixedControl, &FixedAttenuatorControl::maxInputDbmChanged,
+                this, &AttenuatorWidget::maxInputDbmChanged);
         onDescriptionChanged(tr("Fixed"));
     }
     else if (m_type == InternalDigital)
@@ -139,10 +141,42 @@ double AttenuatorWidget::getAttenuation() const
 double AttenuatorWidget::maxInputDbm() const
 {
     if (m_digitalControl) return m_digitalControl->maxInputDbm();
-    // Fixed: user-settable rating arrives in step 6g; cables and the
-    // device-internal stage stay NaN here (the meter's own max-dbm window
-    // covers the internal case from a different path in the calculator).
+    if (m_fixedControl) return m_fixedControl->maxInputDbm();
+    if (m_internalControl) return m_internalDeviceMaxInputDbm;
+    // Cables: rating not modelled (assumed safe at the powers we deal with).
     return std::numeric_limits<double>::quiet_NaN();
+}
+
+void AttenuatorWidget::setOverloadState(const StageReport &report)
+{
+    m_overloadStatus = report.status;
+    if (report.status == StageStatus::Overload)
+        {
+            setStyleSheet("QGroupBox { border: 2px solid #d32f2f; background-color: #ffe0e0; border-radius: 4px; }");
+            m_valueLcd->setStyleSheet("QLCDNumber{ background-color: #d32f2f; color: yellow;}");
+            setToolTip(tr("DANGER: incident here = %1 dBm, rated %2 dBm, over by %3 dB")
+                       .arg(report.incidentDbm, 0, 'f', 1)
+                       .arg(report.ratedDbm, 0, 'f', 1)
+                       .arg(-report.headroomDb, 0, 'f', 1));
+        }
+    else
+        {
+            // Hand the LCD back to its normal colouring; the GroupBox
+            // border reverts to its idle (unpressed) style.
+            setPressedStyle(false);
+            m_valueLcd->setStyleSheet("QLCDNumber{ background-color: green; color: yellow;}");
+            if (report.status == StageStatus::Ok && !std::isnan(report.ratedDbm))
+                {
+                    setToolTip(tr("OK: incident here = %1 dBm, rated %2 dBm (%3 dB headroom)")
+                               .arg(report.incidentDbm, 0, 'f', 1)
+                               .arg(report.ratedDbm, 0, 'f', 1)
+                               .arg(report.headroomDb, 0, 'f', 1));
+                }
+            else
+                {
+                    setToolTip(tr("Rating unknown for this stage; chain safety check skipped."));
+                }
+        }
 }
 
 void AttenuatorWidget::onCheckBoxToggled(bool checked)
@@ -307,9 +341,11 @@ void AttenuatorWidget::onDescriptionChanged(const QString &description)
     }
 }
 
-void AttenuatorWidget::setInternalProperties(double min, double max, double step)
+void AttenuatorWidget::setInternalProperties(double min, double max, double step,
+                                             double deviceMaxInputDbm)
 {
     if (m_internalControl) {
         m_internalControl->setProperties(min, max, step);
     }
+    m_internalDeviceMaxInputDbm = deviceMaxInputDbm;
 }
