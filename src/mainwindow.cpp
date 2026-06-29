@@ -189,6 +189,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(attenuationMgr, &AttenuationManager::totalAttenuationChanged, this, &MainWindow::onTotalAttenuationChanged);
     connect(attenuationMgr, &AttenuationManager::cableManagerAdded, this, &MainWindow::onCableManagerAdded);
     connect(attenuationMgr, &AttenuationManager::cableManagerRemoved, this, &MainWindow::onCableManagerRemoved);
+    connect(this, &MainWindow::currentFrequencyChanged, attenuationMgr, &AttenuationManager::setCurrentFrequencyMHz);
+    attenuationMgr->setCurrentFrequencyMHz(ui->frequency_spinBox->value());
     ui->att_pushButton->setText(tr("Attenuation:") + " " + QString::number(m_current_atteuation,'f',2) + " dB");
 
     m_attenuatorCalculator = new TargetPowerCalculator(this);
@@ -201,6 +203,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Connect the AttenuationManager to the calculator
     connect(attenuationMgr, &AttenuationManager::totalAttenuationChanged, m_attenuatorCalculator, &TargetPowerCalculator::onActualAttenuationChanged);
+
+    // Chain-safety wiring: the calculator publishes the probe input dBm,
+    // the manager re-evaluates and pushes the report back so the calculator
+    // can surface overload warnings and each plate can light up red.
+    connect(m_attenuatorCalculator, &TargetPowerCalculator::inputDbmChanged,
+            attenuationMgr, &AttenuationManager::setProbeInputDbm);
+    connect(attenuationMgr, &AttenuationManager::safetyStateChanged,
+            m_attenuatorCalculator, &TargetPowerCalculator::onSafetyState);
 
     ui->gridLayout_6->setColumnStretch(0, 1);
     ui->gridLayout_6->setColumnStretch(1, 0);
@@ -313,7 +323,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     // --- Tools Menu ---
     QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
-    QAction *cableLossCalcAction = new QAction(tr("Cable Loss Calculator"), this);
+    QAction *cableLossCalcAction = new QAction(
+        QIcon(QStringLiteral(":/images/coaxcable.svg")),
+        tr("Cable Loss Calculator"),
+        this);
     toolsMenu->addAction(cableLossCalcAction);
     connect(cableLossCalcAction, &QAction::triggered, this, &MainWindow::on_actionCableLossCalculator_triggered);
 
@@ -626,7 +639,8 @@ void MainWindow::createDevice(const QString &deviceId)
 
         if (m_activeDeviceObject->properties().hasInternalAttenuator) {
             const auto& props = m_activeDeviceObject->properties();
-            attenuationMgr->addInternalAttenuator(props.internalAttMinDb, props.internalAttMaxDb, props.internalAttStepDb);
+            attenuationMgr->addInternalAttenuator(props.internalAttMinDb, props.internalAttMaxDb, props.internalAttStepDb,
+                                                  props.maxPowerDbm);
 
             // Create connections only when the device supports it
             connect(ui->internalAtt_spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
@@ -634,6 +648,10 @@ void MainWindow::createDevice(const QString &deviceId)
             connect(attenuationMgr, &AttenuationManager::internalAttenuationChanged,
                     this, &MainWindow::onDeviceInternalAttChanged);
         }
+        // Keep the manager's chain-safety rating in sync even for devices
+        // without an internal stage; safetyStateChanged also drives the
+        // calculator's overload label.
+        attenuationMgr->setDeviceMaxInputDbm(m_activeDeviceObject->properties().maxPowerDbm);
 
         updateUiForDevice(m_activeDeviceObject->properties());
 

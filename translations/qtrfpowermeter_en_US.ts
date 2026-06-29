@@ -4,100 +4,125 @@
 <context>
     <name>AttenuationManager</name>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="28"/>
+        <location filename="../src/attenuationmanager.cpp" line="92"/>
         <source>Fixed Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="29"/>
+        <location filename="../src/attenuationmanager.cpp" line="93"/>
         <source>Digital Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="30"/>
+        <location filename="../src/attenuationmanager.cpp" line="94"/>
         <source>Cable Loss</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="32"/>
+        <location filename="../src/attenuationmanager.cpp" line="96"/>
         <source>Add</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="33"/>
+        <location filename="../src/attenuationmanager.cpp" line="97"/>
         <source>Add Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="34"/>
+        <location filename="../src/attenuationmanager.cpp" line="100"/>
         <source>Remove</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="35"/>
+        <location filename="../src/attenuationmanager.cpp" line="101"/>
         <source>Remove Selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuationmanager.cpp" line="62"/>
+        <location filename="../src/attenuationmanager.cpp" line="132"/>
         <source>Total Attenuation:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuationmanager.cpp" line="164"/>
+        <source>▼ INPUT (from source)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuationmanager.cpp" line="166"/>
+        <source>▼ OUTPUT (to meter)</source>
         <translation></translation>
     </message>
 </context>
 <context>
     <name>AttenuatorWidget</name>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="18"/>
+        <location filename="../src/attenuatorwidget.cpp" line="31"/>
         <source>Digital</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="25"/>
+        <location filename="../src/attenuatorwidget.cpp" line="40"/>
         <source>Fixed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="32"/>
+        <location filename="../src/attenuatorwidget.cpp" line="47"/>
         <source>Device Built-in</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="37"/>
+        <location filename="../src/attenuatorwidget.cpp" line="52"/>
         <source>Coaxial Cable Loss Calculator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="44"/>
+        <location filename="../src/attenuatorwidget.cpp" line="59"/>
         <source>Cable Loss</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="74"/>
+        <location filename="../src/attenuatorwidget.cpp" line="94"/>
         <source>Fixed Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="77"/>
+        <location filename="../src/attenuatorwidget.cpp" line="97"/>
         <source>Digital Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="80"/>
+        <location filename="../src/attenuatorwidget.cpp" line="100"/>
         <source>Device Internal Attenuator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="82"/>
+        <location filename="../src/attenuatorwidget.cpp" line="102"/>
         <source>The internal attenuator is part of the device and cannot be removed.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="85"/>
+        <location filename="../src/attenuatorwidget.cpp" line="105"/>
         <source>Coaxial Cable Loss</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/attenuatorwidget.cpp" line="227"/>
+        <location filename="../src/attenuatorwidget.cpp" line="182"/>
+        <source>DANGER: incident here = %1 dBm, rated %2 dBm, over by %3 dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="195"/>
+        <source>OK: incident here = %1 dBm, rated %2 dBm (%3 dB headroom)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="202"/>
+        <source>Rating unknown for this stage; chain safety check skipped.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/attenuatorwidget.cpp" line="365"/>
         <source>Digital Attenuator: </source>
         <translation></translation>
     </message>
@@ -201,7 +226,7 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/calibrationmanager.ui" line="23"/>
-        <location filename="../src/calibrationmanager.cpp" line="1013"/>
+        <location filename="../src/calibrationmanager.cpp" line="1032"/>
         <source>Calibration is disabled for this device.</source>
         <translation></translation>
     </message>
@@ -318,13 +343,13 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/calibrationmanager.ui" line="401"/>
-        <location filename="../src/calibrationmanager.cpp" line="1202"/>
+        <location filename="../src/calibrationmanager.cpp" line="1224"/>
         <source>Connect</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/calibrationmanager.ui" line="408"/>
-        <location filename="../src/calibrationmanager.cpp" line="1203"/>
+        <location filename="../src/calibrationmanager.cpp" line="1228"/>
         <source>not connected</source>
         <translation></translation>
     </message>
@@ -335,7 +360,7 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/calibrationmanager.ui" line="421"/>
-        <location filename="../src/calibrationmanager.cpp" line="126"/>
+        <location filename="../src/calibrationmanager.cpp" line="145"/>
         <source>Calibrate All</source>
         <translation></translation>
     </message>
@@ -361,234 +386,234 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="626"/>
+        <location filename="../src/calibrationmanager.cpp" line="645"/>
         <source>Invalid Step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="626"/>
+        <location filename="../src/calibrationmanager.cpp" line="645"/>
         <source>Frequency step must be greater than zero.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="631"/>
+        <location filename="../src/calibrationmanager.cpp" line="650"/>
         <source>Invalid Range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="631"/>
+        <location filename="../src/calibrationmanager.cpp" line="650"/>
         <source>Start frequency must be less than end frequency.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="651"/>
+        <location filename="../src/calibrationmanager.cpp" line="670"/>
         <source>Invalid power axis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="652"/>
+        <location filename="../src/calibrationmanager.cpp" line="671"/>
         <source>Min must be less than Max.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="685"/>
-        <location filename="../src/calibrationmanager.cpp" line="716"/>
+        <location filename="../src/calibrationmanager.cpp" line="704"/>
+        <location filename="../src/calibrationmanager.cpp" line="735"/>
         <source>No Selection</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="686"/>
+        <location filename="../src/calibrationmanager.cpp" line="705"/>
         <source>Please pick a cell in the Advanced grid first.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="691"/>
-        <location filename="../src/calibrationmanager.cpp" line="725"/>
-        <location filename="../src/calibrationmanager.cpp" line="1305"/>
+        <location filename="../src/calibrationmanager.cpp" line="710"/>
+        <location filename="../src/calibrationmanager.cpp" line="744"/>
+        <location filename="../src/calibrationmanager.cpp" line="1330"/>
         <source>TinySa not connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="692"/>
-        <location filename="../src/calibrationmanager.cpp" line="726"/>
-        <location filename="../src/calibrationmanager.cpp" line="1306"/>
+        <location filename="../src/calibrationmanager.cpp" line="711"/>
+        <location filename="../src/calibrationmanager.cpp" line="745"/>
+        <location filename="../src/calibrationmanager.cpp" line="1331"/>
         <source>Please connect the TinySa first.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="716"/>
+        <location filename="../src/calibrationmanager.cpp" line="735"/>
         <source>Please select a frequency in the table first.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="795"/>
+        <location filename="../src/calibrationmanager.cpp" line="814"/>
         <source>Invalid Name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="795"/>
+        <location filename="../src/calibrationmanager.cpp" line="814"/>
         <source>Please enter a profile name.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="804"/>
-        <location filename="../src/calibrationmanager.cpp" line="854"/>
+        <location filename="../src/calibrationmanager.cpp" line="823"/>
+        <location filename="../src/calibrationmanager.cpp" line="873"/>
         <source>Success</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="804"/>
+        <location filename="../src/calibrationmanager.cpp" line="823"/>
         <source>Profile &apos;%1&apos; saved.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="860"/>
+        <location filename="../src/calibrationmanager.cpp" line="879"/>
         <source>Error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="999"/>
+        <location filename="../src/calibrationmanager.cpp" line="1018"/>
         <source>ConceptRF applies factory calibration internally; user calibration off.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1182"/>
+        <location filename="../src/calibrationmanager.cpp" line="1201"/>
         <source>Pick a port first.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1185"/>
+        <location filename="../src/calibrationmanager.cpp" line="1204"/>
         <source>Connecting to %1...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1192"/>
+        <location filename="../src/calibrationmanager.cpp" line="1211"/>
         <source>Disconnect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1194"/>
+        <location filename="../src/calibrationmanager.cpp" line="1216"/>
         <source>connected: %1 -- connect TinySa RF OUT to the power meter input via coax</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1219"/>
+        <location filename="../src/calibrationmanager.cpp" line="1244"/>
         <source>error: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1264"/>
+        <location filename="../src/calibrationmanager.cpp" line="1289"/>
         <source>cell %1/%2: no signal (skipped)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1267"/>
+        <location filename="../src/calibrationmanager.cpp" line="1292"/>
         <source>row %1: no signal (skipped)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1286"/>
+        <location filename="../src/calibrationmanager.cpp" line="1311"/>
         <source>clamp at %1 Hz: asked %2 dBm -&gt; %3 dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1317"/>
-        <location filename="../src/calibrationmanager.cpp" line="1338"/>
+        <location filename="../src/calibrationmanager.cpp" line="1342"/>
+        <location filename="../src/calibrationmanager.cpp" line="1363"/>
         <source>nothing to calibrate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="126"/>
+        <location filename="../src/calibrationmanager.cpp" line="145"/>
         <source>Cancel calibration</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1362"/>
+        <location filename="../src/calibrationmanager.cpp" line="1387"/>
         <source>calibration cancelled</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1444"/>
+        <location filename="../src/calibrationmanager.cpp" line="1469"/>
         <source>calibration sweep done</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1495"/>
+        <location filename="../src/calibrationmanager.cpp" line="1520"/>
         <source> (cell %1/%2)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1499"/>
+        <location filename="../src/calibrationmanager.cpp" line="1524"/>
         <source>setting %1 MHz / %2 dBm%3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1503"/>
+        <location filename="../src/calibrationmanager.cpp" line="1528"/>
         <source>setting %1 MHz / %2 dBm (asked %3, clamped to band)%4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1559"/>
+        <location filename="../src/calibrationmanager.cpp" line="1584"/>
         <source>setting %1 MHz / %2 dBm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1562"/>
+        <location filename="../src/calibrationmanager.cpp" line="1587"/>
         <source>setting %1 MHz / %2 dBm (asked %3, clamped to band)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1644"/>
+        <location filename="../src/calibrationmanager.cpp" line="1669"/>
         <source>Correction at %1 dBm (dB)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="1646"/>
+        <location filename="../src/calibrationmanager.cpp" line="1671"/>
         <source>Correction (dB)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="849"/>
+        <location filename="../src/calibrationmanager.cpp" line="868"/>
         <source>Confirm Delete</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="151"/>
+        <location filename="../src/calibrationmanager.cpp" line="170"/>
         <source>Power axis (dBm):</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="152"/>
+        <location filename="../src/calibrationmanager.cpp" line="171"/>
         <source>Min</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="158"/>
+        <location filename="../src/calibrationmanager.cpp" line="177"/>
         <source>Max</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="164"/>
+        <location filename="../src/calibrationmanager.cpp" line="183"/>
         <source>Step</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="173"/>
+        <location filename="../src/calibrationmanager.cpp" line="192"/>
         <source>Apply axis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="849"/>
+        <location filename="../src/calibrationmanager.cpp" line="868"/>
         <source>Are you sure you want to delete the profile &apos;%1&apos;?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="854"/>
+        <location filename="../src/calibrationmanager.cpp" line="873"/>
         <source>Profile &apos;%1&apos; deleted.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/calibrationmanager.cpp" line="860"/>
+        <location filename="../src/calibrationmanager.cpp" line="879"/>
         <source>Could not delete profile &apos;%1&apos;.</source>
         <translation></translation>
     </message>
@@ -927,17 +952,22 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
 <context>
     <name>FixedAttenuatorControl</name>
     <message>
-        <location filename="../src/fixedattenuatorcontrol.cpp" line="7"/>
+        <location filename="../src/fixedattenuatorcontrol.cpp" line="10"/>
         <source>Fixed Attenuator Control</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/fixedattenuatorcontrol.cpp" line="25"/>
+        <location filename="../src/fixedattenuatorcontrol.cpp" line="49"/>
         <source>Attenuation:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/fixedattenuatorcontrol.cpp" line="26"/>
+        <location filename="../src/fixedattenuatorcontrol.cpp" line="50"/>
+        <source>Max Input:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/fixedattenuatorcontrol.cpp" line="51"/>
         <source>Description:</source>
         <translation></translation>
     </message>
@@ -1067,7 +1097,7 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="70"/>
-        <location filename="../src/mainwindow.cpp" line="248"/>
+        <location filename="../src/mainwindow.cpp" line="258"/>
         <source>Refresh</source>
         <translation></translation>
     </message>
@@ -1129,14 +1159,14 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="316"/>
-        <location filename="../src/mainwindow.cpp" line="192"/>
-        <location filename="../src/mainwindow.cpp" line="1474"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
+        <location filename="../src/mainwindow.cpp" line="1492"/>
         <source>Attenuation:</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="336"/>
-        <location filename="../src/mainwindow.cpp" line="351"/>
+        <location filename="../src/mainwindow.cpp" line="364"/>
         <source>Current</source>
         <translation></translation>
     </message>
@@ -1232,7 +1262,7 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="537"/>
-        <location filename="../src/mainwindow.cpp" line="239"/>
+        <location filename="../src/mainwindow.cpp" line="249"/>
         <source>Flow</source>
         <translation></translation>
     </message>
@@ -1243,7 +1273,7 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="585"/>
-        <location filename="../src/mainwindow.cpp" line="276"/>
+        <location filename="../src/mainwindow.cpp" line="286"/>
         <source>csv</source>
         <translation></translation>
     </message>
@@ -1293,78 +1323,78 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="240"/>
+        <location filename="../src/mainwindow.cpp" line="250"/>
         <source>After this time data on chart will move out so it will look like a flow</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="242"/>
-        <location filename="../src/mainwindow.cpp" line="243"/>
+        <location filename="../src/mainwindow.cpp" line="252"/>
+        <location filename="../src/mainwindow.cpp" line="253"/>
         <source>Device Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="247"/>
+        <location filename="../src/mainwindow.cpp" line="257"/>
         <source>Refresh Devices</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="256"/>
+        <location filename="../src/mainwindow.cpp" line="266"/>
         <source>Save charts</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="257"/>
+        <location filename="../src/mainwindow.cpp" line="267"/>
         <source>Save charts as images to the log folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="260"/>
+        <location filename="../src/mainwindow.cpp" line="270"/>
         <source>Choose output format</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="264"/>
+        <location filename="../src/mainwindow.cpp" line="274"/>
         <source>Set image width</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="270"/>
+        <location filename="../src/mainwindow.cpp" line="280"/>
         <source>Set image height</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="277"/>
+        <location filename="../src/mainwindow.cpp" line="287"/>
         <source>Write on fly data to csv file into log folder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="315"/>
+        <location filename="../src/mainwindow.cpp" line="325"/>
         <source>&amp;Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="316"/>
+        <location filename="../src/mainwindow.cpp" line="328"/>
         <source>Cable Loss Calculator</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1287"/>
+        <location filename="../src/mainwindow.cpp" line="1305"/>
         <source>Connected to %1 on %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1562"/>
+        <location filename="../src/mainwindow.cpp" line="1580"/>
         <source>No Device Selected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1562"/>
+        <location filename="../src/mainwindow.cpp" line="1580"/>
         <source>Please select a device type first.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1293"/>
+        <location filename="../src/mainwindow.cpp" line="1311"/>
         <source>Error: %1</source>
         <translation></translation>
     </message>
@@ -1379,52 +1409,52 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="361"/>
         <source>&amp;Settings</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="353"/>
+        <location filename="../src/mainwindow.cpp" line="366"/>
         <source>Show dBm Panel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="357"/>
+        <location filename="../src/mainwindow.cpp" line="370"/>
         <source>Show Wattage Panel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="374"/>
         <source>Show mVpp Panel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="368"/>
+        <location filename="../src/mainwindow.cpp" line="381"/>
         <source>Show Log Tab</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="375"/>
+        <location filename="../src/mainwindow.cpp" line="388"/>
         <source>Simulate Device</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="778"/>
+        <location filename="../src/mainwindow.cpp" line="796"/>
         <source>Save failed: could not create %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="784"/>
+        <location filename="../src/mainwindow.cpp" line="802"/>
         <source>Saved charts → %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1297"/>
+        <location filename="../src/mainwindow.cpp" line="1315"/>
         <source>Disconnected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1099"/>
+        <location filename="../src/mainwindow.cpp" line="1117"/>
         <source> [Busy]</source>
         <translation></translation>
     </message>
@@ -1594,43 +1624,89 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/qtdigitalattenuator.ui" line="240"/>
-        <location filename="../src/qtdigitalattenuator.cpp" line="240"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="409"/>
         <source>Show Device Console</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qtdigitalattenuator.cpp" line="21"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="25"/>
         <source>Periodically read the attenuation value from the device every %1 ms.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qtdigitalattenuator.cpp" line="63"/>
-        <location filename="../src/qtdigitalattenuator.cpp" line="289"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="50"/>
+        <source>Insertion Loss</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="59"/>
+        <source>IL dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="67"/>
+        <source>Effective: --- dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="70"/>
+        <source>Sum of nominal attenuation and the insertion loss for the current operating band.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="169"/>
+        <source>Effective: --- dB (set frequency)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="173"/>
+        <source>Effective: %1 dB (out of band)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="177"/>
+        <source>Effective: %1 dB  (= %2 + IL %3)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="211"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="458"/>
         <source>Disconnected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qtdigitalattenuator.cpp" line="134"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="290"/>
         <source> [Busy]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qtdigitalattenuator.cpp" line="278"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="382"/>
+        <source>Chip: %1
+Max CW input: %2 dBm (conservative)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="385"/>
+        <source>Unknown board: no rating data.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/qtdigitalattenuator.cpp" line="447"/>
         <source>Connected to %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qtdigitalattenuator.cpp" line="280"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="449"/>
         <source>Connected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qtdigitalattenuator.cpp" line="287"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="456"/>
         <source>Error: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qtdigitalattenuator.cpp" line="235"/>
+        <location filename="../src/qtdigitalattenuator.cpp" line="404"/>
         <source>Hide Device Console</source>
         <translation></translation>
     </message>
@@ -1670,41 +1746,56 @@ beyond the cable&apos;s min data frequency of %1 MHz.</source>
     </message>
     <message>
         <location filename="../src/targetpowercalculator.cpp" line="30"/>
-        <location filename="../src/targetpowercalculator.cpp" line="144"/>
-        <location filename="../src/targetpowercalculator.cpp" line="160"/>
+        <location filename="../src/targetpowercalculator.cpp" line="149"/>
+        <location filename="../src/targetpowercalculator.cpp" line="165"/>
         <source>(---)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/targetpowercalculator.cpp" line="31"/>
-        <location filename="../src/targetpowercalculator.cpp" line="175"/>
+        <location filename="../src/targetpowercalculator.cpp" line="180"/>
         <source>Attenuation Needed: ---</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/targetpowercalculator.cpp" line="166"/>
+        <location filename="../src/targetpowercalculator.cpp" line="171"/>
         <source>No Need Attenuation (signal is low)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/targetpowercalculator.cpp" line="171"/>
+        <location filename="../src/targetpowercalculator.cpp" line="176"/>
         <source>Attenuation Needed: %1 dB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/targetpowercalculator.cpp" line="224"/>
+        <location filename="../src/targetpowercalculator.cpp" line="199"/>
+        <source>DANGER: stage %1 over by %2 dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/targetpowercalculator.cpp" line="208"/>
+        <source>Chain safety report:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/targetpowercalculator.cpp" line="212"/>
+        <source>  stage %1: incident %2 dBm, rated %3 dBm, over by %4 dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/targetpowercalculator.cpp" line="264"/>
         <source>DANGER: Signal at meter (%1 dBm) is above max (%2 dBm).
 Potential for equipment damage!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/targetpowercalculator.cpp" line="230"/>
+        <location filename="../src/targetpowercalculator.cpp" line="270"/>
         <source>INFO: Signal at meter (%1 dBm) is below min (%2 dBm).
 Measurement may be inaccurate or impossible.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/targetpowercalculator.cpp" line="236"/>
+        <location filename="../src/targetpowercalculator.cpp" line="276"/>
         <source>OK: Signal at meter (%1 dBm) is within the safe range [%2, %3] dBm.</source>
         <translation></translation>
     </message>

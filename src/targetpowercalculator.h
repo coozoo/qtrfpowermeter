@@ -11,6 +11,7 @@
 #include <cmath>
 #include <limits>
 #include "unitconverter.h"
+#include "chainsafetyevaluator.h"
 
 class TargetPowerCalculator : public QGroupBox
 {
@@ -25,6 +26,14 @@ public:
 
 public slots:
     void onActualAttenuationChanged(double actualAttenuation);
+    // Fed by AttenuationManager after each chain re-evaluation. Updates the
+    // safety label and tooltip.
+    void onSafetyState(const ChainReport &report);
+
+signals:
+    // Fires whenever the user-entered probe power changes (in dBm). The
+    // AttenuationManager listens so it can re-evaluate the chain.
+    void inputDbmChanged(double inputDbm);
 
 private slots:
     void onUnitChanged();
@@ -38,6 +47,7 @@ private:
     QComboBox *m_unitComboBox;
     QLabel *m_convertedValueLabel;
     QLabel *m_requiredDbLabel;
+    QLabel *m_safetyLabel;
 
     double m_targetDbm;
     double m_minDbm;

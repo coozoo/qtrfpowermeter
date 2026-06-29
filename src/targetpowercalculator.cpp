@@ -29,13 +29,18 @@ TargetPowerCalculator::TargetPowerCalculator(QWidget *parent)
 
     m_convertedValueLabel = new QLabel(tr("(---)"));
     m_requiredDbLabel = new QLabel(tr("Attenuation Needed: ---"));
+    m_safetyLabel = new QLabel(QString());
+    m_safetyLabel->setWordWrap(true);
+    m_safetyLabel->setVisible(false);
 
     QFont boldFont = m_requiredDbLabel->font();
     boldFont.setBold(true);
     m_requiredDbLabel->setFont(boldFont);
+    m_safetyLabel->setFont(boldFont);
 
     mainLayout->addLayout(inputLayout);
     mainLayout->addWidget(m_convertedValueLabel);
+    mainLayout->addWidget(m_safetyLabel);
     mainLayout->addWidget(m_requiredDbLabel);
 
     connect(m_powerInputSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateCalculations()));
@@ -176,6 +181,41 @@ void TargetPowerCalculator::updateCalculations()
         }
 
     performHighlighting();
+    if (!std::isinf(input_dbm))
+        emit inputDbmChanged(input_dbm);
+}
+
+void TargetPowerCalculator::onSafetyState(const ChainReport &report)
+{
+    if (report.firstOverloadIdx < 0)
+        {
+            m_safetyLabel->setVisible(false);
+            m_safetyLabel->setText(QString());
+            m_safetyLabel->setToolTip(QString());
+            return;
+        }
+
+    const StageReport &worst = report.perStage.at(report.firstOverloadIdx);
+    m_safetyLabel->setText(tr("DANGER: stage %1 over by %2 dB")
+                           .arg(report.firstOverloadIdx + 1)
+                           .arg(-worst.headroomDb, 0, 'f', 1));
+    m_safetyLabel->setStyleSheet("color: #d32f2f;");
+    m_safetyLabel->setVisible(true);
+
+    // Tooltip enumerates every offending stage so the user can see the
+    // whole picture, not just the first one we surface in the headline.
+    QStringList lines;
+    lines << tr("Chain safety report:");
+    for (const StageReport &r : report.perStage)
+        {
+            if (r.status != StageStatus::Overload) continue;
+            lines << tr("  stage %1: incident %2 dBm, rated %3 dBm, over by %4 dB")
+                     .arg(r.stageIdx + 1)
+                     .arg(r.incidentDbm, 0, 'f', 1)
+                     .arg(r.ratedDbm, 0, 'f', 1)
+                     .arg(-r.headroomDb, 0, 'f', 1);
+        }
+    m_safetyLabel->setToolTip(lines.join('\n'));
 }
 
 void TargetPowerCalculator::onActualAttenuationChanged(double actualAttenuation)

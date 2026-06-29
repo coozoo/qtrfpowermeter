@@ -6,6 +6,10 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QDateTime>
+#include <QTableWidget>
+#include <QLabel>
+#include <QGroupBox>
+#include <limits>
 #include "serialportinterface.h"
 #include "attdevice.h"
 #include "unitconverter.h"
@@ -82,14 +86,36 @@ public:
         emit deviceErrorChanged();
     }
 
+public:
+    // Chip-level absolute-max CW input rating for the detected model. NaN
+    // before a known device is detected (e.g. unsupported boards).
+    double maxInputDbm() const { return m_maxInputDbm; }
+    const QString &chipName() const { return m_chip; }
+
+public slots:
+    // Operating frequency feed for IL lookup. Hz. NaN means "unknown" and
+    // the IL table renders no highlighted band.
+    void setCurrentFrequencyHz(double freqHz);
+
 private:
     Ui::QtDigitalAttenuator *ui;
     void updateDeviceList();
+    void setupInsertionLossWidgets();
+    void rebuildIlTableForBands(const QList<InsertionLossBand> &bands);
+    void refreshIlHighlight();
+    void emitEffective();
     AttDevice *serialAttenuator;
     QTimer *attenuation_doubleSpinBox_debounceTimer;
     QString m_currentDevice;
     bool m_isConnected = false;
     QString m_deviceError;
+    double m_maxInputDbm = std::numeric_limits<double>::quiet_NaN();
+    QString m_chip;
+    double m_currentFreqHz = std::numeric_limits<double>::quiet_NaN();
+    double m_currentIlDb = 0.0;
+    QGroupBox *m_ilGroupBox = nullptr;
+    QTableWidget *m_ilTable = nullptr;
+    QLabel *m_effectiveLabel = nullptr;
 
 private slots:
     void onPortOpened();
@@ -105,7 +131,8 @@ private slots:
     void on_set_pushButton_clicked();
     void on_send_pushButton_clicked();
     void on_currentAttenuation_changed(double value);
-    void ondetectedDevice(const QString &model, double step, double max, const QString &format);
+    void ondetectedDevice(const QString &model, double step, double max, const QString &format,
+                          double maxInputDbm, const QString &chip);
     void ondeviceConsole_pushButton_clicked();
     void ondeviceSetStatus(bool status);
     void on_useHardButtons_checkBox_stateChanged(int state);
@@ -114,6 +141,12 @@ signals:
     void currentValueChanged(double value);
     void valueSetStatus(bool status);
     void modelChanged(const QString &model);
+    // Emitted when a known model is detected, carrying its chip-level
+    // CW input rating. NaN means unknown / unsupported board.
+    void maxInputDbmChanged(double maxInputDbm, const QString &chip);
+    // Fires whenever nominal attenuation or the current operating frequency
+    // changes. effectiveDb = nominalDb + ilDb (out-of-band: ilDb = 0).
+    void effectiveAttenuationChanged(double nominalDb, double ilDb, double effectiveDb);
     void currentDeviceChanged();
     void isConnectedChanged(bool connected);
     void deviceErrorChanged();

@@ -52,6 +52,17 @@ Supports adding fixed and digital attenuators of one kind https://github.com/coo
 
 For convenient measurement there is attenuation calculator to prevent mixing and damaging your equipment but still you need to be cautious.
 
+### Attenuation chain safety
+
+The attenuation panel models the full chain top-to-bottom (source above, meter below) and flags damage risk at every stage:
+
+*   **Per-stage rating.** Digital attenuators report their chip-level max input on connect (PE43712 / PE43508 / HMC624 conservative defaults). Fixed attenuators carry a user-set rating with W / mW / dBm units. Cables are assumed safe; the device's own front-end uses its declared max input.
+*   **Frequency-aware insertion loss.** Digital attenuator widgets show their per-band IL table and highlight the active band. Total attenuation reflects `nominal + IL` at the current operating frequency.
+*   **Per-stage overload visual.** Any stage whose incident power exceeds its rating goes red (border + LCD) with a tooltip showing by how many dB it is over. The calculator's safety line names the first offender; the tooltip lists every overloaded stage.
+*   **Order matters.** Drag plates to match the physical cable run. The device's own internal stage stays pinned at the bottom. The chain re-evaluates on every value change, reorder, frequency change or probe input change.
+
+The check is only as accurate as the ratings on each plate; cable, connector and adapter losses are not modelled.
+
 ### Calibration
 
 There are three calibration modes plus a built-in viewer for devices that ship their own factory table.

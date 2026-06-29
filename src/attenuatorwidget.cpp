@@ -1,7 +1,14 @@
 #include "attenuatorwidget.h"
+#include <QApplication>
+#include <QDrag>
+#include <QMimeData>
+#include <QPixmap>
+#include <cmath>
+#include <limits>
 
 AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidget *parent)
-    : QGroupBox(parent), m_type(type), m_attenuationValue(0.0), m_markedForRemoval(false),
+    : QGroupBox(parent), m_type(type), m_attenuationValue(0.0), m_effectiveValue(0.0),
+    m_markedForRemoval(false),
     m_editorHasBeenShown(false), // Initialize the flag to false
     m_digitalControl(nullptr), m_fixedControl(nullptr),
     m_internalControl(nullptr), m_cableManager(nullptr)
@@ -12,9 +19,15 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
     if (m_type == Digital)
     {
         m_digitalControl = new QtDigitalAttenuator();
-        connect(m_digitalControl, &QtDigitalAttenuator::currentValueChanged, this, &AttenuatorWidget::onValueChanged);
+        // Digital widget uses effectiveAttenuationChanged as the canonical
+        // source: it carries nominal (for the LCD) and effective (for the
+        // chain total) together so they cannot drift apart.
+        connect(m_digitalControl, &QtDigitalAttenuator::effectiveAttenuationChanged,
+                this, &AttenuatorWidget::onEffectiveChanged);
         connect(m_digitalControl, &QtDigitalAttenuator::valueSetStatus, this, &AttenuatorWidget::onStatusChanged);
         connect(m_digitalControl, &QtDigitalAttenuator::modelChanged, this, &AttenuatorWidget::onDescriptionChanged);
+        connect(m_digitalControl, &QtDigitalAttenuator::maxInputDbmChanged, this,
+                [this](double v, const QString &) { emit maxInputDbmChanged(v); });
         onDescriptionChanged(tr("Digital"));
     }
     else if (m_type == Fixed)
@@ -22,6 +35,8 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
         m_fixedControl = new FixedAttenuatorControl();
         connect(m_fixedControl, &FixedAttenuatorControl::valueChanged, this, &AttenuatorWidget::onValueChanged);
         connect(m_fixedControl, &FixedAttenuatorControl::descriptionChanged, this, &AttenuatorWidget::onDescriptionChanged);
+        connect(m_fixedControl, &FixedAttenuatorControl::maxInputDbmChanged,
+                this, &AttenuatorWidget::maxInputDbmChanged);
         onDescriptionChanged(tr("Fixed"));
     }
     else if (m_type == InternalDigital)
@@ -48,10 +63,15 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
 AttenuatorWidget::~AttenuatorWidget()
 {
     qDebug()<<"AttenuatorWidget destructor called.";
-    if (m_digitalControl) delete m_digitalControl;
-    if (m_fixedControl) delete m_fixedControl;
-    if (m_internalControl) delete m_internalControl;
-    if (m_cableManager) delete m_cableManager;
+    // Sub-controls are top-level windows constructed without a QObject
+    // parent; deleteLater() defers disposal past the current event loop
+    // iteration so a slot inside one of them (e.g. Set/Send on the digital
+    // editor) cannot finish on a destroyed object when removal is fired
+    // while the editor is visible.
+    if (m_digitalControl) m_digitalControl->deleteLater();
+    if (m_fixedControl) m_fixedControl->deleteLater();
+    if (m_internalControl) m_internalControl->deleteLater();
+    if (m_cableManager) m_cableManager->deleteLater();
 }
 
 void AttenuatorWidget::setupUi()
@@ -120,7 +140,68 @@ void AttenuatorWidget::onStatusChanged(bool status)
 
 double AttenuatorWidget::getAttenuation() const
 {
-    return m_attenuationValue;
+    return m_effectiveValue;
+}
+
+double AttenuatorWidget::maxInputDbm() const
+{
+    if (m_digitalControl) return m_digitalControl->maxInputDbm();
+    if (m_fixedControl) return m_fixedControl->maxInputDbm();
+    if (m_internalControl) return m_internalDeviceMaxInputDbm;
+    // Cables: rating not modelled (assumed safe at the powers we deal with).
+    return std::numeric_limits<double>::quiet_NaN();
+}
+
+void AttenuatorWidget::setOverloadState(const StageReport &report)
+{
+    // The chain re-evaluates on every value change, frequency change,
+    // probe-input change and reorder. Skip the paint/tooltip work when the
+    // resulting state matches what is already on screen; otherwise N plates
+    // re-style on every keystroke.
+    auto sameTooltipInput = [&](double last, double next) {
+        if (std::isnan(last) && std::isnan(next)) return true;
+        if (std::isnan(last) || std::isnan(next)) return false;
+        return qFuzzyCompare(last + 1.0, next + 1.0);
+    };
+    if (m_overloadStateApplied
+        && m_overloadStatus == report.status
+        && sameTooltipInput(m_lastOverloadIncidentDbm, report.incidentDbm)
+        && sameTooltipInput(m_lastOverloadRatedDbm, report.ratedDbm))
+        {
+            return;
+        }
+    m_overloadStateApplied = true;
+    m_overloadStatus = report.status;
+    m_lastOverloadIncidentDbm = report.incidentDbm;
+    m_lastOverloadRatedDbm = report.ratedDbm;
+
+    if (report.status == StageStatus::Overload)
+        {
+            setStyleSheet("QGroupBox { border: 2px solid #d32f2f; background-color: #ffe0e0; border-radius: 4px; }");
+            m_valueLcd->setStyleSheet("QLCDNumber{ background-color: #d32f2f; color: yellow;}");
+            setToolTip(tr("DANGER: incident here = %1 dBm, rated %2 dBm, over by %3 dB")
+                       .arg(report.incidentDbm, 0, 'f', 1)
+                       .arg(report.ratedDbm, 0, 'f', 1)
+                       .arg(-report.headroomDb, 0, 'f', 1));
+        }
+    else
+        {
+            // Hand the LCD back to its normal colouring; the GroupBox
+            // border reverts to its idle (unpressed) style.
+            setPressedStyle(false);
+            m_valueLcd->setStyleSheet("QLCDNumber{ background-color: green; color: yellow;}");
+            if (report.status == StageStatus::Ok && !std::isnan(report.ratedDbm))
+                {
+                    setToolTip(tr("OK: incident here = %1 dBm, rated %2 dBm (%3 dB headroom)")
+                               .arg(report.incidentDbm, 0, 'f', 1)
+                               .arg(report.ratedDbm, 0, 'f', 1)
+                               .arg(report.headroomDb, 0, 'f', 1));
+                }
+            else
+                {
+                    setToolTip(tr("Rating unknown for this stage; chain safety check skipped."));
+                }
+        }
 }
 
 void AttenuatorWidget::onCheckBoxToggled(bool checked)
@@ -136,9 +217,28 @@ void AttenuatorWidget::setValue(double value)
 void AttenuatorWidget::onValueChanged(double value)
 {
     qDebug()<<Q_FUNC_INFO<<value;
+    // Non-digital path: nominal and effective are the same number. Digital
+    // updates take onEffectiveChanged so the LCD stays on nominal while the
+    // chain total picks up nominal + IL.
     m_attenuationValue = value;
+    m_effectiveValue = value;
     m_valueLcd->display(m_attenuationValue);
-    emit valueChanged(m_attenuationValue);
+    emit valueChanged(m_effectiveValue);
+}
+
+void AttenuatorWidget::onEffectiveChanged(double nominalDb, double ilDb, double effectiveDb)
+{
+    Q_UNUSED(ilDb);
+    qDebug()<<Q_FUNC_INFO<<nominalDb<<ilDb<<effectiveDb;
+    m_attenuationValue = nominalDb;
+    m_effectiveValue = effectiveDb;
+    m_valueLcd->display(m_attenuationValue);
+    emit valueChanged(m_effectiveValue);
+}
+
+void AttenuatorWidget::setCurrentFrequencyHz(double freqHz)
+{
+    if (m_digitalControl) m_digitalControl->setCurrentFrequencyHz(freqHz);
 }
 
 void AttenuatorWidget::openEditor()
@@ -199,23 +299,61 @@ void AttenuatorWidget::setPressedStyle(bool pressed)
 
 bool AttenuatorWidget::eventFilter(QObject *watched, QEvent *event)
 {
+    if (watched != this)
+        return QObject::eventFilter(watched, event);
 
-    if (watched == this) {
-        if (event->type() == QEvent::MouseButtonPress) {
-            QWidget *child = childAt(static_cast<QMouseEvent *>(event)->pos());
-            if (qobject_cast<QCheckBox *>(child)) { return false; }
-            setPressedStyle(true);
-            return true;
-        } else if (event->type() == QEvent::MouseButtonRelease) {
-            QWidget *child = childAt(static_cast<QMouseEvent *>(event)->pos());
-            if (qobject_cast<QCheckBox *>(child)) { setPressedStyle(false); return false; }
-            setPressedStyle(false);
-            if (rect().contains(static_cast<QMouseEvent *>(event)->pos())) {
-                openEditor();
-            }
-            return true;
-        }
+    auto *mev = static_cast<QMouseEvent *>(event);
+
+    if (event->type() == QEvent::MouseButtonPress) {
+        QWidget *child = childAt(mev->pos());
+        if (qobject_cast<QCheckBox *>(child)) { return false; }
+        // Internal sub-control is pinned (it represents the device's own
+        // front-end). Press still triggers the open-editor path on release,
+        // but never starts a drag.
+        m_dragStartPos = (m_type == InternalDigital) ? QPoint(-1, -1) : mev->pos();
+        setPressedStyle(true);
+        return true;
     }
+
+    if (event->type() == QEvent::MouseMove) {
+        if (m_dragStartPos.x() < 0) return false;
+        if (!(mev->buttons() & Qt::LeftButton)) return false;
+        if ((mev->pos() - m_dragStartPos).manhattanLength() < QApplication::startDragDistance())
+            return false;
+        // Cross the threshold: start a drag. The release that closes the
+        // drag must not also fire openEditor(), so clear m_dragStartPos
+        // before exec() and rely on the negative sentinel in release below.
+        m_dragStartPos = QPoint(-1, -1);
+        setPressedStyle(false);
+
+        QDrag *drag = new QDrag(this);
+        QMimeData *mime = new QMimeData();
+        // Payload is irrelevant; AttenuationManager identifies the source
+        // via QDrag::source(). The custom mime type is the filter that
+        // distinguishes our drag from foreign QDrag flows.
+        mime->setData(QStringLiteral("application/x-rfpm-attenuator"), QByteArray());
+        drag->setMimeData(mime);
+        QPixmap shot = grab();
+        drag->setPixmap(shot);
+        drag->setHotSpot(mev->pos());
+        drag->exec(Qt::MoveAction);
+        return true;
+    }
+
+    if (event->type() == QEvent::MouseButtonRelease) {
+        QWidget *child = childAt(mev->pos());
+        if (qobject_cast<QCheckBox *>(child)) { setPressedStyle(false); m_dragStartPos = QPoint(-1, -1); return false; }
+        setPressedStyle(false);
+        // If a drag fired, m_dragStartPos was reset above and we suppress
+        // the click-to-open-editor path here.
+        const bool wasPressTracked = (m_dragStartPos.x() >= 0);
+        m_dragStartPos = QPoint(-1, -1);
+        if (wasPressTracked && rect().contains(mev->pos())) {
+            openEditor();
+        }
+        return true;
+    }
+
     return QObject::eventFilter(watched, event);
 }
 
@@ -228,9 +366,11 @@ void AttenuatorWidget::onDescriptionChanged(const QString &description)
     }
 }
 
-void AttenuatorWidget::setInternalProperties(double min, double max, double step)
+void AttenuatorWidget::setInternalProperties(double min, double max, double step,
+                                             double deviceMaxInputDbm)
 {
     if (m_internalControl) {
         m_internalControl->setProperties(min, max, step);
     }
+    m_internalDeviceMaxInputDbm = deviceMaxInputDbm;
 }
