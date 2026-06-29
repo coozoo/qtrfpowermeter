@@ -1,4 +1,8 @@
 #include "attenuatorwidget.h"
+#include <QApplication>
+#include <QDrag>
+#include <QMimeData>
+#include <QPixmap>
 #include <cmath>
 #include <limits>
 
@@ -236,23 +240,61 @@ void AttenuatorWidget::setPressedStyle(bool pressed)
 
 bool AttenuatorWidget::eventFilter(QObject *watched, QEvent *event)
 {
+    if (watched != this)
+        return QObject::eventFilter(watched, event);
 
-    if (watched == this) {
-        if (event->type() == QEvent::MouseButtonPress) {
-            QWidget *child = childAt(static_cast<QMouseEvent *>(event)->pos());
-            if (qobject_cast<QCheckBox *>(child)) { return false; }
-            setPressedStyle(true);
-            return true;
-        } else if (event->type() == QEvent::MouseButtonRelease) {
-            QWidget *child = childAt(static_cast<QMouseEvent *>(event)->pos());
-            if (qobject_cast<QCheckBox *>(child)) { setPressedStyle(false); return false; }
-            setPressedStyle(false);
-            if (rect().contains(static_cast<QMouseEvent *>(event)->pos())) {
-                openEditor();
-            }
-            return true;
-        }
+    auto *mev = static_cast<QMouseEvent *>(event);
+
+    if (event->type() == QEvent::MouseButtonPress) {
+        QWidget *child = childAt(mev->pos());
+        if (qobject_cast<QCheckBox *>(child)) { return false; }
+        // Internal sub-control is pinned (it represents the device's own
+        // front-end). Press still triggers the open-editor path on release,
+        // but never starts a drag.
+        m_dragStartPos = (m_type == InternalDigital) ? QPoint(-1, -1) : mev->pos();
+        setPressedStyle(true);
+        return true;
     }
+
+    if (event->type() == QEvent::MouseMove) {
+        if (m_dragStartPos.x() < 0) return false;
+        if (!(mev->buttons() & Qt::LeftButton)) return false;
+        if ((mev->pos() - m_dragStartPos).manhattanLength() < QApplication::startDragDistance())
+            return false;
+        // Cross the threshold: start a drag. The release that closes the
+        // drag must not also fire openEditor(), so clear m_dragStartPos
+        // before exec() and rely on the negative sentinel in release below.
+        m_dragStartPos = QPoint(-1, -1);
+        setPressedStyle(false);
+
+        QDrag *drag = new QDrag(this);
+        QMimeData *mime = new QMimeData();
+        // Payload is irrelevant; AttenuationManager identifies the source
+        // via QDrag::source(). The custom mime type is the filter that
+        // distinguishes our drag from foreign QDrag flows.
+        mime->setData(QStringLiteral("application/x-rfpm-attenuator"), QByteArray());
+        drag->setMimeData(mime);
+        QPixmap shot = grab();
+        drag->setPixmap(shot);
+        drag->setHotSpot(mev->pos());
+        drag->exec(Qt::MoveAction);
+        return true;
+    }
+
+    if (event->type() == QEvent::MouseButtonRelease) {
+        QWidget *child = childAt(mev->pos());
+        if (qobject_cast<QCheckBox *>(child)) { setPressedStyle(false); m_dragStartPos = QPoint(-1, -1); return false; }
+        setPressedStyle(false);
+        // If a drag fired, m_dragStartPos was reset above and we suppress
+        // the click-to-open-editor path here.
+        const bool wasPressTracked = (m_dragStartPos.x() >= 0);
+        m_dragStartPos = QPoint(-1, -1);
+        if (wasPressTracked && rect().contains(mev->pos())) {
+            openEditor();
+        }
+        return true;
+    }
+
     return QObject::eventFilter(watched, event);
 }
 

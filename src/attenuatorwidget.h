@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QCheckBox>
+#include <QPoint>
 #include "qtdigitalattenuator.h"
 #include "fixedattenuatorcontrol.h"
 #include "internalattenuatorcontrol.h"
@@ -73,6 +74,10 @@ private:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
     AttenuatorType m_type;
+    // Drag-source tracking. Negative position means "no press in progress"
+    // (we ignore the press if it landed on the checkbox or on an
+    // InternalDigital plate, both of which never start a drag).
+    QPoint m_dragStartPos { -1, -1 };
     // For digital this tracks the device's nominal value (what the LCD
     // shows); for everything else it equals the effective value.
     double m_attenuationValue;

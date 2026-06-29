@@ -11,6 +11,11 @@
 #include <QScrollArea>
 #include <QLabel>
 #include <QDebug>
+#include <QFrame>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDragLeaveEvent>
+#include <QDropEvent>
 #include <limits>
 
 class QVBoxLayout;
@@ -47,8 +52,22 @@ public slots:
     // insertion-loss band).
     void setCurrentFrequencyMHz(double freqMHz);
 
+protected:
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dragMoveEvent(QDragMoveEvent *event) override;
+    void dragLeaveEvent(QDragLeaveEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+
 private:
     void setupUi();
+    // Layout-index of the slot just above the drop point. Caller adjusts
+    // for self-removal in dropEvent. Returns m_listLayout->count() - 1
+    // (i.e. the slot above the stretch) when below all widgets.
+    int dropIndexAt(const QPoint &posInScrollContent) const;
+    void showInsertIndicatorAt(int layoutIndex);
+    void hideInsertIndicator();
+    // Clamp so nothing lands at or below the pinned internal widget.
+    int clampForInternal(int layoutIndex) const;
 
     QList<AttenuatorWidget*> m_attenuatorWidgets;
     AttenuatorWidget* m_internalAttenuatorWidget = nullptr;
@@ -61,6 +80,8 @@ private:
     QVBoxLayout *m_listLayout;
     QComboBox *m_typeComboBox;
     QLCDNumber *m_totalLcd;
+    QWidget *m_scrollContent = nullptr;
+    QFrame *m_insertIndicator = nullptr;
 };
 
 #endif // ATTENUATIONMANAGER_H
