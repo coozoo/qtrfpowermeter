@@ -88,9 +88,14 @@ private:
     // Device-front-panel rating for the pinned internal stage. NaN for
     // every other type; the manager skips the check when NaN.
     double m_internalDeviceMaxInputDbm = std::numeric_limits<double>::quiet_NaN();
-    // Last overload status applied; tracked so we can restore the LCD's
-    // value-set colour once the overload clears.
+    // Last overload report applied to the plate. Tracked so re-evaluations
+    // that produce the same visible state (status + the numbers we render
+    // into the tooltip) skip setStyleSheet/setToolTip and avoid N-plate
+    // style-recalc storms on every spinbox keystroke.
     StageStatus m_overloadStatus = StageStatus::Ok;
+    double m_lastOverloadIncidentDbm = std::numeric_limits<double>::quiet_NaN();
+    double m_lastOverloadRatedDbm = std::numeric_limits<double>::quiet_NaN();
+    bool m_overloadStateApplied = false;
     // Drag-source tracking. Negative position means "no press in progress"
     // (we ignore the press if it landed on the checkbox or on an
     // InternalDigital plate, both of which never start a drag).

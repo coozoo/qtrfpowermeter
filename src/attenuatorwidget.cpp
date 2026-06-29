@@ -63,10 +63,15 @@ AttenuatorWidget::AttenuatorWidget(AttenuatorWidget::AttenuatorType type, QWidge
 AttenuatorWidget::~AttenuatorWidget()
 {
     qDebug()<<"AttenuatorWidget destructor called.";
-    if (m_digitalControl) delete m_digitalControl;
-    if (m_fixedControl) delete m_fixedControl;
-    if (m_internalControl) delete m_internalControl;
-    if (m_cableManager) delete m_cableManager;
+    // Sub-controls are top-level windows constructed without a QObject
+    // parent; deleteLater() defers disposal past the current event loop
+    // iteration so a slot inside one of them (e.g. Set/Send on the digital
+    // editor) cannot finish on a destroyed object when removal is fired
+    // while the editor is visible.
+    if (m_digitalControl) m_digitalControl->deleteLater();
+    if (m_fixedControl) m_fixedControl->deleteLater();
+    if (m_internalControl) m_internalControl->deleteLater();
+    if (m_cableManager) m_cableManager->deleteLater();
 }
 
 void AttenuatorWidget::setupUi()
@@ -149,7 +154,27 @@ double AttenuatorWidget::maxInputDbm() const
 
 void AttenuatorWidget::setOverloadState(const StageReport &report)
 {
+    // The chain re-evaluates on every value change, frequency change,
+    // probe-input change and reorder. Skip the paint/tooltip work when the
+    // resulting state matches what is already on screen; otherwise N plates
+    // re-style on every keystroke.
+    auto sameTooltipInput = [&](double last, double next) {
+        if (std::isnan(last) && std::isnan(next)) return true;
+        if (std::isnan(last) || std::isnan(next)) return false;
+        return qFuzzyCompare(last + 1.0, next + 1.0);
+    };
+    if (m_overloadStateApplied
+        && m_overloadStatus == report.status
+        && sameTooltipInput(m_lastOverloadIncidentDbm, report.incidentDbm)
+        && sameTooltipInput(m_lastOverloadRatedDbm, report.ratedDbm))
+        {
+            return;
+        }
+    m_overloadStateApplied = true;
     m_overloadStatus = report.status;
+    m_lastOverloadIncidentDbm = report.incidentDbm;
+    m_lastOverloadRatedDbm = report.ratedDbm;
+
     if (report.status == StageStatus::Overload)
         {
             setStyleSheet("QGroupBox { border: 2px solid #d32f2f; background-color: #ffe0e0; border-radius: 4px; }");

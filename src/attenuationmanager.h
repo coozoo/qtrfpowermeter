@@ -49,7 +49,7 @@ signals:
     // Aggregate signal carrying per-stage incident power, headroom and
     // status. Drives both the calculator's warning surface and each
     // plate's overload visual.
-    void safetyStateChanged(ChainReport report);
+    void safetyStateChanged(const ChainReport &report);
 
 private slots:
     void addAttenuator();
