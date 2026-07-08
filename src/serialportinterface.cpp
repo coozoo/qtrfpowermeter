@@ -14,7 +14,12 @@ SerialPortInterface::SerialPortInterface(QObject *parent) : QObject{parent}
 
 SerialPortInterface::~SerialPortInterface()
 {
-    stopPort();
+    // Close directly instead of stopPort(): emitting portClosed() here would
+    // reach any this->this slot (e.g. AttDevice::onPortClosed wired in its
+    // ctor) after the derived destructor has already run, tripping Qt6's
+    // "Called object is not of the correct type" assert.
+    if (m_serialPort->isOpen())
+        m_serialPort->close();
     m_serialPort->deleteLater();
 }
 
