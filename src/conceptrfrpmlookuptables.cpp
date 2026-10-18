@@ -133,10 +133,10 @@ void Rpm20gsLookupTable::initializeTables()
         m_voltageTableMv[i].fill(0.0f);
     }
     
-    m_freqAxisHz[0] = 10000000L;
-    m_freqAxisHz[1] = 50000000L;
+    m_freqAxisHz[0] = 10000000ULL;
+    m_freqAxisHz[1] = 50000000ULL;
     for (int k = 2; k < freq_size; k++) {
-        m_freqAxisHz[k] = 100000000L * (k - 1);
+        m_freqAxisHz[k] = 100000000ULL * (k - 1);
     }
 
     for (int l = 0; l < power_size; l++) {
@@ -159,11 +159,11 @@ void Rpm3gsLookupTable::initializeTables()
         m_voltageTableMv[i].fill(0.0f);
     }
 
-    m_freqAxisHz[0] = 50L;
-    m_freqAxisHz[1] = 10000000L;
-    m_freqAxisHz[2] = 50000000L;
+    m_freqAxisHz[0] = 50ULL;
+    m_freqAxisHz[1] = 10000000ULL;
+    m_freqAxisHz[2] = 50000000ULL;
     for (int k = 3; k < freq_size; k++) {
-        m_freqAxisHz[k] = 100000000L * (k - 2);
+        m_freqAxisHz[k] = 100000000ULL * (k - 2);
     }
 
     for (int l = 0; l < power_size; l++) {
@@ -186,10 +186,10 @@ void Rpm9gLookupTable::initializeTables()
         m_voltageTableMv[i].fill(0.0f);
     }
     
-    m_freqAxisHz[0] = 10000000L;
-    m_freqAxisHz[1] = 50000000L;
+    m_freqAxisHz[0] = 10000000ULL;
+    m_freqAxisHz[1] = 50000000ULL;
     for (int k = 2; k < freq_size; k++) {
-        m_freqAxisHz[k] = 100000000L * (k - 1);
+        m_freqAxisHz[k] = 100000000ULL * (k - 1);
     }
 
     for (int l = 0; l < power_size; l++) {
@@ -212,10 +212,10 @@ void Rpm6ghLookupTable::initializeTables()
     }
     
     for (int k = 0; k < 9; k++) {
-        m_freqAxisHz[k] = 10000000 + 10000000L * k;
+        m_freqAxisHz[k] = 10000000 + 10000000ULL * k;
     }
     for (int l = 9; l < freq_size; l++) {
-        m_freqAxisHz[l] = 100000000L * (l - 8);
+        m_freqAxisHz[l] = 100000000ULL * (l - 8);
     }
 
     for (int m = 0; m < power_size; m++) {
