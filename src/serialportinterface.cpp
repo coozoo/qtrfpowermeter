@@ -5,7 +5,8 @@ SerialPortInterface::SerialPortInterface(QObject *parent) : QObject{parent}
 {
 
 
-    m_serialPort = new QSerialPort();
+    // Parent to this so the port follows the device in moveToThread().
+    m_serialPort = new QSerialPort(this);
     connect(m_serialPort, &QSerialPort::readyRead, this,
             &SerialPortInterface::readData);
     connect(m_serialPort, &QSerialPort::errorOccurred, this,
@@ -20,7 +21,7 @@ SerialPortInterface::~SerialPortInterface()
     // "Called object is not of the correct type" assert.
     if (m_serialPort->isOpen())
         m_serialPort->close();
-    m_serialPort->deleteLater();
+    // m_serialPort is a child of this and is deleted with it.
 }
 
 void SerialPortInterface::onPortName_changed() {}

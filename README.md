@@ -149,5 +149,119 @@ You can trigger or control specific build jobs by including one or more of these
 If no build tags are present, the system will build **all platforms** by default.  
 Use `[skip ci]` to intentionally skip the build and workflow runs.
 
+## Contributing
 
+Patches are welcome. A few project-specific rules that are easy to miss.
 
+### Send pull requests to `slave`, not `main`
+
+`slave` is the integration branch. CI only runs the release build for pull
+requests opened against `slave`:
+
+```yaml
+# .github/workflows/main.yml
+on:
+  pull_request:
+    branches: [ slave ]
+```
+
+A PR against `main` gets no release build, so nothing verifies it on Windows
+or macOS before it lands. `main` only ever receives merges from `slave`.
+
+So branch off `slave`:
+
+```bash
+git remote add upstream https://github.com/coozoo/qtrfpowermeter.git
+git fetch upstream
+git switch -c my-fix upstream/slave
+```
+
+If you already branched off `main`, rebase instead of just switching the base
+in the GitHub UI. Retargeting alone makes the PR drag `main`'s merge commits
+into `slave`:
+
+```bash
+git rebase --onto upstream/slave upstream/main my-fix
+git push --force-with-lease
+```
+
+### Retarget the base *before* you push
+
+If you force-push first and change the base afterwards, the release workflow
+will not start. Changing the base fires a `pull_request` event of type
+`edited`, which is not one of the default trigger types
+(`opened`, `synchronize`, `reopened`), so the run is simply never created.
+
+Set the base to `slave` first, then push — or push once more afterwards to
+produce a `synchronize` event.
+
+### Keep the PR description in sync
+
+GitHub does not rewrite a pull request description when you force-push. If you
+drop or change part of your work, edit the description too, otherwise it
+advertises changes the diff no longer contains.
+
+### One concern per pull request
+
+Please don't bundle build-configuration changes with a bug fix. In particular,
+leave the release logging default alone:
+
+```qmake
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+```
+
+Release builds are intentionally quiet. `QT_NO_DEBUG_OUTPUT` is not a runtime
+check — it expands `qDebug()` to `while (false) ...`, so the arguments are
+never even constructed. Removing it turns on full argument formatting at every
+call site, including the per-chunk serial read path and the realtime chart. On
+Windows a GUI build with no console routes `qDebug` to `OutputDebugString`, a
+kernel transition behind a machine-global mutex, which can backpressure serial
+reads on the device thread and drop samples.
+
+If you need `qDebug()` output while working on something, build in debug mode
+rather than changing the release default:
+
+```bash
+qmake6 CONFIG+=debug
+```
+
+### Mind the Windows data model
+
+Windows is LLP64: `long` is **32-bit** there, while it is 64-bit on Linux and
+macOS. An `L` suffix is not enough for frequency values. Anything above 2^31
+must use a fixed-width type, or it silently overflows on Windows only — and at
+`-O2` the compiler may treat the provable overflow as unreachable and trap:
+
+```cpp
+m_freqAxisHz[k] = 100000000L   * (k - 1);   // WRONG: overflows on Windows
+m_freqAxisHz[k] = 100000000ULL * (k - 1);   // correct
+```
+
+Note that dropping the suffix entirely is worse — `100000000 * (k - 1)`
+computes in `int` and overflows on *every* platform, even when the destination
+is `quint64`.
+
+### Run the tests before submitting
+
+Same steps CI uses:
+
+```bash
+mkdir -p build/Desktopqt6-Tests
+cd build/Desktopqt6-Tests
+qmake6 ../../tests/tests.pro CONFIG+=debug
+make -j$(nproc)
+QT_QPA_PLATFORM=offscreen make check
+```
+
+Tests run on Linux only, so a green run does not prove a change is correct on
+Windows. Please say in the PR which devices and platforms you actually tested.
+
+### If you are contributing from a fork
+
+- The first PR from a new contributor needs a maintainer to approve the
+  workflow run before any CI starts. This is normal; just wait.
+- Fork pull requests do not receive repository secrets, so some steps of the
+  release workflow can fail on a fork PR for reasons unrelated to your patch.
+  Don't worry about those; the unit test run is the one that matters.
+- See [Supported Build Tags](#supported-build-tags) if you want to narrow which
+  platforms get built.
